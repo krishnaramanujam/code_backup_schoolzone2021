@@ -1,32 +1,26 @@
 <?php
 session_start();
-include_once '../config/database.php';
+include_once '../../config/database_student.php';
 ini_set( 'max_execution_time', 300 );
 
 
-if ( isset( $_SESSION['schoolzone']['SectionMaster_Id'] ) AND  isset( $_SESSION['schoolzone']['ActiveStaffLogin_Id'] ) ) 
+if ( isset( $_SESSION['schoolzone_student']['SectionMaster_Id'] ) AND  isset( $_SESSION['schoolzone_student']['Activestudentregister_Id'] ) ) 
 {
-    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
-    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone_student']['SectionMaster_Id'];
+    $Activestudentregister_Id = $_SESSION['schoolzone_student']['Activestudentregister_Id'];
   
 }else{
-     header( "Location: https://dvsl.in/schoolzone2021/staff/auth/login.php" );
+     header( "Location: https://dvsl.in/schoolzone2021/student/existingstudent/auth/login.php" );
 }
 
-$Admin_Registeration_Id = $ActiveStaffLogin_Id;
+$Admin_Registeration_Id = $Activestudentregister_Id;
 
 //Fetching User Details
-$data_query = "SELECT user_stafflogin.username,setup_sectionmaster.abbreviation As section_abbreviation FROM user_stafflogin JOIN setup_departmentmaster ON setup_departmentmaster.Id = user_stafflogin.departmentmaster_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = setup_departmentmaster.sectionmaster_Id WHERE user_stafflogin.Id = '$ActiveStaffLogin_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id' ";
+$data_query = "SELECT user_studentregister.student_name AS username, setup_sectionmaster.abbreviation AS section_abbreviation FROM user_studentregister JOIN setup_sectionmaster ON setup_sectionmaster.Id = user_studentregister.sectionmaster_Id WHERE user_studentregister.Id = '$Activestudentregister_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id'  ";
 $fetch_data_q = mysqli_query($mysqli,$data_query);
 
 $r_Staffdata_fetch = mysqli_fetch_array($fetch_data_q);
 
-
-
-//Fetching Academic Year
-$AY_array_result = mysqli_query( $mysqli, "SELECT `academic_year` as Academic_Year FROM `setup_academicyear` Where setup_academicyear.sectionmaster_Id = '$SectionMaster_Id' Order By sequence_no Asc " );
-$AY_array = array();
-while ( $row_AY = $AY_array_result->fetch_assoc() ) $AY_array[] = $row_AY;
 
 
 
@@ -36,7 +30,7 @@ $query = "
 SELECT `setup_links_access`.`function_id`
 FROM `user_stafflogin`
     LEFT JOIN `setup_links_access` on `user_stafflogin`.`Id`=`setup_links_access`.`user_id`
-WHERE `user_stafflogin`.`Id`='" . $ActiveStaffLogin_Id . "'
+WHERE `user_stafflogin`.`Id`='" . $Activestudentregister_Id . "'
 ";
 
 $result1 = mysqli_query( $mysqli, $query );
@@ -90,14 +84,14 @@ function hasAccess($permission = [])
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
  
   <!-- Theme style -->
-  <link rel="stylesheet" href="../extra/dist/css/AdminLTE.min.css">
+  <link rel="stylesheet" href="../../extra/dist/css/AdminLTE.min.css">
 
-  <link rel="stylesheet" href="../extra/dist/css/skins/_all-skins.min.css">
+  <link rel="stylesheet" href="../../extra/dist/css/skins/_all-skins.min.css">
 
 
 
-  <link rel="stylesheet" href="../extra/dist/css/index1_style.css">
-  <link rel="stylesheet" href="../extra/plugins/datepicker/datepicker3.css">
+  <link rel="stylesheet" href="../../extra/dist/css/index1_style.css">
+  <link rel="stylesheet" href="../../extra/plugins/datepicker/datepicker3.css">
 </head>
 <body class="hold-transition skin-grey sidebar-mini skin-blue fixed-padding" onload=display_c();>
 
@@ -132,31 +126,7 @@ function hasAccess($permission = [])
             <?php echo $Academic_Year; ?>
             <span class="caret"></span>
           </button>
-          <ul class="dropdown-menu">
-            <?php $j = count( $AY_array );
-            for ( $i = 0; $i < $j; $i++ )
-            {
 
-          
-              if ( $AY_array[$i]['Academic_Year'] == $Academic_Year )
-              {
-                echo '<li class="active"><a href="#">' . $AY_array[$i]['Academic_Year'] . '</a></li>';
-              }
-              else
-              {
-                ?>
-                <li>
-                  <a data-toggle="modal"
-                    data-target="#AY_change_dialog"
-                    onclick="$('#modal_ay_change_pass').val('<?php echo $AY_array[$i]['Academic_Year']; ?>');;">
-                    <?php echo $AY_array[$i]['Academic_Year']; ?>
-                  </a>
-                </li>
-                <?php
-              }
-            }
-            ?>
-          </ul>
         </div>
         </li>
 
@@ -166,7 +136,7 @@ function hasAccess($permission = [])
 
             <div class="dropdown">
               <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenu11" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="border-radius: 50px; border-color: #e08e0b;background: #2c2f31 !important ;">
-              <img src="../extra/dist/img/user2-160x160.jpg" class="user-image" alt="User Image" style="height: 22px;">
+              <img src="../../extra/dist/img/user2-160x160.jpg" class="user-image" alt="User Image" style="height: 22px;">
              
               <span class="hidden-xs" style="text-transform: uppercase;">
                <?php echo $r_Staffdata_fetch['username']; ?>
@@ -230,151 +200,6 @@ function hasAccess($permission = [])
         </a>
 
 
-        <?php
-
-        /*
-         * $tree_views will be our page structure at Level 1, Level 0 being Root
-         * $tree_view will be our page structure at Level 2, Level 1 being Parent
-         * so on recursively...
-         *
-         *----ROOT                         Level 0
-         *    |
-         *    +-- PARENT 1                 Level 1
-         *    |   |
-         *    |   +-- CHILD 1.1            Level 2
-         *    |   |
-         *    |   +-- CHILD 1.2            Level 2
-         *    |
-         *    +-- PARENT 2                 Level1
-         *        |
-         *        +-- CHILD 2.1            Level2
-         *            |
-         *            +-- CHILD 2.2        Level3
-         *
-         */
-        ini_set( 'memory_limit', '-1' );
-        // get unique PARENT nodes directly under ROOT node
-        $search     = 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 ORDER BY `setup_links`.`Id`';
-        $tree_views = QUERY::run( $search )->fetchAll();
-        $innerFlag  = 0;
-        $outerFlag  = 0;
-
-        function printView($tree_views)
-        {
-          global $Admin_Registeration_Id;
-
-          $html = '' . PHP_EOL;
-
-          foreach ( $tree_views as $tree_view )
-          {
-            global $outerFlag;
-
-            $searchChild = 'SELECT * FROM `setup_links` WHERE `parent` = ? ';
-            $views       = QUERY::run( $searchChild, [ $tree_view['Id'] ] )->fetchAll();
-
-//-- if permission -------------------------------------------------------------
-            if ( ($Admin_Registeration_Id == 1 || hasAccess( [ $tree_view['Id'] ] )) && $tree_view['url'] )
-            {
-              $functionName = "getPage('".$tree_view['url']."', '".$tree_view['Id']."');";
-              $html .= '
-          <li class="treelinks">
-            <a onclick="getPage('.$functionName.');" href="#' . $tree_view['header'] . '">
-              <i class="fa fa-circle-o"></i>
-              ' . $tree_view['header'] . '
-            </a>
-          </li>' . PHP_EOL;
-            }
-
-            elseif ( ($Admin_Registeration_Id == 1 || hasAccess( [ $tree_view['Id'] ] )) && !$tree_view['url'] )
-            {
-
-              $html .= '
-  <li  id="' . $tree_view['Id'] . '" class="treeview">
-
-    <a href="#">
-      <i class="fa fa-circle-o"></i>
-      <span>
-        ' . $tree_view['header'] . '
-      </span>
-      <span class="pull-right-container">
-        <i class="fa fa-angle-left pull-right"></i>
-      </span>
-    </a>' . PHP_EOL;
-              // if ( $tree_view['depth'] == 0 )
-              //  $html .= '<ul class="treeview-menu"></ul>' . PHP_EOL;
-              ++$outerFlag;
-            }
-//----------------------------------------------------------------------
-            foreach ( $views as $view )
-            {
-              global $innerFlag;
-              global $outerFlag;
-
-              if ( $view['header'] && !$view['url'] && (1) ) // if ? array of array then -> recurse
-              {
-                $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? ';
-                $subChilds      = QUERY::run( $searchSubChild, [ $view['Id'] ] )->fetchAll(); // GET UNIQUE SUB-CHILDS
-
-                $html .= '
-<ul  id="' . $view['Id'] * 100 . '" class="treeview-menu">' . PHP_EOL;
-
-                $html .= printView( $subChilds ); // going in
-                $html .= '
-      </ul>' . PHP_EOL;
-
-                ++$innerFlag;
-              }
-              else
-              {
-//------ if permission -------------------------------------------------
-                if ( $Admin_Registeration_Id == 1 || hasAccess( [ $view['Id'] ] ) )
-                {
-                  $functionName = "getPage('".$view['url']."', '".$view['Id']."');";
-                  
-                  $html .= '
-      <ul  id="' . $view['Id'] * 100 . '" class="treeview-menu">
-          <li class="treelinks">
-            <a onclick="'.$functionName.'" href="#' . $view['header'] . '">
-              <i class="fa fa-circle-o"></i>
-              ' . $view['header'] . '
-            </a>
-          </li>
-      </ul>' . PHP_EOL;
-                }
-//----------------------------------------------------------------------
-              }
-              --$innerFlag;
-            }
-            for ( $i = 0; $i < $innerFlag; --$innerFlag )
-            {
-              $html .= '</li>' . PHP_EOL;
-            }
-            --$outerFlag;
-          }
-          for ( $i = 0; $i < $outerFlag; --$outerFlag )
-          {
-            $html .= '</li>' . PHP_EOL;
-          }
-
-          return $html;
-        }
-
-        $page = printView( $tree_views );
-        ini_set( 'memory_limit', '128M' );
-
-        //ob_start();
-
-        //echo $page;
-
-        //$out = ob_get_clean();
-
-        //file_put_contents('out.php', $out);
-        file_put_contents( 'out.php', $page );
-
-        include 'out.php';
-        ?>
-
-<!-- ---------------------------------------------------------------------------------------------------------------- -->
 
     </section>
     <!-- /.sidebar -->
@@ -389,43 +214,6 @@ function hasAccess($permission = [])
 
 <!-- ======================================================================================= -->
 
-<div class="modal fade" id="AY_change_dialog" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Academic Year Change</h4>
-          </div>
-          <form id="adminAY_change_form" action="adminAY_change_pass_confirm.php" method="POST" onsubmit="return false">
-            <div class="modal-body">
-              <div class="form-group">
-                <div class="form-group">
-                  <label class="col-md-6 input-md control-label" for="name">Academic Year : </label>
-                  <div class="col-md-6">
-                    <input class="form-control input-md"
-                           readonly
-                           id="modal_ay_change_pass"
-                           type="text"
-                           name="modal_ay_change_pass"></div>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <div class="form-group">
-                  <label class="col-md-6 input-md control-label" for="name">Enter Your Login Password : </label>
-                  <div class="col-md-6">
-                    <input class="form-control input-md" id="passworday" type="password" required name="passworday">
-                  </div>
-                </div>
-              </div>
-
-              <button type="submit" id="submitForm" class="btn btn-default">Submit</button>
-              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
 
 
 
@@ -502,7 +290,7 @@ function hasAccess($permission = [])
 
       <!-- CONTENT -->
     </section>
-    <input type="hidden" value="<?php echo $ActiveStaffLogin_Id; ?>" id="UserId">
+    <input type="hidden" value="<?php echo $Activestudentregister_Id; ?>" id="UserId">
 
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
@@ -542,17 +330,17 @@ function hasAccess($permission = [])
   
   <!-- daterangepicker -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
-  <script src="../extra/plugins/daterangepicker/daterangepicker.js"></script>
+  <script src="../../extra/plugins/daterangepicker/daterangepicker.js"></script>
   <!-- datepicker -->
-  <script src="../extra/plugins/datepicker/bootstrap-datepicker.js"></script>
+  <script src="../../extra/plugins/datepicker/bootstrap-datepicker.js"></script>
 
 
   <script> var AdminLTEOptions = {navbarMenuHeight: "10px",}; </script>
-  <script src="../extra/dist/js/app.min.js"></script>
+  <script src="../../extra/dist/js/app.min.js"></script>
   <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-  <script src="../extra/dist/js/pages/dashboard.js"></script>
+  <script src="../../extra/dist/js/pages/dashboard.js"></script>
   <!-- AdminLTE for demo purposes -->
-  <script src="../extra/dist/js/demo.js"></script>
+  <script src="../../extra/dist/js/demo.js"></script>
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/pretty-checkbox/3.0.0/pretty-checkbox.css" rel="stylesheet" type="text/css">
 
@@ -562,14 +350,14 @@ function hasAccess($permission = [])
 
 
 
-  <link rel="stylesheet" href="../assets/plugins/datatables/dataTables.bootstrap.css">
+  <link rel="stylesheet" href="../../assets/plugins/datatables/dataTables.bootstrap.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.1/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.3/css/fixedHeader.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
 
 
-<link href="../assets/plugins/datatables/jquery.datatables.yadcf.css" rel="stylesheet" type="text/css"/>
+<link href="../../assets/plugins/datatables/jquery.datatables.yadcf.css" rel="stylesheet" type="text/css"/>
 
 <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
@@ -588,11 +376,11 @@ function hasAccess($permission = [])
 <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-filestyle/1.2.1/bootstrap-filestyle.min.js"></script>
 
-<script src="../assets/plugins/datatables/jquery.dataTables.yadcf.js"></script>
+<script src="../../assets/plugins/datatables/jquery.dataTables.yadcf.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.2.1/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/fixedheader/3.1.3/js/dataTables.fixedHeader.min.js"></script>
 
-<script src="../assets/plugins/datatables/dataTables.fnGetFilteredNodes.js"></script>
+<script src="../../assets/plugins/datatables/dataTables.fnGetFilteredNodes.js"></script>
 <script src="https://cdn.datatables.net/plug-ins/1.10.15/api/sum().js"></script>
 
 
@@ -684,41 +472,13 @@ function hasAccess($permission = [])
     $("#loader").css("display", "block");
     $("#DisplayDiv").css("display", "none");
     jQuery.ajax({
-      url: 'staffhomescreen.php',
+      url: 'studenthomescreen.php',
       type: "POST",
       success: function (data) {
         $('#DisplayDiv').html(data);
         $("#loader").css("display", "none");
         $("#DisplayDiv").css("display", "block");
       }
-    });
-
-
-    $('#adminAY_change_form').submit(function (event) {
-      var passworday = $('#passworday').val();
-      if(passworday == ''){
-        alert('Password is Required');
-        return false;
-      }
-
-      $.ajax({
-        url: './auth/onlinelogin_api.php?Change_Academic_Year=u',
-        type: 'post',
-        dataType: 'html',   //expect return data as html from server
-        data: $('#adminAY_change_form').serialize(),
-        success: function (response, textStatus, jqXHR) {
-          if (response == 'Success')
-          {
-            location.reload();
-          }else{
-            alert('Invalid Password');
-          }
-          
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          console.log('error(s):' + textStatus, errorThrown);
-        }
-      });
     });
 
 

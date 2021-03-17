@@ -94,6 +94,8 @@ if($row_sectiondetail > '0'){
               <button type="button" class="btn save_btn_effect sendotp_mobile_details btn-danger" value="Login" style="padding-left: 40px;    padding-right: 40px;"> SEND OTP</button>
                               
               <button type="button" class="btn save_btn_effect verify_otp_details btn-success" value="Login" style="padding-left: 40px;    padding-right: 40px;" disabled> CONFIRM OTP & SUBMIT</button>
+
+              <button type="button" class="btn btn-primary" id="aa">Save changes</button>    
             
           <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           <button type="button" class="btn btn-primary">Save changes</button> -->
@@ -152,6 +154,7 @@ if($row_sectiondetail > '0'){
           format: 'dd/mm/yyyy',
           autoclose: true
       });
+
 
 $('.login_details').click(function(e){
     e.preventDefault();
@@ -390,10 +393,8 @@ $('.verify_otp_details').click(function(e){
                       $('#user_otp').prop("disabled", true);
                       $('.verify_otp_details').prop("disabled", true);
 
-                      alert('New Password is sent to your Mobile and Email Id')
-                      window.open('https://dvsl.in/schoolzone2021/student/ExistingStudent/auth/login.php?sectionmaster_Id='+ SM_Id, '_self');
-
-      
+                      alert('New Password is sent to your Mobile and Email Id, Login From New Password')
+                      $('#myModal').modal('toggle');
                     },
                 });
 
