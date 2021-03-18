@@ -199,6 +199,151 @@ function hasAccess($permission = [])
           <i class="fa fa-folder " style="color:#FA573C"></i> <span>Home</span>
         </a>
 
+        <?php
+
+        /*
+         * $tree_views will be our page structure at Level 1, Level 0 being Root
+         * $tree_view will be our page structure at Level 2, Level 1 being Parent
+         * so on recursively...
+         *
+         *----ROOT                         Level 0
+         *    |
+         *    +-- PARENT 1                 Level 1
+         *    |   |
+         *    |   +-- CHILD 1.1            Level 2
+         *    |   |
+         *    |   +-- CHILD 1.2            Level 2
+         *    |
+         *    +-- PARENT 2                 Level1
+         *        |
+         *        +-- CHILD 2.1            Level2
+         *            |
+         *            +-- CHILD 2.2        Level3
+         *
+         */
+        ini_set( 'memory_limit', '-1' );
+        // get unique PARENT nodes directly under ROOT node
+        $search     = 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 1 ORDER BY `setup_links`.`Id`';
+        $tree_views = QUERY::run( $search )->fetchAll();
+        $innerFlag  = 0;
+        $outerFlag  = 0;
+
+        function printView($tree_views)
+        {
+          global $Admin_Registeration_Id;
+
+          $html = '' . PHP_EOL;
+
+          foreach ( $tree_views as $tree_view )
+          {
+            global $outerFlag;
+
+            $searchChild = 'SELECT * FROM `setup_links` WHERE `parent` = ? AND link_user_type = 1';
+            $views       = QUERY::run( $searchChild, [ $tree_view['Id'] ] )->fetchAll();
+
+//-- if permission -------------------------------------------------------------
+            if ( ($Admin_Registeration_Id == 1 || hasAccess( [ $tree_view['Id'] ] )) && $tree_view['url'] )
+            {
+              $functionName = "getPage('".$tree_view['url']."', '".$tree_view['Id']."');";
+              $html .= '
+          <li class="treelinks">
+            <a onclick="getPage('.$functionName.');" href="#' . $tree_view['header'] . '">
+              <i class="fa fa-circle-o"></i>
+              ' . $tree_view['header'] . '
+            </a>
+          </li>' . PHP_EOL;
+            }
+
+            elseif ( ($Admin_Registeration_Id == 1 || hasAccess( [ $tree_view['Id'] ] )) && !$tree_view['url'] )
+            {
+
+              $html .= '
+  <li  id="' . $tree_view['Id'] . '" class="treeview">
+
+    <a href="#">
+      <i class="fa fa-circle-o"></i>
+      <span>
+        ' . $tree_view['header'] . '
+      </span>
+      <span class="pull-right-container">
+        <i class="fa fa-angle-left pull-right"></i>
+      </span>
+    </a>' . PHP_EOL;
+              // if ( $tree_view['depth'] == 0 )
+              //  $html .= '<ul class="treeview-menu"></ul>' . PHP_EOL;
+              ++$outerFlag;
+            }
+//----------------------------------------------------------------------
+            foreach ( $views as $view )
+            {
+              global $innerFlag;
+              global $outerFlag;
+
+              if ( $view['header'] && !$view['url'] && (1) ) // if ? array of array then -> recurse
+              {
+                $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? AND link_user_type = 1';
+                $subChilds      = QUERY::run( $searchSubChild, [ $view['Id'] ] )->fetchAll(); // GET UNIQUE SUB-CHILDS
+
+                $html .= '
+<ul  id="' . $view['Id'] * 100 . '" class="treeview-menu">' . PHP_EOL;
+
+                $html .= printView( $subChilds ); // going in
+                $html .= '
+      </ul>' . PHP_EOL;
+
+                ++$innerFlag;
+              }
+              else
+              {
+//------ if permission -------------------------------------------------
+                if ( $Admin_Registeration_Id == 1 || hasAccess( [ $view['Id'] ] ) )
+                {
+                  $functionName = "getPage('".$view['url']."', '".$view['Id']."');";
+                  
+                  $html .= '
+      <ul  id="' . $view['Id'] * 100 . '" class="treeview-menu">
+          <li class="treelinks">
+            <a onclick="'.$functionName.'" href="#' . $view['header'] . '">
+              <i class="fa fa-circle-o"></i>
+              ' . $view['header'] . '
+            </a>
+          </li>
+      </ul>' . PHP_EOL;
+                }
+//----------------------------------------------------------------------
+              }
+              --$innerFlag;
+            }
+            for ( $i = 0; $i < $innerFlag; --$innerFlag )
+            {
+              $html .= '</li>' . PHP_EOL;
+            }
+            --$outerFlag;
+          }
+          for ( $i = 0; $i < $outerFlag; --$outerFlag )
+          {
+            $html .= '</li>' . PHP_EOL;
+          }
+
+          return $html;
+        }
+
+        $page = printView( $tree_views );
+        ini_set( 'memory_limit', '128M' );
+
+        //ob_start();
+
+        //echo $page;
+
+        //$out = ob_get_clean();
+
+        //file_put_contents('out.php', $out);
+        file_put_contents( 'out.php', $page );
+
+        include 'out.php';
+        ?>
+
+<!-- ---------------------------------------------------------------------------------------------------------------- -->
 
 
     </section>
@@ -431,7 +576,7 @@ function hasAccess($permission = [])
       $("#DisplayDiv").css("display", "none");
       
       let UserId = $('#UserId').val();
-      let UserType = '0';
+      let UserType = '1';
 
 
       $.ajax({

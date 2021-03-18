@@ -52,6 +52,8 @@ if($row_sectiondetail > '0'){
 
 
             <button type="button" class="btn btn-link pull-right" data-toggle="modal" data-target="#myModal">Forgot Password ?</button>
+
+            <button type="button" class="btn btn-link pull-right" data-toggle="modal"  data-target="#personalChange_dialog">Change Mobile No ?</button>
                 
           </div>
 
@@ -78,7 +80,7 @@ if($row_sectiondetail > '0'){
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="myModalLabel">Set New Password</h4>
+          <h4 class="modal-title" id="myModalLabel">Forget Password</h4>
         </div>
         <div class="modal-body">
               <input type="hidden" value="" id="SR_Id" name="SR_Id">
@@ -86,23 +88,78 @@ if($row_sectiondetail > '0'){
                   <input type="text" class="form-control" id="user_loginId" name="user_loginId" placeholder="Enter Student Id" >
               <label for="email">Enter Date Of Birth*</label>
                 <input type="text" class="form-control" id="user_dob" name="user_dob" placeholder="Enter DOB" >
-              <label for="email">Enter your OTP*</label>
-                      <input type="text" class="form-control" id="user_otp" name="user_otp" placeholder="Enter your OTP" value="" disabled>
-
+   
         </div>
         <div class="modal-footer">
-              <button type="button" class="btn save_btn_effect sendotp_mobile_details btn-danger" value="Login" style="padding-left: 40px;    padding-right: 40px;"> SEND OTP</button>
-                              
-              <button type="button" class="btn save_btn_effect verify_otp_details btn-success" value="Login" style="padding-left: 40px;    padding-right: 40px;" disabled> CONFIRM OTP & SUBMIT</button>
+              <button type="button" class="btn save_btn_effect sendotp_mobile_details btn-danger" value="Login" style="padding-left: 40px;    padding-right: 40px;"> CONFIRM & SUBMIT</button>
+<!--                               
+              <button type="button" class="btn save_btn_effect verify_otp_details btn-success" value="Login" style="padding-left: 40px;    padding-right: 40px;" disabled> CONFIRM OTP & SUBMIT</button> -->
 
-              <button type="button" class="btn btn-primary" id="aa">Save changes</button>    
-            
           <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           <button type="button" class="btn btn-primary">Save changes</button> -->
         </div>
       </div>
     </div>
   </div>
+
+
+
+
+    
+  <div class="modal fade" id="personalChange_dialog" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Change Mobile No</h4>
+          </div>
+          <form id="personaldetails_change_form" method="POST" onsubmit="return false">
+            <div class="modal-body">
+              <div class="form-group hidden">
+                
+                  <label class="col-md-6 input-md control-label" for="name">Operations : </label>
+                  <div class="col-md-6">
+
+                    <select class="form-control" name="staff_operation" id="staff_operation" >
+                      <option value="CHANGE_MOBILE">Change Mobile No</option>
+                    </select>
+
+            
+                  </div>
+                </div>
+
+                <div class="form-group">
+										<label class="col-md-6 input-md control-label" for="name">Enter Student Id* </label>
+										<div class="col-md-6">
+                    <input type="text" class="form-control" id="u_loginId" name="u_loginId" placeholder="Enter Student Id" >
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label class="col-md-6 input-md control-label" for="name">Date Of Birth : </label>
+										<div class="col-md-6">
+                      <input class="form-control input-md" id="u_dateofbirth" type="text" required name="u_dateofbirth" placeholder="Enter Date OF Birth">
+										</div>
+									</div>
+
+             
+
+              <div class="form-group NewMobileContainer">
+                  <label class="col-md-6 input-md control-label" for="name">Enter New Mobile No : </label>
+                  <div class="col-md-6">
+                    <input class="form-control input-md" id="u_newmobileno" type="text" name="u_newmobileno" placeholder="Enter New Mobile No"> 
+                  </div>
+              </div>
+
+
+              <button type="submit" id="submitForm" class="btn btn-default">Submit</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
 
   <!----------------------------------------------------------------------------------------------------------------------------------->
 
@@ -151,6 +208,11 @@ if($row_sectiondetail > '0'){
 
 <script>
      $('#user_dob').datepicker({
+          format: 'dd/mm/yyyy',
+          autoclose: true
+      });
+
+      $('#u_dateofbirth').datepicker({
           format: 'dd/mm/yyyy',
           autoclose: true
       });
@@ -278,8 +340,10 @@ $('.sendotp_mobile_details').click(function(e){
                       $("#loader").css("display", "none");
                       $("#DisplayDiv").css("display", "block");
 
-                      alert('An SMS has been sent to your Mobile no and Email send to your email Id. Please verify otp and Confirm .Do Not Refresh Your Page');
-
+                      alert('New Password is sent to your Mobile and Email Id, Login From New Password')
+                      $('#user_loginId').val('');
+                      $('#user_dob').val('');
+                      $('#myModal').modal('toggle');
       
                     },
                 });
@@ -448,6 +512,59 @@ $('.verify_otp_details').click(function(e){
 
 }); // close send_otp_details
 
+
+
+
+
+$('#personaldetails_change_form').submit(function (event) {
+
+  $("#loader").css("display", "block");
+  $("#DisplayDiv").css("display", "none");
+
+  var FORMDATA = $('#personaldetails_change_form').serializeArray();
+
+  $.ajax({
+      url: './onlinelogin_api.php?Change_MobileDetailsfromOutside=u',
+      type:'POST',
+      data: FORMDATA,
+      dataType: "json",
+      success:function(response){
+
+        if(response['status'] == 'success') {
+
+                
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+
+            iziToast.success({
+                title: 'Success',
+                message: 'Details Updated Successfully',
+            });
+            var u_loginId = $('#u_loginId').val('');
+            var u_dateofbirth = $('#u_dateofbirth').val('');
+            var u_newmobileno = $('#u_newmobileno').val('');
+            
+            $('#personalChange_dialog').modal('toggle');
+
+        }else {
+            //FAILED STAY ON Current Page
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+
+            iziToast.error({
+                title: 'Warning',
+                message: 'Invalid Details',
+            });
+
+        }// Close Else
+
+      },
+
+
+      
+  });
+
+});
 
 
 </script>

@@ -98,12 +98,12 @@ if(isset($_GET['Request_ForChangeMobileNo'])){
        
 
             $updating_studentregister = mysqli_query($mysqli,"Update user_studentregister set verificationCode = 'V$pin' Where Id = '$SR_Id'");
-            $message = "Dear Student, Your Verfication Pin : V" . $pin;
+            $message = "Dear Student, Your New Password : " . $pin;
     
     
     
             $no_of_charater = strlen($message);
-            $userIdType = 'StudentLoginId';
+            $userIdType = 'StudentNewPassword';
             $time = date("Y-m-d h:m:s");
             $template_Id = '1207161192523376255';
 
@@ -127,7 +127,7 @@ if(isset($_GET['Request_ForChangeMobileNo'])){
             
 
             if(!empty($user_emailaddress)){
-                $Inserting_UserDetails = mysqli_query($mysqli,"Insert into comm_message_log (User_Id, message_type, sender_address, no_of_characters, Decrypt_Msg, sender_name, timestamp, SenderHeader, userIdType, moduleType, email_Subjects) values ('$SR_Id', 'Email' ,'$user_emailaddress', '$no_of_charater' , '".$format_message."', '1', '$time' , 'SIWSAD', '$userIdType', 'UserVerfication', 'Verfication Code')");
+                $Inserting_UserDetails = mysqli_query($mysqli,"Insert into comm_message_log (User_Id, message_type, sender_address, no_of_characters, Decrypt_Msg, sender_name, timestamp, SenderHeader, userIdType, moduleType, email_Subjects) values ('$SR_Id', 'Email' ,'$user_emailaddress', '$no_of_charater' , '".$format_message."', '1', '$time' , 'SIWSAD', '$userIdType', 'UserVerfication', 'New Password')");
     
                 if(mysqli_error($mysqli)){
                     $Generating_Error[] = 'Email Error Occurred : '; 
@@ -143,7 +143,10 @@ if(isset($_GET['Request_ForChangeMobileNo'])){
             }//close email ematy
             
           
-
+        
+            $password = password_hash( $pin, PASSWORD_DEFAULT );
+            $updating_studentregister = mysqli_query($mysqli,"Update user_studentregister set password = '$password' Where Id = '$SR_Id'");
+        
 
 
             $res['Error_Message'] = $Generating_Error;
@@ -336,6 +339,44 @@ if(isset($_GET['Change_PersonalDetails'])){
         $res['status'] = 'failed';
         echo json_encode($res);
     }
+
+
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Change_MobileDetailsfromOutside'])){
+
+    extract($_POST);
+    $enter_Date = date('Y-m-d',strtotime(str_replace('/','-',$u_dateofbirth)));
+
+    // Checking the Number is Valid or Not
+    $checking_pnr = mysqli_query($mysqli, "SELECT user_studentregister.Id AS SR_Id, user_studentregister.mobile_no As registeredMobileNo, user_studentregister.verificationCode,user_studentregister.email_address FROM user_studentregister WHERE user_studentregister.student_Id = '$u_loginId' And user_studentregister.date_of_birth = '$enter_Date'"); 
+
+    $row_check = mysqli_num_rows($checking_pnr);
+    
+
+    if($row_check > '0') {
+        $r_detail_fetch = mysqli_fetch_array($checking_pnr);
+            
+        
+
+            $SR_Id = $r_detail_fetch['SR_Id'];
+            
+            $updating_studentregister = mysqli_query($mysqli,"Update user_studentregister set mobile_no = '$u_newmobileno' Where Id = '$SR_Id'");
+
+
+        $res['status'] = 'success';
+        echo json_encode($res);
+
+     } else {
+        // Number Not Exist and Not Valid
+        $res['status'] = 'failed';
+        echo json_encode($res);
+     }
 
 
 

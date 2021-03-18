@@ -254,7 +254,7 @@ function hasAccess($permission = [])
          */
         ini_set( 'memory_limit', '-1' );
         // get unique PARENT nodes directly under ROOT node
-        $search     = 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 ORDER BY `setup_links`.`Id`';
+        $search     = 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0  AND link_user_type = 0 ORDER BY `setup_links`.`Id`';
         $tree_views = QUERY::run( $search )->fetchAll();
         $innerFlag  = 0;
         $outerFlag  = 0;
@@ -269,7 +269,7 @@ function hasAccess($permission = [])
           {
             global $outerFlag;
 
-            $searchChild = 'SELECT * FROM `setup_links` WHERE `parent` = ? ';
+            $searchChild = 'SELECT * FROM `setup_links` WHERE `parent` = ? AND link_user_type = 0 ';
             $views       = QUERY::run( $searchChild, [ $tree_view['Id'] ] )->fetchAll();
 
 //-- if permission -------------------------------------------------------------
@@ -312,7 +312,7 @@ function hasAccess($permission = [])
 
               if ( $view['header'] && !$view['url'] && (1) ) // if ? array of array then -> recurse
               {
-                $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? ';
+                $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? AND link_user_type = 0 ';
                 $subChilds      = QUERY::run( $searchSubChild, [ $view['Id'] ] )->fetchAll(); // GET UNIQUE SUB-CHILDS
 
                 $html .= '
