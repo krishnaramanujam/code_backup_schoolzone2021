@@ -219,13 +219,14 @@ if(isset($_GET['Change_Academic_Year'])){
     extract($_POST);
 
     $result = mysqli_query( $mysqli, "SELECT password FROM user_stafflogin WHERE Id = " . $_SESSION['schoolzone']['ActiveStaffLogin_Id'] . " LIMIT 1 " );
+
+    echo "SELECT password FROM user_stafflogin WHERE Id = " . $_SESSION['schoolzone']['ActiveStaffLogin_Id'] . " LIMIT 1 ";
     $res = mysqli_fetch_assoc( $result );
     $old_password = $res['password'];
   
     if ( password_verify( $_POST['passworday'], $old_password ) )
     {
       $_SESSION['AY_ID'] = $_POST['modal_ay_change_pass'];
-      $_SESSION['Sem_Type'] = $_POST['sem_type'];
       echo('Success');
     }
     else
