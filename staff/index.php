@@ -368,10 +368,12 @@ function hasAccess($permission = [])
 
         //$out = ob_get_clean();
 
-        //file_put_contents('out.php', $out);
-        file_put_contents( 'out.php', $page );
+        //file_put_contents('out.php', $out);\
 
-        include 'out.php';
+        echo $page;
+        // file_put_contents( 'out.php', $page );
+
+        // include 'out.php';
         ?>
 
 <!-- ---------------------------------------------------------------------------------------------------------------- -->
@@ -566,6 +568,7 @@ function hasAccess($permission = [])
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.1/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.3/css/fixedHeader.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/3.3.2/css/fixedColumns.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
 
 
@@ -591,6 +594,7 @@ function hasAccess($permission = [])
 <script src="../assets/plugins/datatables/jquery.dataTables.yadcf.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.2.1/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/fixedheader/3.1.3/js/dataTables.fixedHeader.min.js"></script>
+<script src="https://cdn.datatables.net/fixedcolumns/3.3.2/js/dataTables.fixedColumns.min.js"></script>
 
 <script src="../assets/plugins/datatables/dataTables.fnGetFilteredNodes.js"></script>
 <script src="https://cdn.datatables.net/plug-ins/1.10.15/api/sum().js"></script>

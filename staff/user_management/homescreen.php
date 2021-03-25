@@ -514,8 +514,9 @@ $('#submit_addinstance').click(function(event){
 $('.menuAccessLink').click(function(event){
     var selected_instance_Id = $(this).attr('id');
     $.ajax({
-        url:'./user_management/page_access.php?user_stafflogin_id='+ selected_instance_Id,
-        type:'GET',
+        url:'./user_management/page_access.php',
+        type:'POST',
+        data: {user_stafflogin_id: selected_instance_Id},
         success:function(si_logs){
             $('#DisplayDiv').html(si_logs);
             $("#loader").css("display", "none");
@@ -532,6 +533,24 @@ $('.batchAccessLink').click(function(event){
     $.ajax({
         url:'./user_management/control_batch_access.php',
         type:'GET',
+        success:function(si_logs){
+            $('#DisplayDiv').html(si_logs);
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+        },
+    });  
+
+});
+//Manage Instance Btn close----------------------------------------------------------------------------------------------------------
+
+
+//Manage Instance Btn----------------------------------------------------------------------------------------------------------
+$('.departAccessLink').click(function(event){
+    var selected_instance_Id = $(this).attr('id');
+    $.ajax({
+        url:'./user_management/control_depart_access.php',
+        type:'POST',
+        data: {user_id_edit: selected_instance_Id},
         success:function(si_logs){
             $('#DisplayDiv').html(si_logs);
             $("#loader").css("display", "none");

@@ -15,8 +15,7 @@ if ( isset( $_POST['user_stafflogin_id'] ) )
   $fetch_users = QUERY::run('SELECT *
                               FROM
                                 `user_stafflogin`
-                                LEFT JOIN `user_staffregister` 
-                                  ON `user_stafflogin`.`user_staffRegister_Id` = `user_staffregister`.`Id`
+                    
                               WHERE `user_stafflogin`.`Id` = ?', [ $user_stafflogin_id ] )->fetch();
 }
 if ( isset( $_POST['admin_id'] ) ) {
@@ -37,7 +36,7 @@ if ( isset( $_POST['admin_id'] ) ) {
                                               FROM
                                                 `user_stafflogin`
                                                 LEFT JOIN `setup_links_access` 
-                                                    ON `user_stafflogin`.`user_staffRegister_Id` = `setup_links_access`.`user_id` 
+                                                    ON `user_stafflogin`.`Id` = `setup_links_access`.`user_id` 
                                               WHERE
                                                 `user_stafflogin`.`Id` = ?
                                                 AND `setup_links_access`.`function_id` = ?',
@@ -62,7 +61,7 @@ if ( isset( $_POST['admin_id'] ) ) {
                        LEFT JOIN `setup_links` `greateCube`      ON `greateCube`.`Id`      = `greateCube`.`parent`
                        LEFT JOIN `setup_links` `greatBiquadrate` ON `greatBiquadrate`.`Id` = `greatBiquadrate`.`parent`
                        LEFT JOIN `setup_links` `greateQuintic`   ON `greateQuintic`.`Id`   = `greateQuintic`.`parent`
-											 WHERE `child`.`Id` = ?', [ $value ] )->fetch();
+											 WHERE `child`.`Id` = ? ', [ $value ] )->fetch();
 
       foreach ( $is_users_func_parent_activated as $k => $v )
       {
@@ -71,7 +70,7 @@ if ( isset( $_POST['admin_id'] ) ) {
                                               FROM
                                                 `user_stafflogin`
                                                 LEFT JOIN `setup_links_access` 
-                                                    ON `user_stafflogin`.`user_staffRegister_Id` = `setup_links_access`.`user_id` 
+                                                    ON `user_stafflogin`.`Id` = `setup_links_access`.`user_id` 
                                               WHERE
                                                 `user_stafflogin`.`Id` = ?
                                                 AND `setup_links_access`.`function_id` = ?',
@@ -85,6 +84,8 @@ if ( isset( $_POST['admin_id'] ) ) {
                                     `user_id`
                                   )
                                 VALUES ( ?, ? )';
+
+
             $stmt            = $database->prepare( $insert_access_q );
             $stmt->execute( array( $v, $user_stafflogin_id ) );
           }
@@ -116,8 +117,7 @@ if ( isset( $_POST['admin_id'] ) ) {
   $fetch_users = QUERY::run('SELECT *
                               FROM
                                 user_stafflogin
-                                LEFT JOIN user_staffregister 
-                                  ON user_stafflogin.user_staffRegister_Id = user_staffregister.Id
+                                
                               WHERE user_stafflogin.Id = ?',
                               [ $user_stafflogin_id ] )->fetch();
 
@@ -146,7 +146,7 @@ if ( isset( $_POST['admin_id'] ) ) {
             style="border:1px solid #504343; bgcolor:#e7e7e7; font-size:15px;"
             onclick="getPage('./user_management/homescreen.php');">Go Back
     </button>
-    <form id="functionaccessform" action="control_access_update.php" method="POST" onsubmit="return false">
+    <form id="functionaccessform" action="./user_management/page_access.php" method="POST" onsubmit="return false">
 
       <input style="display:none;"
              class="form-control input-md"
@@ -154,7 +154,7 @@ if ( isset( $_POST['admin_id'] ) ) {
              name="admin_id"
              value="<?php echo $user_stafflogin_id; ?>"
              readonly>
-      <table id="header_list" class="table table-bordered table-striped">
+      <table id="header_list" class="table table-bordered table-striped" style="width:100%">
         <thead>
         <tr>
           <th style='display:none;'>Function Id</th>
@@ -194,7 +194,7 @@ if ( isset( $_POST['admin_id'] ) ) {
                        LEFT JOIN setup_links parent    ON parent.Id    = child.parent 
                        LEFT JOIN setup_links gran      ON gran.Id      = parent.parent
                        LEFT JOIN setup_links greatgran ON greatgran.Id = gran.parent 
-                     WHERE parent.header IS NOT NULL" );
+                     WHERE parent.header IS NOT NULL AND child.link_user_type = '0' AND child.access_type = '0'" );
         $id = 0;
 
         foreach ( $header_result as $header ) {
@@ -237,26 +237,40 @@ if ( isset( $_POST['admin_id'] ) ) {
   </div>
   <!-- /.box-body -->
 </div>
-<script src="datatables/jquery.dataTables.min.js"></script>
-<script src="datatables/dataTables.bootstrap.min.js"></script>
-<script src="js/jquery.dataTables.yadcf.js"></script>
+
 <script>
-  $(function () {
-    $('#header_list').DataTable({
-      "paging": false,
-      "lengthChange": true,
-      "searching": true,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-      "scrollX": false
-    });
-  });
-  $(function () {
-    $('#header_list').dataTable().yadcf([
-      // {column_number: 1,filter_match_mode : "exact"},
-      {column_number: 2,filter_match_mode : "exact"}]);
-  });
+
+  
+$('#header_list').DataTable( {
+    dom: 'Bifrtp',
+    bPaginate:false,
+    
+    buttons: [
+    {
+        extend: 'excel',
+        footer: true,
+		title: "Download Format",
+		text: 'Download Format',
+        exportOptions : {
+            columns : ':visible',
+            format : {
+                header : function (mDataProp, columnIdx) {
+            var htmlText = '<span>' + mDataProp + '</span>';
+            var jHtmlObject = jQuery(htmlText);
+            jHtmlObject.find('div').remove();
+            var newHtml = jHtmlObject.text();
+            console.log('My header > ' + newHtml);
+            return newHtml;
+                }
+            }
+        }
+    }
+    ]
+} );
+
+  $('#header_list').dataTable().yadcf([
+    {column_number: 2, filter_match_mode: "exact"}
+  ]);
 
   $(function () {
     $('#master').on('click', function (e) {

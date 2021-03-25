@@ -180,4 +180,96 @@ if(isset($_GET['MenuActivity_Log_Report'])){
 }
 //-----------------------------------------------------------------------------------------------------------------------
 
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Department_Access_Control'])){
+
+    extract($_POST);
+    
+    $del_entry = "DELETE FROM comm_dept_access WHERE userId = '$user_id'";
+    $del_check = mysqli_query($mysqli,$del_entry);
+
+    foreach($check as $val){
+        
+        $check_entry = "SELECT * FROM `comm_dept_access` where userId = '$user_id' AND departmentmaster_Id = '$val'";
+        $q_entry = mysqli_query($mysqli,$check_entry);
+        $row_check = mysqli_num_rows($q_entry); 
+
+        if($row_check > 0){
+
+        }
+        else{
+
+            $insert_dept_access = "insert into comm_dept_access (userId,departmentmaster_Id) values ('$user_id','$val')";
+            $check_dept_access = mysqli_query($mysqli,$insert_dept_access);    
+
+        }
+
+        
+        
+    }
+    echo "SUCCESS";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_USERInstance'])){
+
+    extract($_POST);
+        
+        $updating_CalenderInstance = mysqli_query($mysqli,"Update setup_departmentmaster Set department_name = '$edit_department_name',abbreviation = '$edit_abbreviation',department_type = '$edit_department_type'
+        where Id  = '$edit_InstanceId'");
+
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_DepartmentInstance'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM setup_departmentmaster where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_DepartmentInstance'])){
+   
+    extract($_POST);
+
+        $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+        $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+    
+        //checking Department Abbbr & Name
+        $depart_fetch_q = mysqli_query($mysqli,"SELECT setup_departmentmaster.* FROM setup_departmentmaster Where setup_departmentmaster.sectionmaster_Id = '$SectionMaster_Id' AND (setup_departmentmaster.department_name LIKE '%$add_department_name%' OR setup_departmentmaster.department_name LIKE '%$add_abbreviation%')");
+        $row_depart_fetch = mysqli_num_rows($depart_fetch_q);
+
+        if($row_depart_fetch == 0){
+
+            
+            $res['status'] = 'EXISTS';
+            echo json_encode($res);
+
+        }else{
+
+            $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into setup_departmentmaster
+            (sectionmaster_Id, department_name, abbreviation, department_type) 
+            Values
+            ('$SectionMaster_Id', '$add_department_name', '$add_abbreviation', '$add_department_type')");
+            
+            $res['status'] = 'success';
+            echo json_encode($res);
+        }
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
 ?>
