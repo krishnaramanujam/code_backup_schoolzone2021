@@ -214,10 +214,11 @@ if(isset($_GET['Department_Access_Control'])){
 //-----------------------------------------------------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------------------------------------------------
-if(isset($_GET['Edit_USERInstance'])){
+if(isset($_GET['Edit_DepartmentInstance'])){
 
     extract($_POST);
-        
+
+    
         $updating_CalenderInstance = mysqli_query($mysqli,"Update setup_departmentmaster Set department_name = '$edit_department_name',abbreviation = '$edit_abbreviation',department_type = '$edit_department_type'
         where Id  = '$edit_InstanceId'");
 
@@ -252,7 +253,7 @@ if(isset($_GET['Add_DepartmentInstance'])){
         $depart_fetch_q = mysqli_query($mysqli,"SELECT setup_departmentmaster.* FROM setup_departmentmaster Where setup_departmentmaster.sectionmaster_Id = '$SectionMaster_Id' AND (setup_departmentmaster.department_name LIKE '%$add_department_name%' OR setup_departmentmaster.department_name LIKE '%$add_abbreviation%')");
         $row_depart_fetch = mysqli_num_rows($depart_fetch_q);
 
-        if($row_depart_fetch == 0){
+        if($row_depart_fetch > 0){
 
             
             $res['status'] = 'EXISTS';

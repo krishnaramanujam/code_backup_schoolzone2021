@@ -348,7 +348,8 @@ $('#submit_addinstance').click(function(event){
         data: {add_department_name:add_department_name,add_abbreviation:add_abbreviation,add_department_type:add_department_type},
         dataType: "json",
         success:function(add_instance_res){  
-            if(add_instance_res['message'] == 'success'){
+            console.log(add_instance_res['success']);
+            if(add_instance_res['status'] == 'success'){
                 $.ajax({
                     url:'./user_management/departmentmaster.php',
                     type:'GET',
@@ -363,8 +364,8 @@ $('#submit_addinstance').click(function(event){
                     },
                 });   
 
-            }else if(add_instance_res['message'] == 'EXISTS'){
-                $('#DisplayDiv').html(st_logs);
+            }else if(add_instance_res['status'] == 'EXISTS'){
+                       
                         $("#loader").css("display", "none");
                         $("#DisplayDiv").css("display", "block");
                         iziToast.error({

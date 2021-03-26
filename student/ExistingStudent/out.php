@@ -12,9 +12,9 @@
       </span>
     </a>
 
-      <ul  id="31200" class="treeview-menu">
+      <ul  id="400" class="treeview-menu">
           <li class="treelinks">
-            <a onclick="getPage('user_management/homescreen.php', '312');" href="#Personal Details">
+            <a onclick="getPage('user_management/homescreen.php', '4');" href="#Personal Details">
               <i class="fa fa-circle-o"></i>
               Personal Details
             </a>

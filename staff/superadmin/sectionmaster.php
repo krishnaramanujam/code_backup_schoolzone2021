@@ -11,7 +11,7 @@ include_once '../../config/database.php';
 $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
 $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
 
-$q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where setup_sectionmaster.Id = '$SectionMaster_Id'";
+$q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where 1";
 
 
 ?>
@@ -73,7 +73,7 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where setup_sectionm
 
                         <tr>
                             <td><?php echo $i; ?></td>
-                            <td><?php echo $r_instance_fetch['username']; ?></td>
+                            <td> <a target="_blank" href="../<?php echo $r_instance_fetch['section_logo']; ?>"><span class="btn btn-link"  style="border-radius: 25px;width:200px;">View</span></a></td>
                             <td><?php echo $r_instance_fetch['section_name']; ?></td>
                             <td><?php echo $r_instance_fetch['abbreviation']; ?></td>
                             <td><?php echo $r_instance_fetch['contact_no']; ?></td>
@@ -124,6 +124,9 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where setup_sectionm
                                 <input type="hidden"  value="<?php echo $r_instance_fetch['open_login']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_open_login">
                                 <input type="hidden"  value="<?php echo $r_instance_fetch['maintenance_message']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_maintenance_message">
                             
+                                <input type="hidden"  value="<?php echo $r_instance_fetch['open_login_student']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_open_login_student">
+                                <input type="hidden"  value="<?php echo $r_instance_fetch['maintenance_message_student']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_maintenance_message_student">
+                            
                             </div>
 
                            
@@ -159,49 +162,50 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where setup_sectionm
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           <h4 class="modal-title" id="myModalLabel">Add Section Entry</h4>
         </div>
+        <form id="Add_FormData">
         <div class="modal-body panel-body">
             <div class="form-group">
                 <label for="email">Section Name*  </label>
-                <input type="text" class="form-control" id="add_section_name" name="add_section_name" placeholder="Enter Section Name">
+                <input type="text" class="form-control" id="add_section_name" name="add_section_name" placeholder="Enter Section Name" required>
                 <br>
                 <label for="email">Abbreviation*  </label>
-                <input type="text" class="form-control" id="add_abbreviation" name="add_abbreviation" placeholder="Enter Abbreviation">
+                <input type="text" class="form-control" id="add_abbreviation" name="add_abbreviation" placeholder="Enter Abbreviation" required>
                 <br>
                 <label for="email">School Type*  </label>
-                <input type="text" class="form-control" id="add_school_type" name="add_school_type" placeholder="Enter School Type">
+                <input type="text" class="form-control" id="add_school_type" name="add_school_type" placeholder="Enter School Type" required>
                 <br>
                 <label for="email">Board*  </label>
-                <input type="text" class="form-control" id="add_board" name="add_board" placeholder="Enter board">
+                <input type="text" class="form-control" id="add_board" name="add_board" placeholder="Enter board" required>
                 <br>
                 <label for="email">Address*  </label>
-                <input type="text" class="form-control" id="add_address" name="add_address" placeholder="Enter Address">
+                <input type="text" class="form-control" id="add_address" name="add_address" placeholder="Enter Address" required>
                 <br>
                 <label for="email">Contact No*  </label>
-                <input type="text" class="form-control" id="add_contact_no" name="add_contact_no" placeholder="Enter Contact No">
+                <input type="text" class="form-control" id="add_contact_no" name="add_contact_no" placeholder="Enter Contact No" required>
                 <br>
                 <label for="email">Principal*  </label>
-                <input type="text" class="form-control" id="add_principal" name="add_principal" placeholder="Enter principal">
+                <input type="text" class="form-control" id="add_principal" name="add_principal" placeholder="Enter principal" required>
                 <br>
                 <label for="email">Principal Contact No*  </label>
-                <input type="text" class="form-control" id="add_principal_contact_no" name="add_principal_contact_no" placeholder="Enter Principal Contact No">
+                <input type="text" class="form-control" id="add_principal_contact_no" name="add_principal_contact_no" placeholder="Enter Principal Contact No" required>
                 <br>
                 <label for="email">Principal Mobile*  </label>
-                <input type="text" class="form-control" id="add_principal_mobile" name="add_principal_mobile" placeholder="Enter Principal Mobile">
+                <input type="text" class="form-control" id="add_principal_mobile" name="add_principal_mobile" placeholder="Enter Principal Mobile" required>
                 <br>
                 <label for="email">Principal Email*  </label>
-                <input type="text" class="form-control" id="add_principal_email" name="add_principal_email" placeholder="Enter Principal Email">
+                <input type="text" class="form-control" id="add_principal_email" name="add_principal_email" placeholder="Enter Principal Email" required>
                 <br>
                 <label for="email">Website*  </label>
-                <input type="text" class="form-control" id="add_website" name="add_website" placeholder="Enter Website">
+                <input type="text" class="form-control" id="add_website" name="add_website" placeholder="Enter Website" required>
                 <br>
                 <label for="email">Udise No*  </label>
-                <input type="text" class="form-control" id="add_udise_no" name="add_udise_no" placeholder="Enter udise No">
+                <input type="text" class="form-control" id="add_udise_no" name="add_udise_no" placeholder="Enter udise No" required>
                 <br>
                 <label for="email">Funding Type*  </label>
-                <input type="text" class="form-control" id="add_funding_type" name="add_funding_type" placeholder="Enter Funding Type">
+                <input type="text" class="form-control" id="add_funding_type" name="add_funding_type" placeholder="Enter Funding Type" required>
                 <br>
                 <label for="email">Maintenance Message*  </label>
-                <input type="text" class="form-control" id="add_maintenance_message" name="add_maintenance_message" placeholder="Enter Maintenance Message">
+                <input type="text" class="form-control" id="add_maintenance_message" name="add_maintenance_message" placeholder="Enter Maintenance Message" required>
                 <br>
                 <label for="email">Section Login Status*  </label>
                 <select class="form-control design_sel" name="add_open_login" id="add_open_login" required>
@@ -210,8 +214,20 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where setup_sectionm
                     <option value="0">Disabled</option>
                 </select>
                 <br>
+               
+                     <label for="email">Section Logo*  </label>
+                     <input type='file'  id="sectionlogo" class="btn btn-block save_btn_effect fontbtn" name="sectionlogo" style="background-color:#d9edf7;color:#31708f;border-radius: 25px;" accept="image/jpeg, image/png"/>  
+                <br>
 
-
+                     <label for="email">Maintenance Message Student*  </label>
+                     <input type="text" class="form-control" id="add_maintenance_message_student" name="add_maintenance_message_student" placeholder="Enter Maintenance Message" required>
+                     <br>
+                     <label for="email">Section Student Login Status*  </label>
+                     <select class="form-control design_sel" name="add_open_login_student" id="add_open_login_student" required>
+                         <option value=''>Select</option>
+                         <option value="1">Active</option>
+                         <option value="0">Disabled</option>
+                     </select>
 
             </div>  
 
@@ -220,6 +236,7 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where setup_sectionm
         <div class="modal-footer">
             <input type="submit" name="submit_addinstance" value="Save Changes" id="submit_addinstance" class="btn btn-primary" >  
         </div>
+        </form>
       </div>
     </div>
   </div>
@@ -236,6 +253,7 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where setup_sectionm
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           <h4 class="modal-title" id="myModalLabel">Edit Section Entry</h4>
         </div>
+        <form id="Edit_FormData">
         <div class="modal-body panel-body">
             <div class="form-group">
             <input type="hidden" class="form-control" id="edit_InstanceId" name="edit_InstanceId">
@@ -289,7 +307,19 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where setup_sectionm
                          <option value="0">Disabled</option>
                      </select>
                      <br>
-
+          
+                     <label for="email">Maintenance Message Student*  </label>
+                     <input type="text" class="form-control" id="edit_maintenance_message_student" name="edit_maintenance_message_student" placeholder="Enter Maintenance Message" required>
+                     <br>
+                     <label for="email">Section Student Login Status*  </label>
+                     <select class="form-control design_sel" name="edit_open_login_student" id="edit_open_login_student" required>
+                         <option value=''>Select</option>
+                         <option value="1">Active</option>
+                         <option value="0">Disabled</option>
+                     </select>
+                     <br>
+                     <label for="email">Section Logo*  </label>
+                     <input type='file'  id="sectionlogo" class="btn btn-block save_btn_effect fontbtn" name="sectionlogo" style="background-color:#d9edf7;color:#31708f;border-radius: 25px;" accept="image/jpeg, image/png"/>  
 
 
             </div>  
@@ -299,6 +329,7 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where setup_sectionm
         <div class="modal-footer">
         <input type="submit" name="submit_editinstance" value="Save Changes" id="submit_editinstance" class="btn btn-primary">  
         </div>
+        </form>
       </div>
     </div>
   </div>
@@ -321,6 +352,40 @@ $('.add_instance').click(function(event){
 
 });
 
+
+
+//Instance Delete----------------------------------------------------------------------------------------------------
+$('.delete_instance_btn').click(function(event){
+    var delete_instance_Id = $(this).attr('id');
+    if (confirm('Are you sure you want to Delete Existing Section?')) {
+        $.ajax({
+            url:'./superadmin/superadmin_api.php?Delete_SectionInstance='+'u',
+            type: 'POST',
+            data: {delete_instance_Id:delete_instance_Id},
+            success:function(del_msg){
+                if(del_msg == '200'){
+                    
+                    $.ajax({
+                        url:'./superadmin/sectionmaster.php',
+                        type:'GET',
+                        success:function(st_logs){
+                            $('#DisplayDiv').html(st_logs);
+                            $("#loader").css("display", "none");
+                            $("#DisplayDiv").css("display", "block");
+                            iziToast.success({
+                                title: 'Success',
+                                message: 'Section Deleted',
+                            });
+                        },
+                    });   
+
+                }
+            },
+        });
+    }
+
+});
+//Instance Delete Close----------------------------------------------------------------------------------------------------
 
 
 //Instance Edit----------------------------------------------------------------------------------------------------
@@ -351,13 +416,15 @@ $('.edit_instance_btn').click(function(event){
     var fetch_Edited_contact_no = createURL.searchParams.get('fetch_edit_contact_no');
     var fetch_Edited_principal = createURL.searchParams.get('fetch_edit_principal');
     var fetch_Edited_principal_contact_no = createURL.searchParams.get('fetch_edit_principal_contact_no');
-    var fetch_Edited_principal_mobile = createURL.searchParams.get('fetch_edit_principal');
+    var fetch_Edited_principal_mobile = createURL.searchParams.get('fetch_edit_principal_mobile');
     var fetch_Edited_principal_email = createURL.searchParams.get('fetch_edit_principal_email');
     var fetch_Edited_website = createURL.searchParams.get('fetch_edit_website');
     var fetch_Edited_udise_no = createURL.searchParams.get('fetch_edit_udise_no');
     var fetch_Edited_funding_type = createURL.searchParams.get('fetch_edit_funding_type');
     var fetch_Edited_open_login = createURL.searchParams.get('fetch_edit_open_login');
     var fetch_Edited_maintenance_message = createURL.searchParams.get('fetch_edit_maintenance_message');
+    var fetch_Edited_open_login_student = createURL.searchParams.get('fetch_edit_open_login_student');
+    var fetch_Edited_maintenance_message_student = createURL.searchParams.get('fetch_edit_maintenance_message_student');
 
 
     //Assign Value To Editable Compoents
@@ -378,6 +445,8 @@ $('.edit_instance_btn').click(function(event){
     $('#edit_open_login').val(fetch_Edited_open_login);
     $('#edit_maintenance_message').val(fetch_Edited_maintenance_message);
 
+    $('#edit_open_login_student').val(fetch_Edited_open_login_student);
+    $('#edit_maintenance_message_student').val(fetch_Edited_maintenance_message_student);
 
 });
 //Instance Edit Close----------------------------------------------------------------------------------------------------
@@ -387,22 +456,27 @@ $('.edit_instance_btn').click(function(event){
 
 //Edit Submit----------------------------------------------------------------------------------------------------
 
-$('#submit_editinstance').click(function(event){
-
-var EditData = $('#Edit_FormData').serializeArray();
+$('#Edit_FormData').submit(function(event){
+event.preventDefault();
+var formData = new FormData(this);
 
 $("#loader").css("display", "block");
 $("#DisplayDiv").css("display", "none");
 
 $.ajax({
-    url:'./user_management/user_management_api.php?Edit_USERInstance='+'u',
-    type:'POST',
-    data: EditData,
+    url:'./superadmin/superadmin_api.php?Edit_SectionInstance='+'u',
+    type: 'POST',
+    contentType:false,   //expect return data as html from server
+    data: formData,
+    async : false,
+    enctype: 'multipart/form-data',
+    processData : false,
+    cache : false,
     dataType: "json",
     success:function(edit_instance_res){  
-        if(edit_instance_res == '200'){
+        if(edit_instance_res['status'] == 'success'){
             $.ajax({
-                url:'./user_management/homescreen.php',
+                url:'./superadmin/sectionmaster.php',
                 type:'GET',
                 success:function(sd_logs){
                     $('#DisplayDiv').html(sd_logs);
@@ -410,7 +484,7 @@ $.ajax({
                     $("#DisplayDiv").css("display", "block");
                     iziToast.success({
                         title: 'Success',
-                        message: 'User Edited',
+                        message: 'Section Edited',
                     });
                 },
             });   
@@ -418,7 +492,7 @@ $.ajax({
         }else{
 
             $.ajax({
-                url:'./user_management/homescreen.php',
+                url:'./superadmin/sectionmaster.php',
                 type:'GET',
                 success:function(sd_logs){
                     $('#DisplayDiv').html(sd_logs);
@@ -442,36 +516,27 @@ $.ajax({
 
 //INSTANCE ADD-----------------------------------------------------------------------------------------------------------
 
-$('#submit_addinstance').click(function(event){
-   var add_username = $('#add_username').val();
-   var add_password = $('#add_password').val();
-   var add_reg_mobile_no = $('#add_reg_mobile_no').val();
-   var add_reg_email_address = $('#add_reg_email_address').val();
-   var add_date_of_birth = $('#add_date_of_birth').val();
-   var add_staff_type = $('#add_staff_type').val();
-   var add_staff_status = $('#add_staff_status').val();
-   var add_departmentmaster_Id = $('#add_departmentmaster_Id').val();
-
-    if(add_username == '' || add_password == '' || add_reg_mobile_no == '' || add_reg_email_address == '' || add_date_of_birth == '' || add_staff_type == '' || add_staff_status == '', add_departmentmaster_Id == ''){
-        iziToast.warning({
-            title: 'Empty Fields',
-            message: 'All fields is mandatory',
-        });
-        return false;
-    }
+$('#Add_FormData').submit(function(event){
+    event.preventDefault();
+    var formData = new FormData(this);
 
     $("#loader").css("display", "block");
     $("#DisplayDiv").css("display", "none");
 
     $.ajax({
-        url:'./user_management/user_management_api.php?Add_USERInstance='+'u',
-        type:'POST',
-        data: {add_username:add_username,add_password:add_password,add_reg_mobile_no:add_reg_mobile_no,add_reg_email_address:add_reg_email_address, add_date_of_birth:add_date_of_birth, add_staff_type:add_staff_type, add_staff_status:add_staff_status, add_departmentmaster_Id:add_departmentmaster_Id},
+        url:'./superadmin/superadmin_api.php?Add_SectionInstance='+'u',
+        type: 'POST',
+        contentType:false,   //expect return data as html from server
+        data: formData,
+        async : false,
+        enctype: 'multipart/form-data',
+        processData : false,
+        cache : false,
         dataType: "json",
         success:function(add_instance_res){  
-            if(add_instance_res == '200'){
+            if(add_instance_res['status'] == 'success'){
                 $.ajax({
-                    url:'./user_management/homescreen.php',
+                    url:'./superadmin/sectionmaster.php',
                     type:'GET',
                     success:function(st_logs){
                         $('#DisplayDiv').html(st_logs);
@@ -479,7 +544,7 @@ $('#submit_addinstance').click(function(event){
                         $("#DisplayDiv").css("display", "block");
                         iziToast.success({
                             title: 'Success',
-                            message: 'User Added',
+                            message: 'Section Added',
                         });
                     },
                 });   
