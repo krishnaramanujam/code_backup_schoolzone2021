@@ -8,6 +8,7 @@ if ( isset( $_SESSION['schoolzone']['SectionMaster_Id'] ) AND  isset( $_SESSION[
 {
     $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
     $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $ViaDirectLogin = $_SESSION['schoolzone']['ViaDirectLogin'];
   
 }else{
      header( "Location: https://dvsl.in/schoolzone2021/staff/auth/login.php" );
@@ -16,11 +17,16 @@ if ( isset( $_SESSION['schoolzone']['SectionMaster_Id'] ) AND  isset( $_SESSION[
 $Admin_Registeration_Id = $ActiveStaffLogin_Id;
 
 //Fetching User Details
-$data_query = "SELECT user_stafflogin.username,setup_sectionmaster.abbreviation As section_abbreviation FROM user_stafflogin JOIN setup_departmentmaster ON setup_departmentmaster.Id = user_stafflogin.departmentmaster_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = setup_departmentmaster.sectionmaster_Id WHERE user_stafflogin.Id = '$ActiveStaffLogin_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id' ";
+$data_query = "SELECT user_stafflogin.username,setup_sectionmaster.abbreviation As section_abbreviation FROM user_stafflogin LEFT JOIN setup_departmentmaster ON setup_departmentmaster.Id = user_stafflogin.departmentmaster_Id LEFT JOIN setup_sectionmaster ON setup_sectionmaster.Id = setup_departmentmaster.sectionmaster_Id WHERE user_stafflogin.Id = '$ActiveStaffLogin_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id' ";
 $fetch_data_q = mysqli_query($mysqli,$data_query);
 
 $r_Staffdata_fetch = mysqli_fetch_array($fetch_data_q);
 
+if($ActiveStaffLogin_Id == '1'){
+  $r_Staffdata_fetch['username'] = 'SuperAdmin';
+}elseif($ActiveStaffLogin_Id == '2'){
+  $r_Staffdata_fetch['username'] = 'SectionAdmin';
+}
 
 
 //Fetching Academic Year
@@ -229,6 +235,12 @@ function hasAccess($permission = [])
           <i class="fa fa-folder " style="color:#FA573C"></i> <span>Home</span>
         </a>
 
+        <?php if($ViaDirectLogin == 'ON'){ ?>
+          <a class="directloginback_btn" href="#">
+            <i class="fa fa-arrow-left" style="color:#6297f2"></i> <span>Go Back</span>
+          </a>
+        <?php } ?>
+
 
         <?php
 
@@ -254,7 +266,14 @@ function hasAccess($permission = [])
           */
           ini_set( 'memory_limit', '-1' );
           // get unique PARENT nodes directly under ROOT node
-          $search     = 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0  AND link_user_type = 0 ORDER BY `setup_links`.`Id`';
+          
+          if($ActiveStaffLogin_Id == '1'){
+              $search .='SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0  AND link_user_type = 0  AND access_type = 1 ORDER BY `setup_links`.`Id`';  
+          }else{
+              $search .= 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 0 AND  access_type = 0 ORDER BY `setup_links`.`Id`';
+          }
+          
+
           $tree_views = QUERY::run( $search )->fetchAll();
           $innerFlag  = 0;
           $outerFlag  = 0;
@@ -273,7 +292,7 @@ function hasAccess($permission = [])
               $views       = QUERY::run( $searchChild, [ $tree_view['Id'] ] )->fetchAll();
 
           //-- if permission -------------------------------------------------------------
-              if ( ($Admin_Registeration_Id == 1 || hasAccess( [ $tree_view['Id'] ] )) && $tree_view['url'] )
+              if ( ($Admin_Registeration_Id == 1 || $Admin_Registeration_Id == 2 ||  hasAccess( [ $tree_view['Id'] ] )) && $tree_view['url'] )
               {
                 $functionName = "getPage('".$tree_view['url']."', '".$tree_view['Id']."');";
                 $html .= '
@@ -285,7 +304,7 @@ function hasAccess($permission = [])
                   </li>' . PHP_EOL;
               }
 
-              elseif ( ($Admin_Registeration_Id == 1 || hasAccess( [ $tree_view['Id'] ] )) && !$tree_view['url'] )
+              elseif ( ($Admin_Registeration_Id == 1 || $Admin_Registeration_Id == 2 || hasAccess( [ $tree_view['Id'] ] )) && !$tree_view['url'] )
               {
 
                 $html .= '
@@ -329,7 +348,7 @@ function hasAccess($permission = [])
                 else
                 {
           //------ if permission -------------------------------------------------
-                  if ( $Admin_Registeration_Id == 1 || hasAccess( [ $view['Id'] ] ) )
+                  if ( $Admin_Registeration_Id == 1 || $Admin_Registeration_Id == 2 || hasAccess( [ $view['Id'] ] ) )
                   {
                     $functionName = "getPage('".$view['url']."', '".$view['Id']."');";
 
@@ -850,19 +869,25 @@ function hasAccess($permission = [])
 });
 
 
-// $('.treeview').click(function(event){
-//   if(this.className == 'treeview'){
-//     // alert('Open');
-//     // $('ul > *').css('display', 'block');
-//     // $(this).children('ul').css( "display", "block" );
-//     $(this).find('ul').css( "background", "green" );
-//     $(this).find('ul').css( "display", "block" );
-//     console.log(  $(this).find('ul').attr('id'));
-//   }else{
-//     $(this).find('ul').css( "background", "red" );
-//     $(this).find('ul').css( "display", "none" );
-//   }
-// });
+
+//Manage Instance Btn----------------------------------------------------------------------------------------------------------
+$('.directloginback_btn').click(function(event){
+    $.ajax({
+        url:'./user_management/user_management_api.php?StaffDirectLoginBack=u',
+        type:'POST',
+        dataType: "json",
+        success:function(si_logs){
+            
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+
+            window.open('./index.php','_self');
+        },
+    });  
+
+});
+//Manage Instance Btn close----------------------------------------------------------------------------------------------------------
+
 
 
 

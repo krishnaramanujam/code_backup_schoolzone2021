@@ -107,6 +107,12 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where 1";
 
 
                                 
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-default moduleMappingTableLink" data-toggle="tooltip" data-placement="top" title="Module Mapping" id="<?php echo $r_instance_fetch['Id']; ?>"><span class="glyphicon glyphicon-tasks" aria-hidden="true" style="color:#fbb536;"></span></button>
+                                </div>
+
+
+                                
                                 <input type="hidden" value="<?php echo $r_instance_fetch['Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Id">
                                 <input type="hidden"  value="<?php echo $r_instance_fetch['section_name']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_section_name">
                                 <input type="hidden" value="<?php echo $r_instance_fetch['abbreviation']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_abbreviation">
@@ -591,6 +597,28 @@ var table = $('#InstanceMaster_Table').DataTable( {
 
 table.columns( [ 6,7,8,9,10,11,12,13,14,15 ] ).visible( false, false );
 table.columns.adjust().draw( false ); // adjust column sizing and redraw
+
+
+//Manage Instance Btn----------------------------------------------------------------------------------------------------------
+$('.moduleMappingTableLink').click(function(event){
+    var selected_instance_Id = $(this).attr('id');
+   
+    $("#loader").css("display", "block");
+    $("#DisplayDiv").css("display", "none");
+
+    $.ajax({
+        url:'./superadmin/modulemapping.php?selectedSection_Id='+ selected_instance_Id,
+        type:'GET',
+        success:function(si_logs){
+            $('#DisplayDiv').html(si_logs);
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+        },
+    });  
+
+});
+//Manage Instance Btn close----------------------------------------------------------------------------------------------------------
+
 
 </script>
 

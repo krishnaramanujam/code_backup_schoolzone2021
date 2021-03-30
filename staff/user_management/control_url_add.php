@@ -16,6 +16,9 @@ if ( isset( $_POST['parent_id'] ) ) {
   $header    = $_POST['page_name'];
   $url       = $_POST['c_url'] == 'null' || $_POST['c_url'] == 'NULL' ? NULL : $_POST['c_url'];
   $access_type = $_POST['access_type'];
+
+  $modulelist_id = $_POST['modulelist_id'];
+
   if ( $parent_id ) {
     $get = QUERY::run( 'SELECT `Id`, `parent`, `depth`, `header`, `url` 
                       FROM `setup_links` 
@@ -23,17 +26,17 @@ if ( isset( $_POST['parent_id'] ) ) {
                       [ $parent_id ] )->fetch();
     QUERY::run( 'INSERT INTO
                  `setup_links`
-                 (`parent`, `header`, `depth`, `url`, link_user_type, access_type)
+                 (`parent`, `header`, `depth`, `url`, link_user_type, access_type, modulelist_Id)
                VALUES
-                  ( ?,  ?,  ?,  ?, ? , ? )',
-               [ $get['Id'], $header, ++$get['depth'], $url, 0 , $access_type ] );
+                  ( ?,  ?,  ?,  ?, ? , ?, ? )',
+               [ $get['Id'], $header, ++$get['depth'], $url, 0 , $access_type, $modulelist_id ] );
   }
   else {
     QUERY::run( 'INSERT INTO
                  `setup_links`
-                 (`parent`, `header`, `depth`, `url`, link_user_type, access_type)
+                 (`parent`, `header`, `depth`, `url`, link_user_type, access_type, modulelist_Id)
                VALUES
-                  ( ?,  ?,  ?,  ?, ? , ? )', [ 0, $header, 0, $url, 0 , $access_type ] );
+                  ( ?,  ?,  ?,  ?, ? , ?, ? )', [ 0, $header, 0, $url, 0 , $access_type, $modulelist_id ] );
   }
 }
 else {
@@ -171,6 +174,33 @@ else {
           </div>
           
           </div>
+
+
+          <div class="form-group">
+
+            <label class="col-sm-2 input-sm control-label"
+                  for="inputheader"
+                  style="font-size:15px">Module List</label>
+            <div class="col-sm-4">
+              <select class="form-control"
+                      required
+                      name="modulelist_id"
+                      id="modulelist_id"
+                      title="Select Module list">
+
+                <option value="">--Select--</option>
+
+                <?php
+                $pages = QUERY::run( 'SELECT * from setup_modulelist' );
+                foreach ( $pages as $view ) {
+                  echo '<option value="' . $view['Id'] . '">' . $view['modulelist'] . '</option>';
+                }
+                ?>
+              </select>
+
+            </div>
+
+            </div>
 
 
           </br>

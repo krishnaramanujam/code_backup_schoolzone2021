@@ -19,6 +19,7 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
     $url         = $_POST['c_url'];
     $p_id        = $_POST['parent_id'];
     $access_type = $_POST['access_type'];
+    $modulelist_id = $_POST['modulelist_id'];
 
     $update_header = QUERY::run('UPDATE 
                                     `setup_links` AS `dest`,
@@ -28,9 +29,10 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
                                     `dest`.`depth`  = `src`.`depth` + 1, 
                                     `dest`.`header` = ?,
                                     `dest`.`url` = ? ,
-                                    dest.access_type = ?
+                                    dest.access_type = ?,
+                                    dest.modulelist_Id = ?
                                   WHERE
-                                    `dest`.`Id` = ? ', [ $p_id, $header_name, $url, $access_type ,$update_c_id ] );
+                                    `dest`.`Id` = ? ', [ $p_id, $header_name, $url, $access_type , $modulelist_id , $update_c_id ] );
 
     if ( $update_header ) echo 'SUCCESS';
     else echo 'ERROR';
@@ -48,7 +50,8 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
                                         `parent`.`depth`  AS `p_dep`,
                                         `parent`.`header` AS `p_head`,
                                         `parent`.`url`    AS `p_url`,
-                                        child.access_type As c_access_type
+                                        child.access_type As c_access_type,
+                                        child.modulelist_Id As modulelist_Id
 
                                        FROM
                                         `setup_links` `child`
@@ -200,6 +203,35 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
           </div>
           
           </div>
+
+
+          <div class="form-group">
+            <label class="col-sm-2 input-sm control-label"
+                   for="inputfee_header_name"
+                   style="font-size:15px">Module List</label>
+            <div class="col-sm-4">
+              <select class="form-control"
+                      required
+                      name="modulelist_id"
+                      id="modulelist_id"
+                      title="Select Module List">
+
+                <option value="">--Select--</option>
+              
+                <?php
+                $pages = QUERY::run( 'SELECT * FROM `setup_modulelist`' );
+                foreach ( $pages as $view ) {
+                  if ( $fetch_header_result['modulelist_Id'] == $view['Id'] )
+                    echo '<option value="' . $view['Id'] . '" selected >' . $view['modulelist'] . '</option>';
+                  else
+                    echo '<option value="' . $view['Id'] . '">' . $view['modulelist'] . '</option>';
+                }
+                ?>
+              </select>
+            </div>
+          </div>
+
+
 
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">

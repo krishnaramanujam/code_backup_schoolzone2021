@@ -173,4 +173,85 @@ if(isset($_GET['Add_SectionInstance'])){
 }
 //-----------------------------------------------------------------------------------------------------------------------
 
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Mapping_Module'])){
+
+    extract($_POST);
+
+  
+        
+    //Deleting UserPageAccess
+    $Deleting_BatchAccess = mysqli_query($mysqli,"DELETE FROM setup_modulemapping WHERE setup_modulemapping.sectionmaster_Id = '$selectedSection_Id'");
+
+    if(isset($check)){
+        foreach($check as $index => $value) {
+
+            //Inserting in BatchPageAccess
+            $Inserting_BatchAccess = mysqli_query($mysqli,"INSERT INTO setup_modulemapping(modulelist_Id, sectionmaster_Id, userType_Id) 
+            values ('$check[$index]', '$selectedSection_Id', '0')");
+            
+        }
+    }
+
+    if(isset($checks)){
+        foreach($checks as $index => $value) {
+
+            //Inserting in BatchPageAccess
+            $Inserting_BatchAccess = mysqli_query($mysqli,"INSERT INTO setup_modulemapping(modulelist_Id, sectionmaster_Id, userType_Id) 
+            values ('$checks[$index]', '$selectedSection_Id' , '1')");
+            
+        }
+    }
+
+
+	$res['status'] = 'success';
+	echo json_encode($res);
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_ModulelistInstance'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM setup_modulelist where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_ModulelistInstance'])){
+   
+    extract($_POST);
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into setup_modulelist
+        (modulelist) 
+        Values
+        ('$add_modulelist')");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_ModulelistInstance'])){
+
+    extract($_POST);
+
+
+        $updating_CalenderInstance = mysqli_query($mysqli,"Update setup_modulelist Set 
+        modulelist = '$edit_modulelist'
+        where Id  = '$edit_InstanceId'");
+
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
 ?>

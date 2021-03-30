@@ -8,6 +8,7 @@
 
 session_start();
 include_once '../../config/database.php';
+$SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
 
 if ( isset( $_POST['user_stafflogin_id'] ) )
 {
@@ -194,7 +195,8 @@ if ( isset( $_POST['admin_id'] ) ) {
                        LEFT JOIN setup_links parent    ON parent.Id    = child.parent 
                        LEFT JOIN setup_links gran      ON gran.Id      = parent.parent
                        LEFT JOIN setup_links greatgran ON greatgran.Id = gran.parent 
-                     WHERE parent.header IS NOT NULL AND child.link_user_type = '0' AND child.access_type = '0'" );
+                       JOIN setup_modulemapping ON setup_modulemapping.modulelist_Id = child.modulelist_Id
+                     WHERE parent.header IS NOT NULL AND child.link_user_type = '0' AND child.access_type = '0' AND setup_modulemapping.sectionmaster_Id = '$SectionMaster_Id' AND  setup_modulemapping.userType_Id = 0" );
         $id = 0;
 
         foreach ( $header_result as $header ) {

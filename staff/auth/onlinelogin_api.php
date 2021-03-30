@@ -14,7 +14,7 @@ include('../../config/database.php');
 if(isset($_GET['Validate_LoginForm'])){
 
     extract($_POST);
-        $time = date("Y-m-d h:i:s");
+       $time = date("Y-m-d h:i:s");
        // Checking the Number is Valid or Not
 	   $checking_number = mysqli_query($mysqli, "SELECT user_stafflogin.* FROM `user_stafflogin` JOIN setup_departmentmaster ON setup_departmentmaster.Id = user_stafflogin.departmentmaster_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = setup_departmentmaster.sectionmaster_Id WHERE user_stafflogin.username = '$login_username' AND setup_sectionmaster.Id = '$SM_Id' "); 
 
@@ -58,7 +58,38 @@ if(isset($_GET['Validate_LoginForm'])){
    
 	   } else {
 
-           
+            //Checking That User is SUperAdmin
+            if($login_username == 'superadmin' || $login_username == 'sectionadmin'){
+                
+                $checking_fetching_password = mysqli_query($mysqli, "SELECT user_stafflogin.* FROM `user_stafflogin` WHERE user_stafflogin.username = '$login_username'"); 
+                $r_checking_details = mysqli_fetch_array($checking_fetching_password);
+                $stafflogin_Id = $r_checking_details['Id']; 
+                $savedPass = $r_checking_details['password'];
+
+                if(password_verify($login_password,$savedPass)){
+                    $count_Inc = (int)$r_checking_details['login_count'];
+                    
+                    $newCount = $count_Inc + 1;
+
+                    //Updating Login Count
+                    $updating_SR = mysqli_query($mysqli,"Update user_stafflogin set user_stafflogin.login_count = '$newCount' Where Id = '$stafflogin_Id'");
+
+                    //Inserting Log in Activity log
+                    $Inserting_UserDetails = mysqli_query($mysqli,"Insert into user_activitylog (activityType_Id, user_Id, userType, timeStamp) values ('1', '$stafflogin_Id' ,'0', '$time' )");
+
+                    $_SESSION['schoolzone']['SectionMaster_Id'] = $SM_Id;
+                    $_SESSION['schoolzone']['ActiveStaffLogin_Id'] = $stafflogin_Id;
+                    $_SESSION['schoolzone']['ViaDirectLogin'] = 'OFF';
+
+                    $res['status'] = 'success';
+                    echo json_encode($res);
+                    exit();
+                    
+                } // close password Verfiy
+            } // close if        
+
+
+
             // Username Not Exist
             $res['status'] = 'failed';
             echo json_encode($res);

@@ -117,6 +117,7 @@ $q = "SELECT user_stafflogin.*, setup_sectionmaster.section_name FROM user_staff
 
         <div class="col-md-9">
             <form id="All_instance_form">
+            <input type="hidden" id="SectionMaster_Id" name="SectionMaster_Id" value="<?php echo $SectionMaster_Id; ?>">
             <table class="table table-striped" id="InstanceMaster_Table">
                 <thead>
                     
@@ -166,6 +167,13 @@ $q = "SELECT user_stafflogin.*, setup_sectionmaster.section_name FROM user_staff
                                 <div class="btn-group" role="group">
                                     <a><button type="button" class="btn btn-default edit_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Edit Staff Details" data-toggle="tooltip"><span class="glyphicon glyphicon-edit" aria-hidden="true" style="color:#33b5e5;"></span></button></a>
                                 </div>
+
+                                <?php if($ActiveStaffLogin_Id == '2'){ ?>
+                                <div class="btn-group" role="group">
+                                    <a><button type="button" class="btn btn-default directlogin_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Direct Login" data-toggle="tooltip"></span> <i class="fa fa-sign-in" aria-hidden="true" style="color:#8aa4af;"></i></button></a>
+                                </div>
+                                <?php } ?>
+
 
 
                                 
@@ -555,6 +563,27 @@ $('.departAccessLink').click(function(event){
             $('#DisplayDiv').html(si_logs);
             $("#loader").css("display", "none");
             $("#DisplayDiv").css("display", "block");
+        },
+    });  
+
+});
+//Manage Instance Btn close----------------------------------------------------------------------------------------------------------
+
+//Manage Instance Btn----------------------------------------------------------------------------------------------------------
+$('.directlogin_btn').click(function(event){
+    var selected_instance_Id = $(this).attr('id');
+    var SectionMaster_Id = $('#SectionMaster_Id').val();
+    $.ajax({
+        url:'./user_management/user_management_api.php?StaffDirectLogin=u',
+        type:'POST',
+        data: {user_stafflogin_id: selected_instance_Id, SectionMaster_Id:SectionMaster_Id},
+        dataType: "json",
+        success:function(si_logs){
+            
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+
+            window.open('./index.php','_self');
         },
     });  
 

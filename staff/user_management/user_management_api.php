@@ -273,4 +273,36 @@ if(isset($_GET['Add_DepartmentInstance'])){
 }
 //-----------------------------------------------------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['StaffDirectLogin'])){
+
+    extract($_POST);
+
+    $_SESSION['schoolzone']['SectionMaster_Id'] = $SectionMaster_Id;
+    $_SESSION['schoolzone']['ActiveStaffLogin_Id'] = $user_stafflogin_id;
+    $_SESSION['schoolzone']['ViaDirectLogin'] = 'ON';
+
+    $res['status'] = 'success';
+    echo json_encode($res);
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['StaffDirectLoginBack'])){
+
+    extract($_POST);
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    $_SESSION['schoolzone']['SectionMaster_Id'] = $SectionMaster_Id;
+    $_SESSION['schoolzone']['ActiveStaffLogin_Id'] = '2';
+    $_SESSION['schoolzone']['ViaDirectLogin'] = 'OFF';
+
+    $res['status'] = 'success';
+    echo json_encode($res);
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
 ?>
