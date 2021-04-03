@@ -1252,7 +1252,7 @@ if(isset($_GET['Add_BatchInstance_InBulk'])){
         $checkinggroupDetails_q = mysqli_query($mysqli, "SELECT setup_academicyear.* FROM setup_academicyear Where setup_academicyear.sectionmaster_Id = '$SectionMaster_Id' AND setup_academicyear.Id = '$row[4]'");
         $row_checkinggroupDetails = mysqli_num_rows($checkinggroupDetails_q);
 
-        if($row_checkinggroupDetails > '0' AND $row_checkingsemDetails > '0'){
+        if($row_checkinggroupDetails > '0'){
 
 
         
@@ -1498,6 +1498,800 @@ if(isset($_GET['Add_BatchGroupInstance_InBulk'])){
 
         $multipleRows=[
             [$row[0],$row[1],$row[2],$row[3],$row[4],$row[5],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+    }
+    unset($uploadMessage);
+//----------------------------------------------------------------------------------------------------------------------
+                   
+
+        }}
+        $count++;
+        }
+
+        }
+
+
+
+
+        }
+
+
+        $writer->close();
+
+
+        $res['UploadedFilePath'] = $fileLocation;
+        $res['displayMessage'] = $displayMessage;
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_BatchCourseInstance'])){
+
+    extract($_POST);
+
+     
+    $updating_CalenderInstance = mysqli_query($mysqli,"Update setup_batchcoursemaster Set 
+    groupmaster_Id ='".htmlspecialchars($edit_groupmaster_Id, ENT_QUOTES)."',
+    coursemaster_Id = '".htmlspecialchars($edit_coursemaster_Id, ENT_QUOTES)."',
+    semestermaster_Id='".htmlspecialchars($edit_semestermaster_Id, ENT_QUOTES)."',
+    divisionmaster_Id='".htmlspecialchars($edit_divisionmaster_Id, ENT_QUOTES)."',
+    batchCourse_Name='".htmlspecialchars($edit_batchCourse_Name, ENT_QUOTES)."',
+    abbreviation='".htmlspecialchars($edit_abbreviation, ENT_QUOTES)."',
+    course_numbering='".htmlspecialchars($edit_course_numbering, ENT_QUOTES)."',
+    seat_capacity='".htmlspecialchars($edit_capacity, ENT_QUOTES)."'
+    where Id  = '$edit_InstanceId'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_BatchCourseInstance'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM setup_batchcoursemaster where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_BatchCourseInstance'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    //checking Department Abbbr & Name
+    $depart_fetch_q = mysqli_query($mysqli,"SELECT setup_batchcoursemaster.* FROM setup_batchcoursemaster WHERE setup_batchcoursemaster.batchmaster_Id = '$add_batchmaster_Id' AND( setup_batchcoursemaster.batchCourse_Name = '".htmlspecialchars($add_batchCourse_Name, ENT_QUOTES)."' OR setup_batchcoursemaster.abbreviation = '".htmlspecialchars($add_abbreviation, ENT_QUOTES)."' )");
+
+
+    $row_depart_fetch = mysqli_num_rows($depart_fetch_q);
+
+    if($row_depart_fetch > 0){
+
+        
+        $res['status'] = 'EXISTS';
+        echo json_encode($res);
+
+    }else{
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into setup_batchcoursemaster
+        (batchmaster_Id, groupmaster_Id, coursemaster_Id, semestermaster_Id, divisionmaster_Id, batchCourse_Name, abbreviation, course_numbering, seat_capacity) 
+        Values
+        ('$add_batchmaster_Id', '".htmlspecialchars($add_groupmaster_Id, ENT_QUOTES)."', '".htmlspecialchars($add_coursemaster_Id, ENT_QUOTES)."', '".htmlspecialchars($add_semestermaster_Id, ENT_QUOTES)."', '".htmlspecialchars($add_divisionmaster_Id, ENT_QUOTES)."', '".htmlspecialchars($add_batchCourse_Name, ENT_QUOTES)."', '".htmlspecialchars($add_abbreviation, ENT_QUOTES)."', '".htmlspecialchars($add_course_numbering, ENT_QUOTES)."', '".htmlspecialchars($add_capacity, ENT_QUOTES)."')");
+
+        $res['status'] = 'success';
+        echo json_encode($res);
+    }
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_BatchCourseInstance_InBulk'])){
+
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    $batch_sel_import = $_POST['batch_sel_import'];
+    // check file name is not empty
+    $pathinfo = pathinfo($_FILES["upload_file"]["name"]); //file extension
+
+    $folderMap = '../';
+    $fileLocation = "FileUploadLogs/BatchCourseMaster_".$SectionMaster_Id."_".date("Y-m-d-h-i-s").'.xlsx';
+    $targetfolder =  $folderMap."".$fileLocation;
+    move_uploaded_file($_FILES['upload_file']['name'], $targetfolder);
+
+    $writer = WriterFactory::create(Type::XLSX); // for XLSX files
+
+    $fileName= $targetfolder;
+    $writer->openToFile($fileName); // write data to a file or to a PHP stream
+    // $writer->openToBrowser($fileName); // stream data directly to the browser
+
+    $singleRow =['Sr No','BatchCourse Name','Abbreviation','Capacity','Course Numbering','Group No','Course No','Sem No','Division No','Upload Status'];
+    $writer->addRow($singleRow); // add a row at a time
+
+
+   
+    if (($pathinfo['extension'] == 'xlsx' || $pathinfo['extension'] == 'xls') && $_FILES['upload_file']['size'] > 0 ) { //check if file is an excel file && is not empty
+        $inputFileName = $_FILES['upload_file']['tmp_name'];  // Temporary file name
+        
+        // Read excel file by using ReadFactory object.
+        $reader = ReaderFactory::create(Type::XLSX);
+
+        // Open file
+        $reader->open($inputFileName);
+
+
+        $count = 1;
+        $flag = 0;
+
+
+
+        // Number of sheet in excel file
+        foreach ($reader->getSheetIterator() as $sheet) {
+            // Number of Rows in Excel sheet
+            foreach ($sheet->getRowIterator() as $row) {
+                // It reads data after header. In the my excel sheet, header is in the first row.
+                if ($count > 1) {  if(!empty($row[0])){
+
+
+//---------------------------------------------------------------------------------------------------------------                  
+
+    $StreamDetails_q = mysqli_query($mysqli, "SELECT setup_batchcoursemaster.* FROM setup_batchcoursemaster WHERE setup_batchcoursemaster.batchmaster_Id = '$batch_sel_import' AND( setup_batchcoursemaster.batchCourse_Name = '".htmlspecialchars($row[1], ENT_QUOTES)."' OR setup_batchcoursemaster.abbreviation = '".htmlspecialchars($$row[2], ENT_QUOTES)."' )");
+
+    $row_StreamDetails = mysqli_num_rows($StreamDetails_q);
+
+
+
+    if($row_StreamDetails == '0'){
+
+        //checking Group and Sem Belong to this Program
+
+    
+
+
+            $checkinggroupDetails_q = mysqli_query($mysqli, "SELECT setup_groupmaster.* FROM `setup_groupmaster` JOIN setup_batchmaster ON setup_batchmaster.programmaster_Id = setup_groupmaster.programmaster_Id WHERE setup_batchmaster.Id = '$batch_sel_import'  AND setup_groupmaster.Id = '$row[5]'");
+            $row_checkinggroupDetails = mysqli_num_rows($checkinggroupDetails_q);
+
+            $checkingcourseDetails_q = mysqli_query($mysqli, "SELECT setup_coursemaster.* FROM setup_coursemaster JOIN setup_batchmaster ON setup_batchmaster.programmaster_Id = setup_coursemaster.programmaster_Id WHERE setup_batchmaster.Id = '$batch_sel_import'   AND setup_coursemaster.Id = '$row[6]'");
+            $row_checkingcourseDetails = mysqli_num_rows($checkingcourseDetails_q);
+
+            $checkingsemDetails_q = mysqli_query($mysqli, "SELECT setup_semestermaster.* FROM setup_semestermaster WHERE setup_semestermaster.sectionmaster_Id = '$SectionMaster_Id'    AND setup_semestermaster.Id = '$row[7]'");
+            $row_checkingsemDetails = mysqli_num_rows($checkingsemDetails_q);
+
+            $checkingdivDetails_q = mysqli_query($mysqli, "SELECT setup_divisionmaster.* FROM setup_divisionmaster WHERE setup_divisionmaster.sectionmaster_Id = '$SectionMaster_Id'    AND setup_divisionmaster.Id = '$row[8]'");
+            $row_checkingdivDetails = mysqli_num_rows($checkingdivDetails_q);
+
+            if($row_checkinggroupDetails > '0' AND $row_checkingcourseDetails > '0' AND $row_checkingsemDetails > '0' AND $row_checkingdivDetails > '0'){
+
+
+                $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into setup_batchcoursemaster
+                (batchmaster_Id, groupmaster_Id, coursemaster_Id, semestermaster_Id, divisionmaster_Id, batchCourse_Name, abbreviation, course_numbering, seat_capacity) 
+                Values
+                ('$batch_sel_import', '".htmlspecialchars($row[5], ENT_QUOTES)."', '".htmlspecialchars($row[6], ENT_QUOTES)."', '".htmlspecialchars($row[7], ENT_QUOTES)."', '".htmlspecialchars($row[8], ENT_QUOTES)."', '".htmlspecialchars($row[1], ENT_QUOTES)."', '".htmlspecialchars($row[2], ENT_QUOTES)."', '".htmlspecialchars($row[4], ENT_QUOTES)."', '".htmlspecialchars($row[3], ENT_QUOTES)."')");
+            
+
+                if(mysqli_error($mysqli)){
+                    $displayMessage[]  = $row[1].' : Query Failed';
+                    $uploadMessage = "Query Failed";
+                }else{
+                    $displayMessage[]  = $row[1].' : Batch Course Added';
+                    $uploadMessage = "Batch Course Added";    
+                }
+
+                
+
+                //close checking Details
+            }else{
+
+                $displayMessage[]  = $row[1].' : Invalid Group No OR Sem No, Division No, Course No';
+                $uploadMessage = "Invalid Group No OR Sem No, Division No, Course No";    
+            }// clsoe else
+
+
+                
+            $multipleRows=[
+                [$row[0],$row[1],$row[2],$row[3],$row[4],$row[5],$row[6],$row[7],$row[8],$uploadMessage],
+            ];
+            $writer->addRows($multipleRows); // add multiple rows at a time
+
+        
+    }elseif($row_StreamDetails > '0'){
+        $displayMessage[]  = $row[1].' : Batch Course Already Present';
+        $uploadMessage = "Batch Course Already Added";
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3],$row[4],$row[5],$row[6],$row[7],$row[8],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+    }
+    unset($uploadMessage);
+//----------------------------------------------------------------------------------------------------------------------
+                   
+
+        }}
+        $count++;
+        }
+
+        }
+
+
+
+
+        }
+
+
+        $writer->close();
+
+
+        $res['UploadedFilePath'] = $fileLocation;
+        $res['displayMessage'] = $displayMessage;
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_DivisionInstance'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    //checking Department Abbbr & Name
+    $depart_fetch_q = mysqli_query($mysqli,"SELECT setup_divisionmaster.* FROM setup_divisionmaster Where setup_divisionmaster.sectionmaster_Id = '$SectionMaster_Id' AND setup_divisionmaster.Division = '".htmlspecialchars($add_Division, ENT_QUOTES)."'");
+
+
+    $row_depart_fetch = mysqli_num_rows($depart_fetch_q);
+
+    if($row_depart_fetch > 0){
+
+        
+        $res['status'] = 'EXISTS';
+        echo json_encode($res);
+
+    }else{
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into setup_divisionmaster
+        (sectionmaster_Id, Division) 
+        Values
+        ('$SectionMaster_Id', '".htmlspecialchars($add_Division, ENT_QUOTES)."')");
+
+
+        $res['status'] = 'success';
+        echo json_encode($res);
+    }
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_DivisionInstance'])){
+
+    extract($_POST);
+
+     
+    $updating_CalenderInstance = mysqli_query($mysqli,"Update setup_divisionmaster Set Division = '".htmlspecialchars($edit_Division, ENT_QUOTES)."' where Id  = '$edit_InstanceId'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_DivisionInstance'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM setup_divisionmaster where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_DivisionInstance_InBulk'])){
+
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    // check file name is not empty
+    $pathinfo = pathinfo($_FILES["upload_file"]["name"]); //file extension
+
+    $folderMap = '../';
+    $fileLocation = "FileUploadLogs/DivisionMaster_".$SectionMaster_Id."_".date("Y-m-d-h-i-s").'.xlsx';
+    $targetfolder =  $folderMap."".$fileLocation;
+    move_uploaded_file($_FILES['upload_file']['name'], $targetfolder);
+
+    $writer = WriterFactory::create(Type::XLSX); // for XLSX files
+
+    $fileName= $targetfolder;
+    $writer->openToFile($fileName); // write data to a file or to a PHP stream
+    // $writer->openToBrowser($fileName); // stream data directly to the browser
+
+    $singleRow =['Sr No','Division Name','Upload Status'];
+    $writer->addRow($singleRow); // add a row at a time
+
+
+
+
+
+   
+    if (($pathinfo['extension'] == 'xlsx' || $pathinfo['extension'] == 'xls') && $_FILES['upload_file']['size'] > 0 ) { //check if file is an excel file && is not empty
+        $inputFileName = $_FILES['upload_file']['tmp_name'];  // Temporary file name
+        
+        // Read excel file by using ReadFactory object.
+        $reader = ReaderFactory::create(Type::XLSX);
+
+        // Open file
+        $reader->open($inputFileName);
+
+
+        $count = 1;
+        $flag = 0;
+
+
+
+        // Number of sheet in excel file
+        foreach ($reader->getSheetIterator() as $sheet) {
+            // Number of Rows in Excel sheet
+            foreach ($sheet->getRowIterator() as $row) {
+                // It reads data after header. In the my excel sheet, header is in the first row.
+                if ($count > 1) {  if(!empty($row[0])){
+
+
+//---------------------------------------------------------------------------------------------------------------                  
+
+    $StreamDetails_q = mysqli_query($mysqli, "SELECT setup_divisionmaster.* FROM setup_divisionmaster Where setup_divisionmaster.sectionmaster_Id = '$SectionMaster_Id' AND setup_divisionmaster.Division = '".htmlspecialchars($row[1], ENT_QUOTES)."'");
+
+    $row_StreamDetails = mysqli_num_rows($StreamDetails_q);
+
+
+
+    if($row_StreamDetails == '0'){
+
+        //checking Group and Sem Belong to this Program
+
+        
+    
+    
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into setup_divisionmaster
+        (sectionmaster_Id, Division) 
+        Values
+        ('$SectionMaster_Id', '".htmlspecialchars($row[1], ENT_QUOTES)."')");
+
+
+
+        if(mysqli_error($mysqli)){
+            $displayMessage[]  = $row[1].' : Query Failed';
+            $uploadMessage = "Query Failed";
+        }else{
+            $displayMessage[]  = $row[1].' : Division Added';
+            $uploadMessage = "Division Added";    
+        }
+
+        
+
+        $multipleRows=[
+            [$row[0],$row[1],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+        
+    }elseif($row_StreamDetails > '0'){
+        $displayMessage[]  = $row[1].' : Division Already Present';
+        $uploadMessage = "Division Already Added";
+
+        $multipleRows=[
+            [$row[0],$row[1],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+    }
+    unset($uploadMessage);
+//----------------------------------------------------------------------------------------------------------------------
+                   
+
+        }}
+        $count++;
+        }
+
+        }
+
+
+
+
+        }
+
+
+        $writer->close();
+
+
+        $res['UploadedFilePath'] = $fileLocation;
+        $res['displayMessage'] = $displayMessage;
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_ResultAssessment'])){
+
+    extract($_POST);
+
+     
+    $updating_CalenderInstance = mysqli_query($mysqli,"Update result_assessment_pattern Set 
+    examheader_Id ='".htmlspecialchars($edit_examheader_Id, ENT_QUOTES)."',
+    coursemaster_Id = '".htmlspecialchars($edit_coursemaster_Id, ENT_QUOTES)."',
+    out_of_marks='".htmlspecialchars($edit_out_of_marks, ENT_QUOTES)."',
+    passing_marks='".htmlspecialchars($edit_passing_marks, ENT_QUOTES)."'
+    where Id  = '$edit_InstanceId'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_ResultAssessment'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM result_assessment_pattern where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_ResultAssessment'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    //checking Department Abbbr & Name
+    $depart_fetch_q = mysqli_query($mysqli,"SELECT result_assessment_pattern.* FROM result_assessment_pattern JOIN setup_coursemaster ON setup_coursemaster.Id = result_assessment_pattern.coursemaster_Id WHERE result_assessment_pattern.examheader_Id = '$add_examheader_Id' AND result_assessment_pattern.coursemaster_Id = '$add_coursemaster_Id' AND setup_coursemaster.programmaster_Id = '$add_programmaster_Id' ");
+
+
+    $row_depart_fetch = mysqli_num_rows($depart_fetch_q);
+
+    if($row_depart_fetch > 0){
+
+        
+        $res['status'] = 'EXISTS';
+        echo json_encode($res);
+
+    }else{
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into result_assessment_pattern
+        (examheader_Id, coursemaster_Id, out_of_marks, passing_marks) 
+        Values
+        ('$add_examheader_Id', '".htmlspecialchars($add_coursemaster_Id, ENT_QUOTES)."', '".htmlspecialchars($add_out_of_marks, ENT_QUOTES)."', '".htmlspecialchars($add_passing_marks, ENT_QUOTES)."')");
+        
+        $res['status'] = 'success';
+        echo json_encode($res);
+    }
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_ResultAssessment_InBulk'])){
+
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    $program_sel_import = $_POST['program_sel_import'];
+    // check file name is not empty
+    $pathinfo = pathinfo($_FILES["upload_file"]["name"]); //file extension
+
+    $folderMap = '../';
+    $fileLocation = "FileUploadLogs/ResultAssessmentMaster_".$SectionMaster_Id."_".date("Y-m-d-h-i-s").'.xlsx';
+    $targetfolder =  $folderMap."".$fileLocation;
+    move_uploaded_file($_FILES['upload_file']['name'], $targetfolder);
+
+    $writer = WriterFactory::create(Type::XLSX); // for XLSX files
+
+    $fileName= $targetfolder;
+    $writer->openToFile($fileName); // write data to a file or to a PHP stream
+    // $writer->openToBrowser($fileName); // stream data directly to the browser
+
+    $singleRow =['Sr No','Exam Header No','Course No','Out of Marks','Passing Marks','Upload Status'];
+    $writer->addRow($singleRow); // add a row at a time
+
+
+
+
+
+   
+    if (($pathinfo['extension'] == 'xlsx' || $pathinfo['extension'] == 'xls') && $_FILES['upload_file']['size'] > 0 ) { //check if file is an excel file && is not empty
+        $inputFileName = $_FILES['upload_file']['tmp_name'];  // Temporary file name
+        
+        // Read excel file by using ReadFactory object.
+        $reader = ReaderFactory::create(Type::XLSX);
+
+        // Open file
+        $reader->open($inputFileName);
+
+
+        $count = 1;
+        $flag = 0;
+
+
+
+        // Number of sheet in excel file
+        foreach ($reader->getSheetIterator() as $sheet) {
+            // Number of Rows in Excel sheet
+            foreach ($sheet->getRowIterator() as $row) {
+                // It reads data after header. In the my excel sheet, header is in the first row.
+                if ($count > 1) {  if(!empty($row[0])){
+
+
+//---------------------------------------------------------------------------------------------------------------                  
+
+    $StreamDetails_q = mysqli_query($mysqli, "SELECT result_assessment_pattern.* FROM result_assessment_pattern JOIN setup_coursemaster ON setup_coursemaster.Id = result_assessment_pattern.coursemaster_Id WHERE result_assessment_pattern.examheader_Id = '$row[1]' AND result_assessment_pattern.coursemaster_Id = '$row[2]' AND setup_coursemaster.programmaster_Id = '$program_sel_import'");
+
+    $row_StreamDetails = mysqli_num_rows($StreamDetails_q);
+
+
+
+    if($row_StreamDetails == '0'){
+
+        //checking Group and Sem Belong to this Program
+
+        
+        $checkingheaderDetails_q = mysqli_query($mysqli, "SELECT result_exam_header.* FROM result_exam_header Where result_exam_header.sectionmaster_Id = '$SectionMaster_Id' AND result_exam_header.Id = '$row[1]'");
+        $row_checkingheaderDetails = mysqli_num_rows($checkingheaderDetails_q);
+
+        $checkingcourseDetails_q = mysqli_query($mysqli, "SELECT setup_coursemaster.* FROM `setup_coursemaster` WHERE setup_coursemaster.programmaster_Id = '$program_sel_import' AND setup_coursemaster.Id = '$row[2]'");
+        $row_checkingcourseDetails = mysqli_num_rows($checkingcourseDetails_q);
+
+        if($row_checkingheaderDetails > '0' AND $row_checkingcourseDetails > '0'){
+            
+        
+            $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into result_assessment_pattern
+            (examheader_Id, coursemaster_Id, out_of_marks, passing_marks) 
+            Values
+            ('$row[1]', '".htmlspecialchars($row[2], ENT_QUOTES)."', '".htmlspecialchars($row[3], ENT_QUOTES)."', '".htmlspecialchars($row[4], ENT_QUOTES)."')");
+
+
+            if(mysqli_error($mysqli)){
+                $displayMessage[]  = $row[1].' : Query Failed';
+                $uploadMessage = "Query Failed";
+            }else{
+                $displayMessage[]  = $row[1].' : Assessment Pattern Entry Added';
+                $uploadMessage = "Assessment Pattern Entry Added";    
+            }
+            
+        //close checking Details
+        }else{
+
+            $displayMessage[]  = $row[1].' : Invalid Course Id or Exam Header Id';
+            $uploadMessage = "Invalid Course Id or Exam Header";    
+        }// clsoe else
+
+            
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3],$row[4],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+        
+    }elseif($row_StreamDetails > '0'){
+        $displayMessage[]  = $row[1].' : Assessment Pattern Entry Already Present';
+        $uploadMessage = "Assessment Pattern Entry Already Added";
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3],$row[4],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+    }
+    unset($uploadMessage);
+//----------------------------------------------------------------------------------------------------------------------
+                   
+
+        }}
+        $count++;
+        }
+
+        }
+
+
+
+
+        }
+
+
+        $writer->close();
+
+
+        $res['UploadedFilePath'] = $fileLocation;
+        $res['displayMessage'] = $displayMessage;
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_ExamInstance'])){
+
+    extract($_POST);
+
+     
+    $updating_CalenderInstance = mysqli_query($mysqli,"Update exam_master Set 
+    Maximum_marks ='".htmlspecialchars($edit_Maximum_marks, ENT_QUOTES)."',
+    Date = '".htmlspecialchars($edit_Date, ENT_QUOTES)."',
+    passing_marks='".htmlspecialchars($edit_passing_marks, ENT_QUOTES)."'
+    where Id  = '$edit_InstanceId'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_ExamInstance'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM exam_master where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_ExamInstance'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    //checking Department Abbbr & Name
+    $depart_fetch_q = mysqli_query($mysqli,"SELECT exam_master.* FROM `exam_master` WHERE exam_master.batchcoursemaster_Id = '$add_batchcoursemaster_Id' ");
+
+
+    $row_depart_fetch = mysqli_num_rows($depart_fetch_q);
+
+    if($row_depart_fetch > 0){
+
+        
+        $res['status'] = 'EXISTS';
+        echo json_encode($res);
+
+    }else{
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into exam_master
+        (batchcoursemaster_Id, Maximum_marks, Date, passing_marks) 
+        Values
+        ('$add_batchcoursemaster_Id', '".htmlspecialchars($add_Maximum_marks, ENT_QUOTES)."', '".htmlspecialchars($add_Date, ENT_QUOTES)."', '".htmlspecialchars($add_passing_marks, ENT_QUOTES)."')");
+
+        $res['status'] = 'success';
+        echo json_encode($res);
+    }
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_ExamInstance_InBulk'])){
+
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    $batchcourse_sel_import = $_POST['batchcourse_sel_import'];
+    // check file name is not empty
+    $pathinfo = pathinfo($_FILES["upload_file"]["name"]); //file extension
+
+    $folderMap = '../';
+    $fileLocation = "FileUploadLogs/ExamMaster_".$SectionMaster_Id."_".date("Y-m-d-h-i-s").'.xlsx';
+    $targetfolder =  $folderMap."".$fileLocation;
+    move_uploaded_file($_FILES['upload_file']['name'], $targetfolder);
+
+    $writer = WriterFactory::create(Type::XLSX); // for XLSX files
+
+    $fileName= $targetfolder;
+    $writer->openToFile($fileName); // write data to a file or to a PHP stream
+    // $writer->openToBrowser($fileName); // stream data directly to the browser
+
+    $singleRow =['Sr No','Maximum Marks','Date','Passing Marks','Upload Status'];
+    $writer->addRow($singleRow); // add a row at a time
+
+
+   
+    if (($pathinfo['extension'] == 'xlsx' || $pathinfo['extension'] == 'xls') && $_FILES['upload_file']['size'] > 0 ) { //check if file is an excel file && is not empty
+        $inputFileName = $_FILES['upload_file']['tmp_name'];  // Temporary file name
+        
+        // Read excel file by using ReadFactory object.
+        $reader = ReaderFactory::create(Type::XLSX);
+
+        // Open file
+        $reader->open($inputFileName);
+
+
+        $count = 1;
+        $flag = 0;
+
+
+
+        // Number of sheet in excel file
+        foreach ($reader->getSheetIterator() as $sheet) {
+            // Number of Rows in Excel sheet
+            foreach ($sheet->getRowIterator() as $row) {
+                // It reads data after header. In the my excel sheet, header is in the first row.
+                if ($count > 1) {  if(!empty($row[0])){
+
+
+//---------------------------------------------------------------------------------------------------------------                  
+
+    $StreamDetails_q = mysqli_query($mysqli, "SELECT exam_master.* FROM `exam_master` WHERE exam_master.batchcoursemaster_Id = '$batchcourse_sel_import'");
+
+    $row_StreamDetails = mysqli_num_rows($StreamDetails_q);
+
+
+
+    if($row_StreamDetails == '0'){
+
+        //checking Group and Sem Belong to this Program
+
+    
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into exam_master
+        (batchcoursemaster_Id, Maximum_marks, Date, passing_marks) 
+        Values
+        ('$batchcourse_sel_import', '".htmlspecialchars($row[1], ENT_QUOTES)."', '".htmlspecialchars($row[2], ENT_QUOTES)."', '".htmlspecialchars($row[3], ENT_QUOTES)."')");
+
+            
+
+                if(mysqli_error($mysqli)){
+                    $displayMessage[]  = $row[1].' : Query Failed';
+                    $uploadMessage = "Query Failed";
+                }else{
+                    $displayMessage[]  = $row[1].' : Exam Added';
+                    $uploadMessage = "Exam Added";    
+                }
+
+                
+
+                
+            $multipleRows=[
+                [$row[0],$row[1],$row[2],$row[3],$uploadMessage],
+            ];
+            $writer->addRows($multipleRows); // add multiple rows at a time
+
+        
+    }elseif($row_StreamDetails > '0'){
+        $displayMessage[]  = $row[1].' : Exam Already Present';
+        $uploadMessage = "Exam Already Added";
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3],$uploadMessage],
         ];
         $writer->addRows($multipleRows); // add multiple rows at a time
 

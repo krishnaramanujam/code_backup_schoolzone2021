@@ -43,7 +43,7 @@ include_once '../../config/database.php';
                                 <?php 
                                     $batch_fetch = mysqli_query($mysqli,"SELECT * FROM `setup_batchmaster` Where academicYear_Id = '$Acadmic_Year_ID'  ORDER BY `academicYear_Id` DESC ");
                                     while($r_batch = mysqli_fetch_array($batch_fetch)){ ?>
-                                    <option value="<?php echo $r_batch['Id']; ?>" <?php if($r_batch['Id'] == $_GET['batch_sel']){ echo 'Selected'; } ?>  class="<?php echo $r_batch['Batch_Name']; ?>"><?php echo $r_batch['Batch_Name']; ?></option>
+                                    <option value="<?php echo $r_batch['Id']; ?>" <?php if($r_batch['Id'] == $_GET['batch_sel']){ echo 'Selected'; } ?>  class="<?php echo $r_batch['batch_name']; ?>"><?php echo $r_batch['batch_name']; ?></option>
                                 <?php }   ?>
                                 
 

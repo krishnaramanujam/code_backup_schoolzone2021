@@ -11,7 +11,7 @@ include_once '../../config/database.php';
 <div class="container">
 
     <div class="row">
-        <div class="col-md-11"><h3 style="font-weight:bold;font-style:italic;" class="font_all"><i class="fa fa-clock-o text-primary" aria-hidden="true"></i>  Batch Group Master</h3></div>   
+        <div class="col-md-11"><h3 style="font-weight:bold;font-style:italic;" class="font_all"><i class="fa fa-clock-o text-primary" aria-hidden="true"></i>  Batch Course Master</h3></div>   
     </div>
 
 
@@ -63,7 +63,7 @@ include_once '../../config/database.php';
 
 
 <div class="row">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="headingFive">
                 <h4 class="panel-title">
@@ -78,11 +78,14 @@ include_once '../../config/database.php';
                             <thead>
                                 <tr>
                                     <th>Sr No</th>
-                                    <th>Batchgroup Name</th>
+                                    <th>BatchCourse Name</th>
                                     <th>Abbreviation</th>
                                     <th>Capacity</th>
-                                    <th>Previous Group</th>
-                                    <th>Group Master No</th>
+                                    <th>Course Numbering</th>
+                                    <th>Group No</th>
+                                    <th>Course No</th>
+                                    <th>Sem No</th>
+                                    <th>Division No</th>
                                     <th></th>
                                     <th>Please remove the below data before importing:</th>
                                     <th>Please remove the below data before importing:</th>
@@ -91,6 +94,10 @@ include_once '../../config/database.php';
                             <tbody>
 
                             <tr>
+                              
+                                <td></td>
+                                <td></td>
+                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -108,6 +115,10 @@ include_once '../../config/database.php';
                                  while($run_d = mysqli_fetch_array($run_de)){  ?>
 
                                    <tr>
+                                  
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -124,7 +135,182 @@ include_once '../../config/database.php';
                                  }
                             ?>
 
+                            <tr>
+                               
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
 
+                            <tr>
+                               
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>Course No</td>
+                                <td>Course Name</td>
+                            </tr>
+
+                            <?php
+                                 $query_de = "SELECT setup_coursemaster.* FROM setup_coursemaster JOIN setup_batchmaster ON setup_batchmaster.programmaster_Id = setup_coursemaster.programmaster_Id WHERE setup_batchmaster.Id = '$batch_sel'  ";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){  ?>
+
+                                   <tr>
+                                   
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><?php echo $run_d['Id']; ?></td>
+                                    <td><?php echo $run_d['course_name']; ?></td>
+                                   </tr>
+
+                                 
+                                 <?php
+                                 }
+                            ?>
+
+
+                            
+                            <tr>
+                               
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            <tr>
+                                
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>Semester No</td>
+                                <td>Semester Name</td>
+                            </tr>
+
+                            <?php
+                                 $query_de = "SELECT setup_semestermaster.* FROM setup_semestermaster WHERE setup_semestermaster.sectionmaster_Id = '$SectionMaster_Id'   ";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){  ?>
+
+                                   <tr>
+                                   
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><?php echo $run_d['Id']; ?></td>
+                                    <td><?php echo $run_d['Semester_Name']; ?></td>
+                                   </tr>
+
+                                 
+                                 <?php
+                                 }
+                            ?>
+
+                                                        
+                            <tr>
+                               
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            <tr>
+                               
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>Division No</td>
+                                <td>Division Name</td>
+                            </tr>
+
+                            <?php
+                                 $query_de = "SELECT setup_divisionmaster.* FROM setup_divisionmaster WHERE setup_divisionmaster.sectionmaster_Id = '$SectionMaster_Id'   ";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){  ?>
+
+                                   <tr>
+                                    
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><?php echo $run_d['Id']; ?></td>
+                                    <td><?php echo $run_d['Division']; ?></td>
+                                   </tr>
+
+                                 
+                                 <?php
+                                 }
+                            ?>
                                 
                             </tbody>
                         </table>
@@ -133,7 +319,7 @@ include_once '../../config/database.php';
             </div> <!--Close Panel -->
         </div>	
 
-        <div class="col-md-2">
+        <div class="col-md-4">
             <a onclick="$('#contact_dialog').modal('show');" class="btn btn-default">
                     <i class="fa fa-upload" aria-hidden="true"></i> Import
             </a>
@@ -185,40 +371,46 @@ include_once '../../config/database.php';
          <form id="All_instance_form">
          <table class="table table-striped" id="InstanceMaster_Table">
              <thead>
-                 <tr><th>Sr No.</th><th style="text-align:left;">Batch Group Name</th><th>Abbreviation</th><th>Capacity</th><th>previous group</th><th>Group Name</th><th>Operations</th></tr>
+                 <tr><th>Sr No.</th><th style="text-align:left;">Batch Course Name</th><th>Abbreviation</th><th>Course Numbering</th><th>Seat Capacity</th><th>Group Name</th><th>Course Name</th><th>Semester Name</th><th>Division Name</th><th>Operations</th></tr>
              </thead>
              <tbody>
-                 <?php  $instance_fetch_q = mysqli_query($mysqli,"SELECT setup_batchgroupmaster.*, setup_groupmaster.group_name FROM `setup_batchgroupmaster` JOIN setup_groupmaster ON setup_groupmaster.Id = setup_batchgroupmaster.groupmasterid WHERE setup_batchgroupmaster.batchmasterid = '$batch_sel'   ");
+                 <?php  $instance_fetch_q = mysqli_query($mysqli,"SELECT setup_batchcoursemaster.*, setup_groupmaster.group_name, setup_coursemaster.course_name, setup_semestermaster.Semester_Name, setup_divisionmaster.Division FROM `setup_batchcoursemaster` JOIN setup_groupmaster ON setup_groupmaster.Id = setup_batchcoursemaster.groupmaster_Id JOIN setup_coursemaster ON setup_coursemaster.Id = setup_batchcoursemaster.coursemaster_Id JOIN setup_semestermaster ON setup_semestermaster.Id = setup_batchcoursemaster.semestermaster_Id JOIN setup_divisionmaster ON setup_divisionmaster.Id = setup_batchcoursemaster.divisionmaster_Id WHERE setup_batchcoursemaster.batchmaster_Id = '$batch_sel'    ");
                  $i = 1; while($r_instance_fetch = mysqli_fetch_array($instance_fetch_q)){  ?>
                      <tr> 
                          <td style="width:10%"><?php echo $i; ?></td>
-                         <td style="width:20%;text-align:left;"><?php echo $r_instance_fetch['batchgroup_name']; ?></td>
+                         <td style="width:15%;text-align:left;"><?php echo $r_instance_fetch['batchCourse_Name']; ?></td>
                          <td style="width:10%"><?php echo $r_instance_fetch['abbreviation']; ?></td>
-                         <td style="width:10%"><?php echo $r_instance_fetch['Capacity']; ?></td>
-                         <td style="width:10%"><?php echo $r_instance_fetch['prev_group']; ?></td>
+                         <td style="width:10%"><?php echo $r_instance_fetch['course_numbering']; ?></td>
+                         <td style="width:10%"><?php echo $r_instance_fetch['seat_capacity']; ?></td>
                          <td style="width:10%"><?php echo $r_instance_fetch['group_name']; ?></td>
-                         <td style="width:20%">
+                         <td style="width:10%"><?php echo $r_instance_fetch['course_name']; ?></td>
+                         <td style="width:5%"><?php echo $r_instance_fetch['Semester_Name']; ?></td>
+                         <td style="width:5%"><?php echo $r_instance_fetch['Division']; ?></td>
+                         <td style="width:25%">
                          <div class="btn-group btn-group-xs" role="group" aria-label="...">
                             
                              <div class="btn-group" role="group">
-                                 <a href="#Edit_Scroll"><button type="button" class="btn btn-default edit_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Edit BatchGroup Instance" data-toggle="tooltip"><span class="glyphicon glyphicon-edit" aria-hidden="true" style="color:#33b5e5;"></span></button></a>
+                                 <a href="#Edit_Scroll"><button type="button" class="btn btn-default edit_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Edit BatchCourse Instance" data-toggle="tooltip"><span class="glyphicon glyphicon-edit" aria-hidden="true" style="color:#33b5e5;"></span></button></a>
                              </div>
                              <div class="btn-group" role="group">
-                                 <button type="button" class="btn btn-default delete_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Delete BatchGroup Instance" data-toggle="tooltip"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:#ff3547;"></span></button>
+                                 <button type="button" class="btn btn-default delete_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Delete BatchCourse Instance" data-toggle="tooltip"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:#ff3547;"></span></button>
                              </div>
                              </div>
 
                              <input type="hidden" value="<?php echo $r_instance_fetch['Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Id">
-                             <input type="hidden"  value="<?php echo $r_instance_fetch['batchgroup_name']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_batchgroup_name">
+                             <input type="hidden"  value="<?php echo $r_instance_fetch['batchCourse_Name']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_batchCourse_Name">
 
                              <input type="hidden"  value="<?php echo $r_instance_fetch['abbreviation']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_abbreviation">
 
-                             <input type="hidden" value="<?php echo $r_instance_fetch['Capacity']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_capacity">
-                             <input type="hidden"  value="<?php echo $r_instance_fetch['prev_group']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_prev_group">
+                             <input type="hidden" value="<?php echo $r_instance_fetch['course_numbering']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_course_numbering">
+                             <input type="hidden"  value="<?php echo $r_instance_fetch['seat_capacity']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_seat_capacity">
 
-                             <input type="hidden"  value="<?php echo $r_instance_fetch['groupmasterid']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_groupmasterid">
+                             <input type="hidden"  value="<?php echo $r_instance_fetch['groupmaster_Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_groupmaster_Id">
+                             <input type="hidden"  value="<?php echo $r_instance_fetch['coursemaster_Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_coursemaster_Id">
+                             <input type="hidden"  value="<?php echo $r_instance_fetch['semestermaster_Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_semestermaster_Id">
+                             <input type="hidden"  value="<?php echo $r_instance_fetch['divisionmaster_Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_divisionmaster_Id">
                       
-                             <input type="hidden"  value="<?php echo $r_instance_fetch['batchmasterid']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_batchmasterid">
+                             <input type="hidden"  value="<?php echo $r_instance_fetch['batchmaster_Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_batchmaster_Id">
                             
                             
 
@@ -238,27 +430,27 @@ include_once '../../config/database.php';
              <div class="panel-heading" role="tab" id="headingOne">
              <h4 class="panel-title">
                  <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                 Create New BatchGroup Instance
+                 Create New BatchCourse Instance
                  </a>
              </h4>
              </div>
              <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
              <div class="panel-body">
                  <div class="form-group">
-                     <label for="email">Enter Batch Group Name*  </label>
-                     <input type="text" class="form-control" id="add_batchgroup_name" name="add_batchgroup_name" placeholder="Enter Batch Group Name">
+                     <label for="email">Enter Batch Course Name*  </label>
+                     <input type="text" class="form-control" id="add_batchCourse_Name" name="add_batchCourse_Name" placeholder="Enter Batch Course Name">
                      <br>
                      <label for="email">Enter Abbreviation*  </label>
                      <input type="text" class="form-control" id="add_abbreviation" name="add_abbreviation" placeholder="Enter Abbreviation">
                      <br>
-                     <label for="email">Enter Capacity*  </label>
+                     <label for="email">Enter Seat Capacity*  </label>
                      <input type="text" class="form-control" id="add_capacity" name="add_capacity" placeholder="Enter Capacity">
                      <br>
-                     <label for="email">Enter Previous Group*  </label>
-                     <input type="text" class="form-control" id="add_prev_group" name="add_prev_group" placeholder="Enter Previous Group">
+                     <label for="email">Enter Course Numbering*  </label>
+                     <input type="number" class="form-control" id="add_course_numbering" name="add_course_numbering" placeholder="Enter Course Numbering">
                      <br>
                      <label for="email">Select Group Name*  </label>
-                     <select class="form-control drop_sel" id="add_groupmasterid" name="add_groupmasterid">
+                     <select class="form-control drop_sel" id="add_groupmaster_Id" name="add_groupmaster_Id">
                         <option value="">Select Group</option>
                          <?php
                                  $query_de = "SELECT setup_groupmaster.* FROM `setup_groupmaster` JOIN setup_batchmaster ON setup_batchmaster.programmaster_Id = setup_groupmaster.programmaster_Id WHERE setup_batchmaster.Id = '$batch_sel'";
@@ -271,8 +463,50 @@ include_once '../../config/database.php';
                      </select>
 
                      <br>
+                     <label for="email">Select Course Name*  </label>
+                     <select class="form-control drop_sel" id="add_coursemaster_Id" name="add_coursemaster_Id">
+                        <option value="">Select Course</option>
+                         <?php
+                                 $query_de = "SELECT setup_coursemaster.* FROM setup_coursemaster JOIN setup_batchmaster ON setup_batchmaster.programmaster_Id = setup_coursemaster.programmaster_Id WHERE setup_batchmaster.Id = '$batch_sel' ";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['course_name']."</option>";
+                                 }
+                         ?>
+
+                     </select>
+                     <br>
+                     <label for="email">Select Semester Name*  </label>
+                     <select class="form-control drop_sel" id="add_semestermaster_Id" name="add_semestermaster_Id">
+                        <option value="">Select Semester</option>
+                         <?php
+                                 $query_de = "SELECT setup_semestermaster.* FROM setup_semestermaster WHERE setup_semestermaster.sectionmaster_Id = '$SectionMaster_Id' ";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['Semester_Name']."</option>";
+                                 }
+                         ?>
+
+                     </select>
+
+                     <br>
+
+                     <label for="email">Select Division Name*  </label>
+                     <select class="form-control drop_sel" id="add_divisionmaster_Id" name="add_divisionmaster_Id">
+                        <option value="">Select Division</option>
+                         <?php
+                                 $query_de = "SELECT setup_divisionmaster.* FROM setup_divisionmaster WHERE setup_divisionmaster.sectionmaster_Id = '$SectionMaster_Id'";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['Division']."</option>";
+                                 }
+                         ?>
+
+                     </select>
+
+                     <br>
                      <label for="email">Batch*  </label>
-                     <select class="form-control drop_sel" id="add_batchmasterid" name="add_batchmasterid" readonly style="pointer-events: none;">
+                     <select class="form-control drop_sel" id="add_batchmaster_Id" name="add_batchmaster_Id" readonly style="pointer-events: none;">
                          <?php
                                  $query_de = "SELECT setup_batchmaster.* FROM setup_batchmaster JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_streammaster.sectionmaster_Id = '$SectionMaster_Id' AND setup_batchmaster.academicyear_Id = '$Acadmic_Year_ID' ";
                                  $run_de = mysqli_query($mysqli,$query_de);
@@ -309,19 +543,20 @@ include_once '../../config/database.php';
                  <div class="form-group">
                      <input type="hidden" class="form-control" id="edit_InstanceId" name="edit_InstanceId">
                      <label for="email">Enter Batch Name*  </label>
-                     <input type="text" class="form-control" id="edit_batchgroup_name" name="edit_batchgroup_name" placeholder="Enter Program Name">
+                     <input type="text" class="form-control" id="edit_batchCourse_Name" name="edit_batchCourse_Name" placeholder="Enter Program Name">
                      <br>
                      <label for="email">Enter Abbreviation*  </label>
                      <input type="text" class="form-control" id="edit_abbreviation" name="edit_abbreviation" placeholder="Enter Abbreviation">
                      <br>
-                     <label for="email">Enter Seat Capacity*  </label>
-                     <input type="text" class="form-control" id="edit_capacity" name="edit_capacity" placeholder="Enter Program Code">
+                     <label for="email">Enter Capacity*  </label>
+                     <input type="text" class="form-control" id="edit_capacity" name="edit_capacity" placeholder="Enter Capacity">
                      <br>
-                     <label for="email">Enter Previous Group*  </label>
-                     <input type="text" class="form-control" id="edit_prev_group" name="edit_prev_group" placeholder="Enter Previous Group">
+                     <label for="email">Enter Course Numbering*  </label>
+                     <input type="number" class="form-control" id="edit_course_numbering" name="edit_course_numbering" placeholder="Enter Previous Group">
+
                      <br>
                      <label for="email">Select Group Name*  </label>
-                     <select class="form-control drop_sel" id="edit_groupmasterid" name="edit_groupmasterid">
+                     <select class="form-control drop_sel" id="edit_groupmaster_Id" name="edit_groupmaster_Id">
                         <option value="">Select Group</option>
                          <?php
                                  $query_de = "SELECT setup_groupmaster.* FROM `setup_groupmaster` JOIN setup_batchmaster ON setup_batchmaster.programmaster_Id = setup_groupmaster.programmaster_Id WHERE setup_batchmaster.Id = '$batch_sel'";
@@ -332,9 +567,53 @@ include_once '../../config/database.php';
                          ?>
 
                      </select>
+
+                     <br>
+                     <label for="email">Select Course Name*  </label>
+                     <select class="form-control drop_sel" id="edit_coursemaster_Id" name="edit_coursemaster_Id">
+                        <option value="">Select Course</option>
+                         <?php
+                                 $query_de = "SELECT setup_coursemaster.* FROM setup_coursemaster JOIN setup_batchmaster ON setup_batchmaster.programmaster_Id = setup_coursemaster.programmaster_Id WHERE setup_batchmaster.Id = '$batch_sel' ";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['course_name']."</option>";
+                                 }
+                         ?>
+
+                     </select>
+                     <br>
+                     <label for="email">Select Semester Name*  </label>
+                     <select class="form-control drop_sel" id="edit_semestermaster_Id" name="edit_semestermaster_Id">
+                        <option value="">Select Semester</option>
+                         <?php
+                                 $query_de = "SELECT setup_semestermaster.* FROM setup_semestermaster WHERE setup_semestermaster.sectionmaster_Id = '$SectionMaster_Id' ";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['Semester_Name']."</option>";
+                                 }
+                         ?>
+
+                     </select>
+
+                     <br>
+
+                     <label for="email">Select Division Name*  </label>
+                     <select class="form-control drop_sel" id="edit_divisionmaster_Id" name="edit_divisionmaster_Id">
+                        <option value="">Select Division</option>
+                         <?php
+                                 $query_de = "SELECT setup_divisionmaster.* FROM setup_divisionmaster WHERE setup_divisionmaster.sectionmaster_Id = '$SectionMaster_Id'";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['Division']."</option>";
+                                 }
+                         ?>
+
+                     </select>
+
+
                      <br>
                      <label for="email">Batch*  </label>
-                     <select class="form-control drop_sel" id="edit_batchmasterid" name="edit_batchmasterid" readonly style="pointer-events: none;">
+                     <select class="form-control drop_sel" id="edit_batchmaster_Id" name="edit_batchmaster_Id" readonly style="pointer-events: none;">
                          <?php
                                  $query_de = "SELECT setup_batchmaster.* FROM setup_batchmaster JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_streammaster.sectionmaster_Id = '$SectionMaster_Id' AND setup_batchmaster.academicyear_Id = '$Acadmic_Year_ID' ";
                                  $run_de = mysqli_query($mysqli,$query_de);
@@ -380,7 +659,7 @@ $('#FilterForm').submit(function(e){
     $("#DisplayDiv").css("display", "none");
     
     $.ajax({
-        url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+        url:'./setup/batchcoursemaster.php?Generate_View='+'u',
         type:'GET',
         data: {batch_sel:batch_sel},
         success:function(srh_response){
@@ -388,7 +667,7 @@ $('#FilterForm').submit(function(e){
             $("#loader").css("display", "none");
             $("#DisplayDiv").css("display", "block");
 
-            $('#add_batchmasterid').val(batch_sel);
+            $('#add_batchmaster_Id').val(batch_sel);
             
             $('#batch_sel_import').val(batch_sel);
         },
@@ -415,19 +694,23 @@ $('.add_instance').click(function(event){
 //INSTANCE ADD-----------------------------------------------------------------------------------------------------------
 
 $('#submit_addinstance').click(function(event){
-   var add_batchgroup_name = $('#add_batchgroup_name').val();
+   var add_batchCourse_Name = $('#add_batchCourse_Name').val();
    var add_abbreviation = $('#add_abbreviation').val();
    var add_capacity = $('#add_capacity').val();
-   var add_prev_group = $('#add_prev_group').val();
+   var add_course_numbering = $('#add_course_numbering').val();
 
-   var add_groupmasterid = $('#add_groupmasterid').val();
-   var add_batchmasterid = $('#add_batchmasterid').val();
+   var add_groupmaster_Id = $('#add_groupmaster_Id').val();
+   var add_coursemaster_Id = $('#add_coursemaster_Id').val();
+   var add_semestermaster_Id = $('#add_semestermaster_Id').val();
+   var add_divisionmaster_Id = $('#add_divisionmaster_Id').val();
+
+   var add_batchmaster_Id = $('#add_batchmaster_Id').val();
  
    
    var batch_sel = $('#batch_sel').val();
 
 
-    if(add_batchgroup_name == '' || add_abbreviation == '' || add_capacity == '' || add_batchmasterid == '' || add_groupmasterid == ''|| add_prev_group == '' ){
+    if(add_batchCourse_Name == '' || add_abbreviation == '' || add_capacity == '' || add_batchmaster_Id == '' || add_groupmaster_Id == ''|| add_course_numbering == '' || add_coursemaster_Id == '' || add_semestermaster_Id == '' || add_divisionmaster_Id == ''){
         iziToast.warning({
             title: 'Empty Fields',
             message: 'All fields is mandatory',
@@ -439,14 +722,14 @@ $('#submit_addinstance').click(function(event){
     $("#DisplayDiv").css("display", "none");
 
     $.ajax({
-        url:'./setup/setup_api.php?Add_BatchGroupInstance='+'u',
+        url:'./setup/setup_api.php?Add_BatchCourseInstance='+'u',
         type:'POST',
-        data: {add_batchgroup_name:add_batchgroup_name,add_abbreviation:add_abbreviation,add_capacity:add_capacity, add_batchmasterid:add_batchmasterid, add_groupmasterid:add_groupmasterid, add_prev_group:add_prev_group},
+        data: {add_batchCourse_Name:add_batchCourse_Name,add_abbreviation:add_abbreviation,add_capacity:add_capacity, add_batchmaster_Id:add_batchmaster_Id, add_groupmaster_Id:add_groupmaster_Id, add_course_numbering:add_course_numbering, add_coursemaster_Id:add_coursemaster_Id, add_semestermaster_Id:add_semestermaster_Id, add_divisionmaster_Id:add_divisionmaster_Id},
         dataType: "json",
         success:function(add_instance_res){  
             if(add_instance_res['status'] == 'success'){
                 $.ajax({
-                    url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+                    url:'./setup/batchcoursemaster.php?Generate_View='+'u',
                     type:'GET',
                     data: {batch_sel: batch_sel},
                     success:function(st_logs){
@@ -455,11 +738,11 @@ $('#submit_addinstance').click(function(event){
                         $("#DisplayDiv").css("display", "block");
                         iziToast.success({
                             title: 'Success',
-                            message: 'BatchGroup Instance Added',
+                            message: 'BatchCourse Instance Added',
                         });
 
                                     
-                        $('#add_batchmasterid').val(batch_sel);
+                        $('#add_batchmaster_Id').val(batch_sel);
                         
                         $('#batch_sel_import').val(batch_sel);
                     },
@@ -471,7 +754,7 @@ $('#submit_addinstance').click(function(event){
                        $("#DisplayDiv").css("display", "block");
                        iziToast.error({
                            title: 'Duplicate',
-                           message: 'BatchGroup Already Exist',
+                           message: 'BatchCourse Already Exist',
                        });
            }
 
@@ -491,14 +774,14 @@ $('.delete_instance_btn').click(function(event){
 
     if (confirm('Are you sure you want to Delete Existing Instance?')) {
         $.ajax({
-            url:'./setup/setup_api.php?Delete_BatchGroupInstance='+'u',
+            url:'./setup/setup_api.php?Delete_BatchCourseInstance='+'u',
             type: 'POST',
             data: {delete_instance_Id:delete_instance_Id},
             success:function(del_msg){
                 if(del_msg == '200'){
                     
                     $.ajax({
-                        url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+                        url:'./setup/batchcoursemaster.php?Generate_View='+'u',
                         type:'GET',
                         data: {batch_sel: batch_sel},
                         success:function(st_logs){
@@ -507,11 +790,11 @@ $('.delete_instance_btn').click(function(event){
                             $("#DisplayDiv").css("display", "block");
                             iziToast.success({
                                 title: 'Success',
-                                message: 'BatchGroup Deleted',
+                                message: 'BatchCourse Deleted',
                             });
 
                                             
-                            $('#add_batchmasterid').val(batch_sel);
+                            $('#add_batchmaster_Id').val(batch_sel);
                             
                             $('#batch_sel_import').val(batch_sel);
                         },
@@ -546,20 +829,28 @@ $('.edit_instance_btn').click(function(event){
 
     var fetch_Edited_Id = createURL.searchParams.get('fetch_edit_Id');
     var fetch_Edited_abbreviation = createURL.searchParams.get('fetch_edit_abbreviation');
-    var fetch_Edited_batchgroup_name = createURL.searchParams.get('fetch_edit_batchgroup_name');
-    var fetch_Edited_capacity = createURL.searchParams.get('fetch_edit_capacity');
+    var fetch_Edited_batchCourse_Name = createURL.searchParams.get('fetch_edit_batchCourse_Name');
+    var fetch_Edited_capacity = createURL.searchParams.get('fetch_edit_seat_capacity');
     var fetch_programmaster_Id = createURL.searchParams.get('fetch_edit_programmaster_Id');
-    var fetch_groupmasterid = createURL.searchParams.get('fetch_edit_groupmasterid');
-    var fetch_prev_group = createURL.searchParams.get('fetch_edit_prev_group');
+    var fetch_groupmaster_Id = createURL.searchParams.get('fetch_edit_groupmaster_Id');
+    var fetch_course_numbering = createURL.searchParams.get('fetch_edit_course_numbering');
+
+    var fetch_coursemaster_Id = createURL.searchParams.get('fetch_edit_coursemaster_Id');
+    var fetch_semestermaster_Id = createURL.searchParams.get('fetch_edit_semestermaster_Id');
+    var fetch_divisionmaster_Id = createURL.searchParams.get('fetch_edit_divisionmaster_Id');
 
     //Assign Value To Editable Compoents
     $('#edit_InstanceId').val(fetch_Edited_Id);
     $('#edit_abbreviation').val(fetch_Edited_abbreviation);
-    $('#edit_batchgroup_name').val(fetch_Edited_batchgroup_name);
+    $('#edit_batchCourse_Name').val(fetch_Edited_batchCourse_Name);
     $('#edit_capacity').val(fetch_Edited_capacity);
-    $('#edit_prev_group').val(fetch_prev_group);
+    $('#edit_course_numbering').val(fetch_course_numbering);
     $('#edit_programmaster_Id').val(fetch_programmaster_Id);
-    $('#edit_groupmasterid').val(fetch_groupmasterid);
+    $('#edit_groupmaster_Id').val(fetch_groupmaster_Id);
+
+    $('#edit_coursemaster_Id').val(fetch_coursemaster_Id);
+    $('#edit_semestermaster_Id').val(fetch_semestermaster_Id);
+    $('#edit_divisionmaster_Id').val(fetch_divisionmaster_Id);
 
 });
 //Instance Edit Close----------------------------------------------------------------------------------------------------
@@ -578,14 +869,14 @@ $('#submit_editinstance').click(function(event){
     $("#DisplayDiv").css("display", "none");
     
     $.ajax({
-        url:'./setup/setup_api.php?Edit_BatchGroupInstance='+'u',
+        url:'./setup/setup_api.php?Edit_BatchCourseInstance='+'u',
         type:'POST',
         data: EditData,
         dataType: "json",
         success:function(edit_instance_res){  
             if(edit_instance_res == '200'){
                 $.ajax({
-                    url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+                    url:'./setup/batchcoursemaster.php?Generate_View='+'u',
                     type:'GET',
                     data: {batch_sel: batch_sel},
                     success:function(sd_logs){
@@ -594,11 +885,11 @@ $('#submit_editinstance').click(function(event){
                         $("#DisplayDiv").css("display", "block");
                         iziToast.success({
                             title: 'Success',
-                            message: 'BatchGroup Instance Edited',
+                            message: 'BatchCourse Instance Edited',
                         });
 
                                     
-                        $('#add_batchmasterid').val(batch_sel);
+                        $('#add_batchmaster_Id').val(batch_sel);
                         
                         $('#batch_sel_import').val(batch_sel);
                     },
@@ -607,7 +898,7 @@ $('#submit_editinstance').click(function(event){
             }else{
 
                 $.ajax({
-                    url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+                    url:'./setup/batchcoursemaster.php?Generate_View='+'u',
                     type:'GET',
                     data: {batch_sel: batch_sel},
                     success:function(sd_logs){
@@ -620,7 +911,7 @@ $('#submit_editinstance').click(function(event){
                         });
 
                                     
-                        $('#add_batchmasterid').val(batch_sel);
+                        $('#add_batchmaster_Id').val(batch_sel);
                         
                         $('#batch_sel_import').val(batch_sel);
                     },
@@ -648,7 +939,7 @@ $('#import_file_submit').on('click', function(event){
         $("#loader").css("display", "block");
         $("#DisplayDiv").css("display", "none");
         jQuery.ajax({
-            url: './setup/setup_api.php?Add_BatchGroupInstance_InBulk=u',
+            url: './setup/setup_api.php?Add_BatchCourseInstance_InBulk=u',
             type: 'POST',
             enctype: 'multipart/form-data',
             processData: false,  // Important!
@@ -697,14 +988,14 @@ $('#import_file_submit').on('click', function(event){
 
 
 					jQuery.ajax({
-                        url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+                        url:'./setup/batchcoursemaster.php?Generate_View='+'u',
 						type: "GET",
                         data: {batch_sel:batch_sel},
 						success:function(data){
 							$('#DisplayDiv').html(data);
 							$("#loader").css("display", "none");
 							$("#DisplayDiv").css("display", "block");
-                            $('#add_batchmasterid').val(batch_sel);
+                            $('#add_batchmaster_Id').val(batch_sel);
                             
                             $('#batch_sel_import').val(batch_sel);
 							}

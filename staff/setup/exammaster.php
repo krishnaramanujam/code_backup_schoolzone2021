@@ -11,7 +11,7 @@ include_once '../../config/database.php';
 <div class="container">
 
     <div class="row">
-        <div class="col-md-11"><h3 style="font-weight:bold;font-style:italic;" class="font_all"><i class="fa fa-clock-o text-primary" aria-hidden="true"></i>  Batch Group Master</h3></div>   
+        <div class="col-md-11"><h3 style="font-weight:bold;font-style:italic;" class="font_all"><i class="fa fa-clock-o text-primary" aria-hidden="true"></i>  Exam Master</h3></div>   
     </div>
 
 
@@ -21,20 +21,20 @@ include_once '../../config/database.php';
         <div class="row">
 
                 <div class="col-md-1" style="text-align:center;">
-                    <label for="email">Batch:</label>
+                    <label for="email">Batch Course:</label>
                 </div>
 
                 <div class="col-md-2"> 
-                    <select name="batch_sel" id="batch_sel" class="form-control" style="margin-right:50px;" required>
-                                <option value="">---- Select Batch ----</option>
+                    <select name="batchcourse_sel" id="batchcourse_sel" class="form-control" style="margin-right:50px;" required>
+                                <option value="">---- Select Batch Course----</option>
                                 <?php 
                                 
-                                    $batch_fetch = mysqli_query($mysqli,"SELECT setup_batchmaster.* FROM setup_batchmaster JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_streammaster.sectionmaster_Id = '$SectionMaster_Id' AND setup_batchmaster.academicyear_Id = '$Acadmic_Year_ID'  ");
+                                    $batch_fetch = mysqli_query($mysqli,"SELECT setup_batchcoursemaster.* FROM setup_batchcoursemaster JOIN setup_batchmaster ON setup_batchmaster.Id = setup_batchcoursemaster.batchmaster_Id JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_streammaster.sectionmaster_Id = '$SectionMaster_Id' AND setup_batchmaster.academicyear_Id = '$Acadmic_Year_ID'  ");
 
                                     while($r_batch = mysqli_fetch_array($batch_fetch)){ ?>
                                     <option value="<?php echo $r_batch['Id']; ?>"  
-                                    <?php if($_GET['batch_sel'] == $r_batch['Id']){ echo 'Selected'; } ?>
-                                    ><?php echo $r_batch['batch_name']; ?></option>
+                                    <?php if($_GET['batchcourse_sel'] == $r_batch['Id']){ echo 'Selected'; } ?>
+                                    ><?php echo $r_batch['batchCourse_Name']; ?></option>
                                 <?php }   ?>
                     </select>
                 </div>
@@ -56,14 +56,14 @@ include_once '../../config/database.php';
     if(isset($_GET['Generate_View'])){
 
 
-        $batch_sel = $_GET['batch_sel'];
+        $batchcourse_sel = $_GET['batchcourse_sel'];
 
 ?>
 
 
 
 <div class="row">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="headingFive">
                 <h4 class="panel-title">
@@ -78,54 +78,23 @@ include_once '../../config/database.php';
                             <thead>
                                 <tr>
                                     <th>Sr No</th>
-                                    <th>Batchgroup Name</th>
-                                    <th>Abbreviation</th>
-                                    <th>Capacity</th>
-                                    <th>Previous Group</th>
-                                    <th>Group Master No</th>
-                                    <th></th>
-                                    <th>Please remove the below data before importing:</th>
-                                    <th>Please remove the below data before importing:</th>
+                                    <th>Maximum Marks</th>
+                                    <th>Date</th>
+                                    <th>Passing Marks</th>
+                                  
                                 </tr>
                             </thead>
                             <tbody>
 
                             <tr>
+                              
                                 <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>Group No</td>
-                                <td>Group Name</td>
+                               
                             </tr>
 
-                            <?php
-                                 $query_de = "SELECT setup_groupmaster.* FROM `setup_groupmaster` JOIN setup_batchmaster ON setup_batchmaster.programmaster_Id = setup_groupmaster.programmaster_Id WHERE setup_batchmaster.Id = '$batch_sel' ";
-                                 $run_de = mysqli_query($mysqli,$query_de);
-                                 while($run_d = mysqli_fetch_array($run_de)){  ?>
-
-                                   <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td><?php echo $run_d['Id']; ?></td>
-                                    <td><?php echo $run_d['group_name']; ?></td>
-                                   </tr>
-
-                                 
-                                 <?php
-                                 }
-                            ?>
-
-
-                                
                             </tbody>
                         </table>
                 </div>
@@ -133,7 +102,7 @@ include_once '../../config/database.php';
             </div> <!--Close Panel -->
         </div>	
 
-        <div class="col-md-2">
+        <div class="col-md-4">
             <a onclick="$('#contact_dialog').modal('show');" class="btn btn-default">
                     <i class="fa fa-upload" aria-hidden="true"></i> Import
             </a>
@@ -152,7 +121,7 @@ include_once '../../config/database.php';
                     <div class="modal-body" style="padding-bottom:10%">
                         <form id="import_file_form" method="post" enctype="multipart/form-data">
                             
-                            <input type="hidden" name="batch_sel_import" id="batch_sel_import" val="">
+                            <input type="hidden" name="batchcourse_sel_import" id="batchcourse_sel_import" val="">
                             
                             <div class="form-group">
                                 <div class="form-group">
@@ -185,40 +154,36 @@ include_once '../../config/database.php';
          <form id="All_instance_form">
          <table class="table table-striped" id="InstanceMaster_Table">
              <thead>
-                 <tr><th>Sr No.</th><th style="text-align:left;">Batch Group Name</th><th>Abbreviation</th><th>Capacity</th><th>previous group</th><th>Group Name</th><th>Operations</th></tr>
+                 <tr><th>Sr No.</th><th>Maximum marks</th><th>Date</th><th>Passing Marks</th><th>Operations</th></tr>
              </thead>
              <tbody>
-                 <?php  $instance_fetch_q = mysqli_query($mysqli,"SELECT setup_batchgroupmaster.*, setup_groupmaster.group_name FROM `setup_batchgroupmaster` JOIN setup_groupmaster ON setup_groupmaster.Id = setup_batchgroupmaster.groupmasterid WHERE setup_batchgroupmaster.batchmasterid = '$batch_sel'   ");
+                 <?php  $instance_fetch_q = mysqli_query($mysqli,"SELECT exam_master.* FROM exam_master WHERE exam_master.batchcoursemaster_Id = '$batchcourse_sel'    ");
                  $i = 1; while($r_instance_fetch = mysqli_fetch_array($instance_fetch_q)){  ?>
                      <tr> 
                          <td style="width:10%"><?php echo $i; ?></td>
-                         <td style="width:15%;text-align:left;"><?php echo $r_instance_fetch['batchgroup_name']; ?></td>
-                         <td style="width:10%"><?php echo $r_instance_fetch['abbreviation']; ?></td>
-                         <td style="width:10%"><?php echo $r_instance_fetch['Capacity']; ?></td>
-                         <td style="width:15%"><?php echo $r_instance_fetch['prev_group']; ?></td>
-                         <td style="width:10%"><?php echo $r_instance_fetch['group_name']; ?></td>
-                         <td style="width:20%">
+                         <td style="width:10%;"><?php echo $r_instance_fetch['Maximum_marks']; ?></td>
+                         <td style="width:10%"><?php echo $r_instance_fetch['Date']; ?></td>
+                         <td style="width:10%"><?php echo $r_instance_fetch['passing_marks']; ?></td>
+                        
+                         <td style="width:25%">
                          <div class="btn-group btn-group-xs" role="group" aria-label="...">
                             
                              <div class="btn-group" role="group">
-                                 <a href="#Edit_Scroll"><button type="button" class="btn btn-default edit_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Edit BatchGroup Instance" data-toggle="tooltip"><span class="glyphicon glyphicon-edit" aria-hidden="true" style="color:#33b5e5;"></span></button></a>
+                                 <a href="#Edit_Scroll"><button type="button" class="btn btn-default edit_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Edit Exam Instance" data-toggle="tooltip"><span class="glyphicon glyphicon-edit" aria-hidden="true" style="color:#33b5e5;"></span></button></a>
                              </div>
                              <div class="btn-group" role="group">
-                                 <button type="button" class="btn btn-default delete_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Delete BatchGroup Instance" data-toggle="tooltip"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:#ff3547;"></span></button>
+                                 <button type="button" class="btn btn-default delete_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Delete Exam Instance" data-toggle="tooltip"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:#ff3547;"></span></button>
                              </div>
                              </div>
 
                              <input type="hidden" value="<?php echo $r_instance_fetch['Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Id">
-                             <input type="hidden"  value="<?php echo $r_instance_fetch['batchgroup_name']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_batchgroup_name">
+                             <input type="hidden"  value="<?php echo $r_instance_fetch['Maximum_marks']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Maximum_marks">
 
-                             <input type="hidden"  value="<?php echo $r_instance_fetch['abbreviation']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_abbreviation">
+                             <input type="hidden"  value="<?php echo $r_instance_fetch['Date']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Date">
 
-                             <input type="hidden" value="<?php echo $r_instance_fetch['Capacity']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_capacity">
-                             <input type="hidden"  value="<?php echo $r_instance_fetch['prev_group']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_prev_group">
-
-                             <input type="hidden"  value="<?php echo $r_instance_fetch['groupmasterid']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_groupmasterid">
-                      
-                             <input type="hidden"  value="<?php echo $r_instance_fetch['batchmasterid']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_batchmasterid">
+                             <input type="hidden" value="<?php echo $r_instance_fetch['passing_marks']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_passing_marks">
+                            
+                             <input type="hidden"  value="<?php echo $r_instance_fetch['batchcoursemaster_Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_batchcoursemaster_Id">
                             
                             
 
@@ -238,46 +203,30 @@ include_once '../../config/database.php';
              <div class="panel-heading" role="tab" id="headingOne">
              <h4 class="panel-title">
                  <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                 Create New BatchGroup Instance
+                 Create New Exam Instance
                  </a>
              </h4>
              </div>
              <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
              <div class="panel-body">
                  <div class="form-group">
-                     <label for="email">Enter Batch Group Name*  </label>
-                     <input type="text" class="form-control" id="add_batchgroup_name" name="add_batchgroup_name" placeholder="Enter Batch Group Name">
+                     <label for="email">Enter Maximum Marks*  </label>
+                     <input type="text" class="form-control" id="add_Maximum_marks" name="add_Maximum_marks" placeholder="Enter Maximum marks">
                      <br>
-                     <label for="email">Enter Abbreviation*  </label>
-                     <input type="text" class="form-control" id="add_abbreviation" name="add_abbreviation" placeholder="Enter Abbreviation">
+                     <label for="email">Enter Date*  </label>
+                     <input type="text" class="form-control" id="add_Date" name="add_Date" placeholder="Enter Date">
                      <br>
-                     <label for="email">Enter Capacity*  </label>
-                     <input type="text" class="form-control" id="add_capacity" name="add_capacity" placeholder="Enter Capacity">
+                     <label for="email">Enter Passing Marks*  </label>
+                     <input type="text" class="form-control" id="add_passing_marks" name="add_passing_marks" placeholder="Enter Passing Marks">
+                     
                      <br>
-                     <label for="email">Enter Previous Group*  </label>
-                     <input type="text" class="form-control" id="add_prev_group" name="add_prev_group" placeholder="Enter Previous Group">
-                     <br>
-                     <label for="email">Select Group Name*  </label>
-                     <select class="form-control drop_sel" id="add_groupmasterid" name="add_groupmasterid">
-                        <option value="">Select Group</option>
+                     <label for="email">BatchCourse*  </label>
+                     <select class="form-control drop_sel" id="add_batchcoursemaster_Id" name="add_batchcoursemaster_Id" readonly style="pointer-events: none;">
                          <?php
-                                 $query_de = "SELECT setup_groupmaster.* FROM `setup_groupmaster` JOIN setup_batchmaster ON setup_batchmaster.programmaster_Id = setup_groupmaster.programmaster_Id WHERE setup_batchmaster.Id = '$batch_sel'";
+                                 $query_de = "SELECT setup_batchcoursemaster.* FROM setup_batchcoursemaster JOIN setup_batchmaster ON setup_batchmaster.Id = setup_batchcoursemaster.batchmaster_Id JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_streammaster.sectionmaster_Id = '$SectionMaster_Id' AND setup_batchmaster.academicyear_Id = '$Acadmic_Year_ID' ";
                                  $run_de = mysqli_query($mysqli,$query_de);
                                  while($run_d = mysqli_fetch_array($run_de)){ 
-                                     echo "<option value=".$run_d['Id'].">".$run_d['group_name']."</option>";
-                                 }
-                         ?>
-
-                     </select>
-
-                     <br>
-                     <label for="email">Batch*  </label>
-                     <select class="form-control drop_sel" id="add_batchmasterid" name="add_batchmasterid" readonly style="pointer-events: none;">
-                         <?php
-                                 $query_de = "SELECT setup_batchmaster.* FROM setup_batchmaster JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_streammaster.sectionmaster_Id = '$SectionMaster_Id' AND setup_batchmaster.academicyear_Id = '$Acadmic_Year_ID' ";
-                                 $run_de = mysqli_query($mysqli,$query_de);
-                                 while($run_d = mysqli_fetch_array($run_de)){ 
-                                     echo "<option value=".$run_d['Id'].">".$run_d['batch_name']."</option>";
+                                     echo "<option value=".$run_d['Id'].">".$run_d['batchCourse_Name']."</option>";
                                  }
                          ?>
 
@@ -299,7 +248,7 @@ include_once '../../config/database.php';
              <h4 class="panel-title">
              <button type="button" class="close add_instance"><span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#3c8dbc;"></span></button>
                  <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                 Edit Batch Group Instance 
+                 Edit Exam Instance 
                  </a>
              </h4>
              </div>
@@ -307,43 +256,31 @@ include_once '../../config/database.php';
              <form id="Edit_FormData">
              <div class="panel-body">
                  <div class="form-group">
-                     <input type="hidden" class="form-control" id="edit_InstanceId" name="edit_InstanceId">
-                     <label for="email">Enter Batch Name*  </label>
-                     <input type="text" class="form-control" id="edit_batchgroup_name" name="edit_batchgroup_name" placeholder="Enter Program Name">
+                 <input type="hidden" class="form-control" id="edit_InstanceId" name="edit_InstanceId">
+                     
+                 <label for="email">Enter Maximum Marks*  </label>
+                     <input type="text" class="form-control" id="edit_Maximum_marks" name="edit_Maximum_marks" placeholder="Enter Maximum marks">
                      <br>
-                     <label for="email">Enter Abbreviation*  </label>
-                     <input type="text" class="form-control" id="edit_abbreviation" name="edit_abbreviation" placeholder="Enter Abbreviation">
+                     <label for="email">Enter Date*  </label>
+                     <input type="text" class="form-control" id="edit_Date" name="edit_Date" placeholder="Enter Date">
                      <br>
-                     <label for="email">Enter Seat Capacity*  </label>
-                     <input type="text" class="form-control" id="edit_capacity" name="edit_capacity" placeholder="Enter Program Code">
+                     <label for="email">Enter Passing Marks*  </label>
+                     <input type="text" class="form-control" id="edit_passing_marks" name="edit_passing_marks" placeholder="Enter Passing Marks">
+                     
                      <br>
-                     <label for="email">Enter Previous Group*  </label>
-                     <input type="text" class="form-control" id="edit_prev_group" name="edit_prev_group" placeholder="Enter Previous Group">
-                     <br>
-                     <label for="email">Select Group Name*  </label>
-                     <select class="form-control drop_sel" id="edit_groupmasterid" name="edit_groupmasterid">
-                        <option value="">Select Group</option>
+                     <label for="email">BatchCourse*  </label>
+                     <select class="form-control drop_sel" id="edit_batchcoursemaster_Id" name="edit_batchcoursemaster_Id" readonly style="pointer-events: none;">
+                                
                          <?php
-                                 $query_de = "SELECT setup_groupmaster.* FROM `setup_groupmaster` JOIN setup_batchmaster ON setup_batchmaster.programmaster_Id = setup_groupmaster.programmaster_Id WHERE setup_batchmaster.Id = '$batch_sel'";
+                                 $query_de = "SELECT setup_batchcoursemaster.* FROM setup_batchcoursemaster JOIN setup_batchmaster ON setup_batchmaster.Id = setup_batchcoursemaster.batchmaster_Id JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_streammaster.sectionmaster_Id = '$SectionMaster_Id' AND setup_batchmaster.academicyear_Id = '$Acadmic_Year_ID' ";
                                  $run_de = mysqli_query($mysqli,$query_de);
                                  while($run_d = mysqli_fetch_array($run_de)){ 
-                                     echo "<option value=".$run_d['Id'].">".$run_d['group_name']."</option>";
+                                     echo "<option value=".$run_d['Id'].">".$run_d['batchCourse_Name']."</option>";
                                  }
                          ?>
 
                      </select>
-                     <br>
-                     <label for="email">Batch*  </label>
-                     <select class="form-control drop_sel" id="edit_batchmasterid" name="edit_batchmasterid" readonly style="pointer-events: none;">
-                         <?php
-                                 $query_de = "SELECT setup_batchmaster.* FROM setup_batchmaster JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_streammaster.sectionmaster_Id = '$SectionMaster_Id' AND setup_batchmaster.academicyear_Id = '$Acadmic_Year_ID' ";
-                                 $run_de = mysqli_query($mysqli,$query_de);
-                                 while($run_d = mysqli_fetch_array($run_de)){ 
-                                     echo "<option value=".$run_d['Id'].">".$run_d['batch_name']."</option>";
-                                 }
-                         ?>
-
-                     </select>
+                    
 
                  </div>
              </div>
@@ -372,25 +309,37 @@ include_once '../../config/database.php';
 
 
 <script>
+
+
+$('#add_Date').datepicker({
+    format: 'yyyy-mm-dd',
+    autoclose: true
+});
+
+$('#edit_Date').datepicker({
+    format: 'yyyy-mm-dd',
+    autoclose: true
+});
+
 $('#FilterForm').submit(function(e){
     e.preventDefault();
-    var batch_sel = $('#batch_sel').val();
+    var batchcourse_sel = $('#batchcourse_sel').val();
 
     $("#loader").css("display", "block");
     $("#DisplayDiv").css("display", "none");
     
     $.ajax({
-        url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+        url:'./setup/exammaster.php?Generate_View='+'u',
         type:'GET',
-        data: {batch_sel:batch_sel},
+        data: {batchcourse_sel:batchcourse_sel},
         success:function(srh_response){
             $('#DisplayDiv').html(srh_response);
             $("#loader").css("display", "none");
             $("#DisplayDiv").css("display", "block");
 
-            $('#add_batchmasterid').val(batch_sel);
+            $('#add_batchcoursemaster_Id').val(batchcourse_sel);
             
-            $('#batch_sel_import').val(batch_sel);
+            $('#batchcourse_sel_import').val(batchcourse_sel);
         },
    });
 
@@ -415,19 +364,17 @@ $('.add_instance').click(function(event){
 //INSTANCE ADD-----------------------------------------------------------------------------------------------------------
 
 $('#submit_addinstance').click(function(event){
-   var add_batchgroup_name = $('#add_batchgroup_name').val();
-   var add_abbreviation = $('#add_abbreviation').val();
-   var add_capacity = $('#add_capacity').val();
-   var add_prev_group = $('#add_prev_group').val();
-
-   var add_groupmasterid = $('#add_groupmasterid').val();
-   var add_batchmasterid = $('#add_batchmasterid').val();
+   var add_Maximum_marks = $('#add_Maximum_marks').val();
+   var add_Date = $('#add_Date').val();
+   var add_passing_marks = $('#add_passing_marks').val();
+   
+   var add_batchcoursemaster_Id = $('#add_batchcoursemaster_Id').val();
  
    
-   var batch_sel = $('#batch_sel').val();
+   var batchcourse_sel = $('#batchcourse_sel').val();
 
 
-    if(add_batchgroup_name == '' || add_abbreviation == '' || add_capacity == '' || add_batchmasterid == '' || add_groupmasterid == ''|| add_prev_group == '' ){
+    if(add_Maximum_marks == '' || add_Date == '' || add_passing_marks == '' || add_batchcoursemaster_Id == '' ){
         iziToast.warning({
             title: 'Empty Fields',
             message: 'All fields is mandatory',
@@ -439,29 +386,29 @@ $('#submit_addinstance').click(function(event){
     $("#DisplayDiv").css("display", "none");
 
     $.ajax({
-        url:'./setup/setup_api.php?Add_BatchGroupInstance='+'u',
+        url:'./setup/setup_api.php?Add_ExamInstance='+'u',
         type:'POST',
-        data: {add_batchgroup_name:add_batchgroup_name,add_abbreviation:add_abbreviation,add_capacity:add_capacity, add_batchmasterid:add_batchmasterid, add_groupmasterid:add_groupmasterid, add_prev_group:add_prev_group},
+        data: {add_Maximum_marks:add_Maximum_marks,add_Date:add_Date,add_passing_marks:add_passing_marks, add_batchcoursemaster_Id:add_batchcoursemaster_Id},
         dataType: "json",
         success:function(add_instance_res){  
             if(add_instance_res['status'] == 'success'){
                 $.ajax({
-                    url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+                    url:'./setup/exammaster.php?Generate_View='+'u',
                     type:'GET',
-                    data: {batch_sel: batch_sel},
+                    data: {batchcourse_sel: batchcourse_sel},
                     success:function(st_logs){
                         $('#DisplayDiv').html(st_logs);
                         $("#loader").css("display", "none");
                         $("#DisplayDiv").css("display", "block");
                         iziToast.success({
                             title: 'Success',
-                            message: 'BatchGroup Instance Added',
+                            message: 'Exam Instance Added',
                         });
 
                                     
-                        $('#add_batchmasterid').val(batch_sel);
+                        $('#add_batchcoursemaster_Id').val(batchcourse_sel);
                         
-                        $('#batch_sel_import').val(batch_sel);
+                        $('#batchcourse_sel_import').val(batchcourse_sel);
                     },
                 });   
 
@@ -471,7 +418,7 @@ $('#submit_addinstance').click(function(event){
                        $("#DisplayDiv").css("display", "block");
                        iziToast.error({
                            title: 'Duplicate',
-                           message: 'BatchGroup Already Exist',
+                           message: 'Exam Already Exist',
                        });
            }
 
@@ -486,34 +433,34 @@ $('#submit_addinstance').click(function(event){
 //Instance Delete----------------------------------------------------------------------------------------------------
 $('.delete_instance_btn').click(function(event){
     var delete_instance_Id = $(this).attr('id');
-    var batch_sel = $('#batch_sel').val();
+    var batchcourse_sel = $('#batchcourse_sel').val();
 
 
     if (confirm('Are you sure you want to Delete Existing Instance?')) {
         $.ajax({
-            url:'./setup/setup_api.php?Delete_BatchGroupInstance='+'u',
+            url:'./setup/setup_api.php?Delete_ExamInstance='+'u',
             type: 'POST',
             data: {delete_instance_Id:delete_instance_Id},
             success:function(del_msg){
                 if(del_msg == '200'){
                     
                     $.ajax({
-                        url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+                        url:'./setup/exammaster.php?Generate_View='+'u',
                         type:'GET',
-                        data: {batch_sel: batch_sel},
+                        data: {batchcourse_sel: batchcourse_sel},
                         success:function(st_logs){
                             $('#DisplayDiv').html(st_logs);
                             $("#loader").css("display", "none");
                             $("#DisplayDiv").css("display", "block");
                             iziToast.success({
                                 title: 'Success',
-                                message: 'BatchGroup Deleted',
+                                message: 'Exam Deleted',
                             });
 
                                             
-                            $('#add_batchmasterid').val(batch_sel);
+                            $('#add_batchcoursemaster_Id').val(batchcourse_sel);
                             
-                            $('#batch_sel_import').val(batch_sel);
+                            $('#batchcourse_sel_import').val(batchcourse_sel);
                         },
                     });   
 
@@ -545,21 +492,19 @@ $('.edit_instance_btn').click(function(event){
 
 
     var fetch_Edited_Id = createURL.searchParams.get('fetch_edit_Id');
-    var fetch_Edited_abbreviation = createURL.searchParams.get('fetch_edit_abbreviation');
-    var fetch_Edited_batchgroup_name = createURL.searchParams.get('fetch_edit_batchgroup_name');
-    var fetch_Edited_capacity = createURL.searchParams.get('fetch_edit_capacity');
-    var fetch_programmaster_Id = createURL.searchParams.get('fetch_edit_programmaster_Id');
-    var fetch_groupmasterid = createURL.searchParams.get('fetch_edit_groupmasterid');
-    var fetch_prev_group = createURL.searchParams.get('fetch_edit_prev_group');
+    var fetch_Edited_Maximum_marks = createURL.searchParams.get('fetch_edit_Maximum_marks');
+    var fetch_Edited_Date = createURL.searchParams.get('fetch_edit_Date');
+    var fetch_Edited_passing_marks = createURL.searchParams.get('fetch_edit_passing_marks');
+
+    var fetch_batchcoursemaster_Id = createURL.searchParams.get('fetch_edit_batchcoursemaster_Id');
 
     //Assign Value To Editable Compoents
     $('#edit_InstanceId').val(fetch_Edited_Id);
-    $('#edit_abbreviation').val(fetch_Edited_abbreviation);
-    $('#edit_batchgroup_name').val(fetch_Edited_batchgroup_name);
-    $('#edit_capacity').val(fetch_Edited_capacity);
-    $('#edit_prev_group').val(fetch_prev_group);
-    $('#edit_programmaster_Id').val(fetch_programmaster_Id);
-    $('#edit_groupmasterid').val(fetch_groupmasterid);
+    $('#edit_Maximum_marks').val(fetch_Edited_Maximum_marks);
+    $('#edit_Date').val(fetch_Edited_Date);
+    $('#edit_passing_marks').val(fetch_Edited_passing_marks);
+    
+    $('#edit_batchcoursemaster_Id').val(fetch_batchcoursemaster_Id);
 
 });
 //Instance Edit Close----------------------------------------------------------------------------------------------------
@@ -571,45 +516,45 @@ $('.edit_instance_btn').click(function(event){
 $('#submit_editinstance').click(function(event){
 
     var EditData = $('#Edit_FormData').serializeArray();
-    var batch_sel = $('#batch_sel').val();
+    var batchcourse_sel = $('#batchcourse_sel').val();
 
 
     $("#loader").css("display", "block");
     $("#DisplayDiv").css("display", "none");
     
     $.ajax({
-        url:'./setup/setup_api.php?Edit_BatchGroupInstance='+'u',
+        url:'./setup/setup_api.php?Edit_ExamInstance='+'u',
         type:'POST',
         data: EditData,
         dataType: "json",
         success:function(edit_instance_res){  
             if(edit_instance_res == '200'){
                 $.ajax({
-                    url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+                    url:'./setup/exammaster.php?Generate_View='+'u',
                     type:'GET',
-                    data: {batch_sel: batch_sel},
+                    data: {batchcourse_sel: batchcourse_sel},
                     success:function(sd_logs){
                         $('#DisplayDiv').html(sd_logs);
                         $("#loader").css("display", "none");
                         $("#DisplayDiv").css("display", "block");
                         iziToast.success({
                             title: 'Success',
-                            message: 'BatchGroup Instance Edited',
+                            message: 'Exam Instance Edited',
                         });
 
                                     
-                        $('#add_batchmasterid').val(batch_sel);
+                        $('#add_batchcoursemaster_Id').val(batchcourse_sel);
                         
-                        $('#batch_sel_import').val(batch_sel);
+                        $('#batchcourse_sel_import').val(batchcourse_sel);
                     },
                 });   
 
             }else{
 
                 $.ajax({
-                    url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+                    url:'./setup/exammaster.php?Generate_View='+'u',
                     type:'GET',
-                    data: {batch_sel: batch_sel},
+                    data: {batchcourse_sel: batchcourse_sel},
                     success:function(sd_logs){
                         $('#DisplayDiv').html(sd_logs);
                         $("#loader").css("display", "none");
@@ -620,9 +565,9 @@ $('#submit_editinstance').click(function(event){
                         });
 
                                     
-                        $('#add_batchmasterid').val(batch_sel);
+                        $('#add_batchcoursemaster_Id').val(batchcourse_sel);
                         
-                        $('#batch_sel_import').val(batch_sel);
+                        $('#batchcourse_sel_import').val(batchcourse_sel);
                     },
                 });  
 
@@ -643,12 +588,12 @@ $('#import_file_submit').on('click', function(event){
     $('#contact_dialog').modal('hide');
     let form = $('#import_file_form')[0];
     let data = new FormData(form);
-    var batch_sel = $('#batch_sel').val();
+    var batchcourse_sel = $('#batchcourse_sel').val();
     setTimeout(function(){
         $("#loader").css("display", "block");
         $("#DisplayDiv").css("display", "none");
         jQuery.ajax({
-            url: './setup/setup_api.php?Add_BatchGroupInstance_InBulk=u',
+            url: './setup/setup_api.php?Add_ExamInstance_InBulk=u',
             type: 'POST',
             enctype: 'multipart/form-data',
             processData: false,  // Important!
@@ -697,16 +642,16 @@ $('#import_file_submit').on('click', function(event){
 
 
 					jQuery.ajax({
-                        url:'./setup/batchgroupmaster.php?Generate_View='+'u',
+                        url:'./setup/exammaster.php?Generate_View='+'u',
 						type: "GET",
-                        data: {batch_sel:batch_sel},
+                        data: {batchcourse_sel:batchcourse_sel},
 						success:function(data){
 							$('#DisplayDiv').html(data);
 							$("#loader").css("display", "none");
 							$("#DisplayDiv").css("display", "block");
-                            $('#add_batchmasterid').val(batch_sel);
+                            $('#add_batchcoursemaster_Id').val(batchcourse_sel);
                             
-                            $('#batch_sel_import').val(batch_sel);
+                            $('#batchcourse_sel_import').val(batchcourse_sel);
 							}
                             
 					});

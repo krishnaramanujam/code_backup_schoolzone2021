@@ -159,7 +159,7 @@ include_once '../../config/database.php';
                          <td style="width:10%"><?php echo $r_instance_fetch['abbreviation']; ?></td>
                          <td style="width:10%"><?php echo $r_instance_fetch['previous_group_id']; ?></td>
                          
-                         <td style="width:40%">
+                         <td style="width:20%">
                          <div class="btn-group btn-group-xs" role="group" aria-label="...">
                             
                              <div class="btn-group" role="group">

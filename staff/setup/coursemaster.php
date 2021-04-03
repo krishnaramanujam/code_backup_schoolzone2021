@@ -237,12 +237,12 @@ include_once '../../config/database.php';
                  $i = 1; while($r_instance_fetch = mysqli_fetch_array($instance_fetch_q)){  ?>
                      <tr> 
                          <td style="width:10%"><?php echo $i; ?></td>
-                         <td style="width:20%;text-align:left;"><?php echo $r_instance_fetch['course_name']; ?></td>
+                         <td style="width:15%;text-align:left;"><?php echo $r_instance_fetch['course_name']; ?></td>
                          <td style="width:10%"><?php echo $r_instance_fetch['abbreviation']; ?></td>
                          <td style="width:10%"><?php echo $r_instance_fetch['Semester_Name']; ?></td>
-                         <td style="width:10%"><?php echo $r_instance_fetch['course_number']; ?></td>
+                         <td style="width:15%"><?php echo $r_instance_fetch['course_number']; ?></td>
                          <td style="width:10%"><?php echo $r_instance_fetch['group_name']; ?></td>
-                         <td style="width:40%">
+                         <td style="width:20%">
                          <div class="btn-group btn-group-xs" role="group" aria-label="...">
                             
                              <div class="btn-group" role="group">

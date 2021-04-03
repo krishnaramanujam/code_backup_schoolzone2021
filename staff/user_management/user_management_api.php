@@ -305,4 +305,38 @@ if(isset($_GET['StaffDirectLoginBack'])){
 }
 //-----------------------------------------------------------------------------------------------------------------------
 
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Batch_Access_Control_User'])){
+
+    extract($_POST);
+    
+    $del_entry = "DELETE FROM comm_batch_access WHERE userId = '$user_id'";
+    $del_check = mysqli_query($mysqli,$del_entry);
+
+    foreach($check as $val){
+        
+        $check_entry = "SELECT * FROM `comm_batch_access` where userId = '$user_id' AND batchMaster_Id = '$val'";
+        $q_entry = mysqli_query($mysqli,$check_entry);
+        $row_check = mysqli_num_rows($q_entry); 
+
+        if($row_check > 0){
+
+        }
+        else{
+
+            $insert_dept_access = "insert into comm_batch_access (userId, batchMaster_Id) values ('$user_id','$val')";
+            $check_dept_access = mysqli_query($mysqli,$insert_dept_access);    
+
+        }
+
+        
+        
+    }
+    echo "SUCCESS";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
 ?>

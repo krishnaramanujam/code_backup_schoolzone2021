@@ -76,6 +76,9 @@ $q = "SELECT user_stafflogin.*, setup_sectionmaster.section_name FROM user_staff
             <a onclick="$('#contact_dialog').modal('show');" class="btn btn-default">
                     <i class="fa fa-upload" aria-hidden="true"></i> Import
             </a>
+
+            <button type="button" class="btn btn-default batchAccessLink"
+            data-toggle="tooltip" data-placement="top" title="Batch Access" id="<?php echo $r_instance_fetch['Id']; ?>"><span class="glyphicon glyphicon-tasks" aria-hidden="true" style="color:#fa573c;"></span>Batch Access</button>
         </div>
 
 
@@ -154,7 +157,7 @@ $q = "SELECT user_stafflogin.*, setup_sectionmaster.section_name FROM user_staff
                                 </div>
 
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-default batchAccessLink"
+                                    <button type="button" class="btn btn-default batchAccessUserLink"
                                     data-toggle="tooltip" data-placement="top" title="Batch Access" id="<?php echo $r_instance_fetch['Id']; ?>"><span class="glyphicon glyphicon-tasks" aria-hidden="true" style="color:#fa573c;"></span></button>
                                 </div>
 
@@ -551,7 +554,22 @@ $('.batchAccessLink').click(function(event){
 });
 //Manage Instance Btn close----------------------------------------------------------------------------------------------------------
 
+//Manage Instance Btn----------------------------------------------------------------------------------------------------------
+$('.batchAccessUserLink').click(function(event){
+    var selected_instance_Id = $(this).attr('id');
+    $.ajax({
+        url:'./user_management/control_batch_access_user.php',
+        type:'POST',
+        data: {user_id_edit: selected_instance_Id},
+        success:function(si_logs){
+            $('#DisplayDiv').html(si_logs);
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+        },
+    });  
 
+});
+//Manage Instance Btn close----------------------------------------------------------------------------------------------------------
 //Manage Instance Btn----------------------------------------------------------------------------------------------------------
 $('.departAccessLink').click(function(event){
     var selected_instance_Id = $(this).attr('id');
