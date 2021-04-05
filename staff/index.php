@@ -1,6 +1,6 @@
 <?php
 session_start();
-include_once '../config/database.php';
+include '../config/database.php';
 ini_set( 'max_execution_time', 300 );
 
 
@@ -268,9 +268,9 @@ function hasAccess($permission = [])
           // get unique PARENT nodes directly under ROOT node
           
           if($ActiveStaffLogin_Id == '1'){
-              $search .='SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0  AND link_user_type = 0  AND access_type = 1 ORDER BY `setup_links`.`Id`';  
+              $search .='SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0  AND link_user_type = 0  AND access_type = 1 ORDER BY parent_sequence,`setup_links`.`Id`';  
           }else{
-              $search .= 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 0 AND  access_type = 0 ORDER BY `setup_links`.`Id`';
+              $search .= 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 0 AND  access_type = 0 ORDER BY parent_sequence,`setup_links`.`Id`';
           }
           
 
@@ -278,8 +278,9 @@ function hasAccess($permission = [])
           $innerFlag  = 0;
           $outerFlag  = 0;
 
-          function printView($tree_views)
+          function printView($tree_views , $mysqli)
           {
+      
             global $Admin_Registeration_Id;
 
             $html = '' . PHP_EOL;
@@ -307,13 +308,25 @@ function hasAccess($permission = [])
               elseif ( ($Admin_Registeration_Id == 1 || $Admin_Registeration_Id == 2 || hasAccess( [ $tree_view['Id'] ] )) && !$tree_view['url'] )
               {
 
+
+                  //checking Parent Count
+                $parent_count_q = mysqli_query($mysqli, "SELECT * FROM `setup_links` WHERE `url` IS NULL AND Id = '$tree_view[Id]' ");
+                $row_parent_count = mysqli_fetch_array($parent_count_q);
+              
+
+                // if($row_parent_count['depth'] == $row_parent_count){
+                //   $html .= ' </ul>';
+                //   $parentFolder = 0;
+                // }
+
+
                 $html .= '
                     <li  id="' . $tree_view['Id'] . '" class="treeview">
 
                     <a href="#">
                     <i class="fa fa-folder"  style="color: #f5c601"></i>
                     <span>
-                    ' . $tree_view['header'] . '
+                    ' . $tree_view['header'] . ' 
                     </span>
                     <span class="pull-right-container">
                     <i class="fa fa-angle-left pull-right"></i>
@@ -339,7 +352,7 @@ function hasAccess($permission = [])
                   $html .= '
           <li  id="' . $view['Id'] * 100 . '" class="treeview-menu">' . PHP_EOL;
 
-                  $html .= printView( $subChilds ); // going in
+                  $html .= printView( $subChilds  , $mysqli); // going in
                   $html .= '
           </li>' . PHP_EOL;
 
@@ -397,7 +410,7 @@ function hasAccess($permission = [])
             return $html;
           }
 
-          $page = printView( $tree_views );
+          $page = printView( $tree_views  , $mysqli);
           ini_set( 'memory_limit', '128M' );
 
           //ob_start();
