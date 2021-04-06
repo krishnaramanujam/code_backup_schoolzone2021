@@ -177,6 +177,10 @@ $q = "SELECT user_stafflogin.*, setup_sectionmaster.section_name FROM user_staff
                                 </div>
                                 <?php } ?>
 
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-default SMSHeaderMappingTableLink" data-toggle="tooltip" data-placement="top" title="Module Mapping" id="<?php echo $r_instance_fetch['Id']; ?>"><span class="glyphicon glyphicon-tasks" aria-hidden="true" style="color:#fbb536;"></span></button>
+                                </div>
+
 
 
                                 
@@ -707,6 +711,25 @@ $('#online_table').DataTable( {
     ]
 } );
 
+//Manage Instance Btn----------------------------------------------------------------------------------------------------------
+$('.SMSHeaderMappingTableLink').click(function(event){
+    var selected_instance_Id = $(this).attr('id');
+   
+    $("#loader").css("display", "block");
+    $("#DisplayDiv").css("display", "none");
+
+    $.ajax({
+        url:'./user_management/SMSHeader_EMAILDetailsMapping.php?SelectedUser_Id='+ selected_instance_Id,
+        type:'GET',
+        success:function(si_logs){
+            $('#DisplayDiv').html(si_logs);
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+        },
+    });  
+
+});
+//Manage Instance Btn close----------------------------------------------------------------------------------------------------------
 
 </script>
 

@@ -88,10 +88,10 @@ include_once '../../config/database.php';
     <tbody>
         <?php $i = 1; while($r_batch = mysqli_fetch_array($batch_fetch)){
         
-              $studentsms_fetch = mysqli_query($mysqli,"SELECT count(comm_message_log.comm_message_log_Id) As Student_SMS_Count FROM `comm_message_log` JOIN user_studentbatchmaster ON user_studentbatchmaster.Id = comm_message_log.User_Id WHERE comm_message_log.userIdType = 'SBM_Id' AND comm_message_log.moduleType = 'Communication' AND user_studentbatchmaster.batchMaster_Id = '$r_batch[Id]' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00' ");
+              $studentsms_fetch = mysqli_query($mysqli,"SELECT count(comm_message_log.comm_message_log_Id) As Student_SMS_Count FROM `comm_message_log` JOIN user_studentbatchmaster ON user_studentbatchmaster.Id = comm_message_log.User_Id WHERE comm_message_log.userIdType = 'SBM_Id' AND comm_message_log.moduleType = 'Communication' AND user_studentbatchmaster.batchMaster_Id = '$r_batch[Id]' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00' AND comm_message_log.message_type = '1' ");
               $r_studentsms_fetch = mysqli_fetch_array($studentsms_fetch);
               
-              $candidatesms_fetch = mysqli_query($mysqli,"SELECT count(comm_message_log.comm_message_log_Id) As Candidate_SMS_Count FROM `comm_message_log` JOIN user_applicationdetails ON user_applicationdetails.Id = comm_message_log.User_Id WHERE comm_message_log.userIdType = 'AD_Id' AND comm_message_log.moduleType = 'Communication' AND user_applicationdetails.batchMaster_Id = '$r_batch[Id]' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00' ");
+              $candidatesms_fetch = mysqli_query($mysqli,"SELECT count(comm_message_log.comm_message_log_Id) As Candidate_SMS_Count FROM `comm_message_log` JOIN user_applicationdetails ON user_applicationdetails.Id = comm_message_log.User_Id WHERE comm_message_log.userIdType = 'AD_Id' AND comm_message_log.moduleType = 'Communication' AND user_applicationdetails.batchMaster_Id = '$r_batch[Id]' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00' AND comm_message_log.message_type = '1' ");
               $r_candidatesms_fetch = mysqli_fetch_array($candidatesms_fetch);
 
               $tot_sel_batch = $r_studentsms_fetch['Student_SMS_Count'] + $r_candidatesms_fetch['Candidate_SMS_Count'];

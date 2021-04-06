@@ -260,14 +260,14 @@ include_once '../../config/database.php';
                         $i = 1;
                         While($r_Studentlist = mysqli_fetch_array($Studentlist_q)){
 
-                            $Fees_payment_query = mysqli_query($mysqli,"SELECT fee_receipts.amount FROM fee_receipts JOIN setup_batchmaster ON fee_receipts.batchMaster_Id = setup_batchmaster.Id WHERE fee_receipts.feeheadertype = 1 AND fee_receipts.applicationdetails_id = '$r_Studentlist[AD_Id]' group By fee_receipts.feeheadertype ");
-                            $row_fees_payment = mysqli_num_rows($Fees_payment_query);
+                            // $Fees_payment_query = mysqli_query($mysqli,"SELECT fee_receipts.amount FROM fee_receipts JOIN setup_batchmaster ON fee_receipts.batchMaster_Id = setup_batchmaster.Id WHERE fee_receipts.feeheadertype = 1 AND fee_receipts.applicationdetails_id = '$r_Studentlist[AD_Id]' group By fee_receipts.feeheadertype ");
+                            // $row_fees_payment = mysqli_num_rows($Fees_payment_query);
 
-                            if($row_fees_payment > 0){
-                                $fees_payment_count = mysqli_fetch_array($Fees_payment_query);                   
-                            }else{
-                                $fees_payment_count['amount'] = 0;
-                            }
+                            // if($row_fees_payment > 0){
+                            //     $fees_payment_count = mysqli_fetch_array($Fees_payment_query);                   
+                            // }else{
+                            //     $fees_payment_count['amount'] = 0;
+                            // }
                             
                 ?>
                 

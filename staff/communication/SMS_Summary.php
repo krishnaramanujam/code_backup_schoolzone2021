@@ -62,7 +62,7 @@ include_once '../../config/database.php';
       
 
 // --------------------------------------------------------------------------------------------------------------------------------------------
-        $deliver_candidate_admission_fetch_q = mysqli_query($mysqli, "SELECT comm_message_log.* FROM comm_message_log  WHERE  (userIdType = 'CR_Id' OR userIdType = 'AD_Id') AND moduleType != 'Communication' AND comm_message_log.Status = 'SUBMIT_SUCCESS' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00'");
+        $deliver_candidate_admission_fetch_q = mysqli_query($mysqli, "SELECT comm_message_log.* FROM comm_message_log  WHERE  (userIdType = 'CR_Id' OR userIdType = 'AD_Id') AND moduleType != 'Communication' AND comm_message_log.Status = 'SUBMIT_SUCCESS' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00' AND comm_message_log.message_type = '1'");
         $rows_deliver_candidate_admission_fetch = mysqli_num_rows($deliver_candidate_admission_fetch_q);
         if($rows_deliver_candidate_admission_fetch == '0'){ $Candidate_SMS_Sent = 0; }else{ $Candidate_SMS_Sent = $rows_deliver_candidate_admission_fetch; }
         $DS_TOT_CAF = 0;
@@ -103,7 +103,7 @@ include_once '../../config/database.php';
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------------
-$deliver_student_admission_fetch_q = mysqli_query($mysqli, "SELECT comm_message_log.* FROM comm_message_log  WHERE  userIdType = 'SBM_Id' AND moduleType != 'Communication' AND Status = 'SUBMIT_SUCCESS' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00'");
+$deliver_student_admission_fetch_q = mysqli_query($mysqli, "SELECT comm_message_log.* FROM comm_message_log  WHERE  userIdType = 'SBM_Id' AND moduleType != 'Communication' AND Status = 'SUBMIT_SUCCESS' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00' AND comm_message_log.message_type = '1'");
 $rows_deliver_student_admission_fetch = mysqli_num_rows($deliver_student_admission_fetch_q);
 if($rows_deliver_student_admission_fetch == '0'){ $Student_SMS_Sent = 0; }else{ $Student_SMS_Sent = $rows_deliver_student_admission_fetch; }
 $DS_TOT_SAF = 0;
@@ -140,7 +140,7 @@ if($rows_deliver_student_admission_fetch > 0){
 // --------------------------------------------------------------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------------------------------------------------------------
-$deliver_comm_admission_fetch_q = mysqli_query($mysqli, "SELECT comm_message_log.* FROM comm_message_log  WHERE  (userIdType = 'SBM_Id' OR userIdType = 'AD_Id') AND moduleType = 'Communication' AND Status = 'SUBMIT_SUCCESS' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00'");
+$deliver_comm_admission_fetch_q = mysqli_query($mysqli, "SELECT comm_message_log.* FROM comm_message_log  WHERE  (userIdType = 'SBM_Id' OR userIdType = 'AD_Id') AND moduleType = 'Communication' AND Status = 'SUBMIT_SUCCESS' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00' AND comm_message_log.message_type = '1'");
 $rows_deliver_comm_admission_fetch = mysqli_num_rows($deliver_comm_admission_fetch_q);
 if($rows_deliver_comm_admission_fetch == '0'){ $comm_SMS_Sent = 0; }else{ $comm_SMS_Sent = $rows_deliver_comm_admission_fetch; }
 $DS_TOT_COMM = 0;

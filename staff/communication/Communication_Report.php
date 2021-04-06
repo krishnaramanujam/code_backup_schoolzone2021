@@ -65,7 +65,7 @@ include_once '../../config/database.php';
         $end_f   = date('Y-m-d', strtotime(str_replace('/', '-', $end_date)));
     
 
-        $comm_fetch_q = mysqli_query($mysqli, "SELECT comm_message_log.* FROM comm_message_log  WHERE  comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00'");
+        $comm_fetch_q = mysqli_query($mysqli, "SELECT comm_message_log.* FROM comm_message_log  WHERE  comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00' AND comm_message_log.message_type = '1'");
 
         $rows_comm_fetch = mysqli_num_rows($comm_fetch_q);
         
@@ -121,7 +121,7 @@ include_once '../../config/database.php';
                         user_studentregister.email_address AS registeredEmailAddress,
                         user_studentregister.gr_no AS GR_No,
                         user_studentregister.student_Id,
-                        comm_message_log.sender_address
+                        comm_message_log.recipient_address
                       FROM
                         user_studentbatchmaster
                       JOIN
@@ -170,7 +170,7 @@ include_once '../../config/database.php';
         <tr>
             <td><?php echo $i; ?></td> 
             <td><?php echo $r_Fetching_StudentData['Sender_login_Id']; ?></td> 
-            <td><?php echo $r_comm_fetch['sender_address']; ?></td> 
+            <td><?php echo $r_comm_fetch['recipient_address']; ?></td> 
             <td><?php echo $r_Fetching_StudentData['Student_name']; ?></td>
             <td><?php echo $r_Fetching_StudentData['roll_no']; ?></td>
             <td><?php echo $datee ." <br> " . $Formart_DTime; ?></td>

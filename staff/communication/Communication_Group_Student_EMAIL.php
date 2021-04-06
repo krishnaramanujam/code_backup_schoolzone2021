@@ -6,10 +6,41 @@ include_once '../../config/database.php';
 
 extract($_POST);
 
+$maildetails_q = mysqli_query($mysqli, "SELECT setup_sectionmaildetails.* FROM  setup_sectionmaildetails WHERE setup_sectionmaildetails.sectionmaster_Id = '$SectionMaster_Id' ");
+$row_maildetails = mysqli_num_rows($maildetails_q);
+
+if($row_maildetails == '0'){ ?>
+
+<input type="hidden" name="return_batch_sel" id="return_batch_sel" class="form-control" value="<?php echo $return_batch_sel; ?>">
+<input type="hidden" name="return_batch_name" id="return_batch_name" class="form-control" value="<?php echo $return_batch_name; ?>">
+<input type="hidden" name="return_list_sel" id="return_list_sel" class="form-control" value="<?php echo $return_list_sel; ?>">
+<input type="hidden" name="return_list_name" id="return_list_name" class="form-control" value="<?php echo $return_list_name; ?>">
+<input type="hidden" name="return_contact_sel" id="return_contact_sel" class="form-control" value="<?php echo $return_contact_sel; ?>">
+<input type="hidden" name="return_group_sel" id="return_group_sel" class="form-control" value="<?php echo $return_group_sel; ?>">
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-6"><h3><i class="fa fa-envelope text-primary" aria-hidden="true"></i>  SEND EMAIL</h3></div>
+        <div class="col-md-5">
+            <h2 class="return_btn pull-right"><i class="fa fa-arrow-circle-left"></i></h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+             <div class="alert alert-warning" role="alert">Contact Admin, Your Email Details Is not linked.</div>
+        </div>
+    </div>
+
+</div>
 
 
-if(isset($_POST['User_Id'])){
-    
+<?php
+
+}elseif(isset($_POST['User_Id'])){
+   
+
     $formating_User_Id = implode(",",$User_Id);
 
 
@@ -25,13 +56,13 @@ if(isset($_POST['User_Id'])){
 <div class="container col-md-10">
 
     <div class="row">
-        <div class="col-md-6"><h3><i class="fa fa-envelope text-primary" aria-hidden="true"></i>  SEND SMS</h3></div>
+        <div class="col-md-6"><h3><i class="fa fa-envelope text-primary" aria-hidden="true"></i>  SEND EMAILS</h3></div>
         <div class="col-md-5">
             <h2 class="return_btn pull-right"><i class="fa fa-arrow-circle-left"></i></h2>
         </div>
     </div>
 
-    <form id="SMSDetailsForm">
+    <form id="SMSDetailsForm" enctype="multipart/form-data" method="POST" action="./communication/Communication_api.php?InsertingEmailLogEntries=u" onsubmit="return false">
 
         <?php foreach($User_Id as $index => $value) { ?>
             <input type="hidden" name="User_Id[]" class="form-control" value="<?php echo $User_Id[$index]; ?>">
@@ -39,6 +70,7 @@ if(isset($_POST['User_Id'])){
         <input type="hidden" name="contact_Person" id="contact_Person" class="form-control" value="<?php echo $return_contact_sel; ?>">
         <input type="hidden" name="SenderName" id="SenderName" class="form-control" value="<?php echo $ActiveStaffLogin_Id; ?>">
         <input type="hidden" name="UserType" id="UserType" class="form-control" value="<?php echo 'Student'; ?>">
+        <input type="hidden" name="Sender_Header" id="Sender_Header" class="form-control" value="<?php echo 'SIWSAD'; ?>">
         
 
         <div class="row">
@@ -53,44 +85,42 @@ if(isset($_POST['User_Id'])){
             </div>
         </div>
 
-        
         <div class="row">
             <div class="col-md-12">
 
                 <div class="form-group">
                     
-                    <label for="exampleFormControlSelect1">Select SMS Header*</label>
+                    <label for="exampleFormControlSelect1">Select Email Header*</label>
                     <select name="Sender_Header" id="Sender_Header" class="form-control"  required>
-                    <option value="">---- Select SMS Header ----</option>
+                    <option value="">---- Select Email Header ----</option>
                     <?php 
                         
                         if($ActiveStaffLogin_Id != 2){
-                            $q = "SELECT comm_sms_header_ids.* FROM `comm_sms_header_ids` JOIN comm_smsheaderids_access ON comm_smsheaderids_access.smsheader_Id = comm_sms_header_ids.Id WHERE comm_sms_header_ids.sectionmaster_Id = '$SectionMaster_Id' AND comm_smsheaderids_access.userId = '$ActiveStaffLogin_Id' ";
+                            $q = "SELECT setup_sectionmaildetails.* FROM `setup_sectionmaildetails` JOIN comm_emaildetails_access ON comm_emaildetails_access.sectionmaildetails_Id = setup_sectionmaildetails.Id WHERE setup_sectionmaildetails.sectionmaster_Id = '$SectionMaster_Id' AND comm_emaildetails_access.userId = '$ActiveStaffLogin_Id' ";
                         }else{
-                            $q = "SELECT comm_sms_header_ids.* FROM `comm_sms_header_ids`  WHERE comm_sms_header_ids.sectionmaster_Id = '$SectionMaster_Id'";
+                            $q = "SELECT setup_sectionmaildetails.* FROM `setup_sectionmaildetails`  WHERE setup_sectionmaildetails.sectionmaster_Id = '$SectionMaster_Id'";
                         }
                     
                         $batch_fetch = mysqli_query($mysqli,$q);
 
                         while($r_batch = mysqli_fetch_array($batch_fetch)){ ?>
                         <option value="<?php echo $r_batch['Id']; ?>"  
-                        ><?php echo $r_batch['header_name']; ?></option>
+                        ><?php echo $r_batch['setFromAddress']; ?></option>
                     <?php }   ?>
                     </select>
                 </div>
             </div>
         </div>
 
+
         <div class="row">
             <div class="col-md-12">
 
                 <div class="form-group">
                     
-                    <label for="exampleFormControlSelect1">Select SMS Template*</label>
-                    <select name="Sender_Template_Id" id="Sender_Template_Id" class="form-control"  required>
-                    <option value="">---- Select SMS Template ----</option>
+                    <label for="exampleFormControlSelect1">Subject</label><br>
+                    <input type="text" name="emailSubjects" id="emailSubjects" class="form-control" value="">
                     
-                    </select>
                 </div>
             </div>
         </div>
@@ -101,12 +131,24 @@ if(isset($_POST['User_Id'])){
 
                 <div class="form-group">
                     
+                    <label for="exampleFormControlSelect1">Attachment</label><br>
+                    <input type='file'  id="attachmentPath" class="btn btn-block save_btn_effect fontbtn" name="attachmentPath" style="background-color:#d9edf7;color:#31708f;border-radius: 25px;" accept="image/jpeg, image/png, application/pdf"/>  
+                   
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="form-group">
+
+                
+                    
                     <label for="exampleFormControlSelect1">Message*</label><br>
-                    <small id="emailHelp" class="form-text text-muted">Use #NAME #BATCH #ROLLNO #DIVISION #EMAIL  #STUDENTID #GRNO as place holder for each students details.</small><br>
-                    <small id="emailHelp" class="form-text text-muted">Only Replace Dynamic Variable.</small><br>
-                    <!-- <small id="emailHelp" class="form-text text-muted"> Use #S1 #S2 #S3 #S4 #S5 and #S6 as place holder for students subject..</small><br> -->
+                    <small id="emailHelp" class="form-text text-muted">Use #NAME #BATCH #ROLLNO #DIVISION #EMAIL as place holder for each students details.</small><br>
                     <!-- <small id="emailHelp" class="form-text text-danger"><b>Avoid copy paste. Type the special characater like @$^&\_|' "</b></small><br> -->
-                    <textarea rows="8" class="form-control detailsinput" id="messageText" name="message" maxlength="1000"></textarea readonly><br>
+                    <textarea rows="8" class="form-control detailsinput" id="messageText" name="message" maxlength="230"></textarea><br>
                     <small id="emailHelp" class="form-text text-muted char_cal"></small>
 
                 </div>
@@ -117,7 +159,7 @@ if(isset($_POST['User_Id'])){
             <div class="col-md-12">
 
                 <div class="form-group">
-                      <button type="submit" id="send_sms" name="send_sms" class="btn btn-primary btn-block"><i class="fa fa-send-o" aria-hidden="true"></i>  Send Message</button>                    
+                      <input type="submit" id="send_sms" name="send_sms" class="btn btn-primary btn-block" value="Send Email">
                 </div>
             </div>
         </div>
@@ -128,7 +170,8 @@ if(isset($_POST['User_Id'])){
 
 <?php }else{ ?>
 
-    <input type="hidden" name="return_batch_sel" id="return_batch_sel" class="form-control" value="<?php echo $return_batch_sel; ?>">
+
+<input type="hidden" name="return_batch_sel" id="return_batch_sel" class="form-control" value="<?php echo $return_batch_sel; ?>">
 <input type="hidden" name="return_batch_name" id="return_batch_name" class="form-control" value="<?php echo $return_batch_name; ?>">
 <input type="hidden" name="return_list_sel" id="return_list_sel" class="form-control" value="<?php echo $return_list_sel; ?>">
 <input type="hidden" name="return_list_name" id="return_list_name" class="form-control" value="<?php echo $return_list_name; ?>">
@@ -138,7 +181,7 @@ if(isset($_POST['User_Id'])){
 <div class="container">
 
     <div class="row">
-        <div class="col-md-6"><h3><i class="fa fa-envelope text-primary" aria-hidden="true"></i>  SEND MESSAGE</h3></div>
+        <div class="col-md-6"><h3><i class="fa fa-envelope text-primary" aria-hidden="true"></i>  SEND EMAIL</h3></div>
         <div class="col-md-5">
             <h2 class="return_btn pull-right"><i class="fa fa-arrow-circle-left"></i></h2>
         </div>
@@ -153,12 +196,10 @@ if(isset($_POST['User_Id'])){
 </div>
 <?php } ?>
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.css" rel="stylesheet" type="text/css">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" rel="stylesheet" type="text/css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.js"></script>
-
 
 <script>
+
+
 
 $('.return_btn').click(function(event){
     event.preventDefault();
@@ -199,7 +240,7 @@ $(document).ready(function () {
 
 $(document).ready(function () {
     
-    var text_max = 1000;
+    var text_max = 230;
     $('.char_cal').html(text_max + ' Characters Remaining');
     $('#messageText').keyup(function () {
       var text_length = $('#messageText').val().length;
@@ -212,41 +253,48 @@ $(document).ready(function () {
 
 
 
-$('#SMSDetailsForm').submit(function(e){
-e.preventDefault();
 
+$('#SMSDetailsForm').submit(function(event){
+
+    
     var return_batch_sel = $('#return_batch_sel').val();
     var return_batch_name = $('#return_batch_name').val();
     var return_list_sel = $('#return_list_sel').val();
     var return_list_name = $('#return_list_name').val();
     var return_contact_sel = $('#return_contact_sel').val();
 
-    var FORMDATASMS = $('#SMSDetailsForm').serializeArray();
+    var FORMDATASMS = new FormData(this);
     $("#loader").css("display", "block");
     $("#DisplayDiv").css("display", "none");
 
+
     $.ajax({
-        type:'POST',
-        url:'./communication/Communication_api.php?InsertingSMSLogEntries='+'u',
-        dataType: "json",
+        url:'./communication/Communication_api.php?InsertingEmailLogEntries='+'u',
         data: FORMDATASMS,
+        type: 'POST',
+        contentType:false,   //expect return data as html from server
+        async : false,
+        enctype: 'multipart/form-data',
+        processData : false,
+        cache : false,
+        dataType: "json",
         success:function(res_data){
             
             if(res_data['status'] == 'success') {
-                var CML_Id = res_data['Comm_Message_Logs_Id'];
+                var CEL_Id = res_data['Comm_Email_Logs_Id'];
 
-                if(CML_Id === 'NA' || CML_Id === ''){
+                if(CEL_Id === 'NA' || CEL_Id === ''){
                     $("#loader").css("display", "none");
                     $("#DisplayDiv").css("display", "block");
 
                     alert('Try Again Not Able to Create Entries')
-                }else if(CML_Id != '' || CML_Id != 'NA'){
+                }else if(CEL_Id != '' || CEL_Id != 'NA'){
                     
                     $.ajax({
                         type:'POST',
-                        url:'./communication/Communication_api.php?SendingStudentSMS='+'u',
+                        url:'./communication/Communication_api.php?SendingStudentEmails='+'u',
                         dataType: "json",
-                        data: {CML_Id: CML_Id},
+                        data: {CEL_Id: CEL_Id},
                         success:function(res_data_sms){
                             $("#loader").css("display", "none");
                             $("#DisplayDiv").css("display", "block");
@@ -259,13 +307,13 @@ e.preventDefault();
                             var errorString = '';
                             var successString = '';
 
-                            res_data_sms['SMSReponse'].forEach(function(entry) {
-                                var pattn = /SUBMIT_SUCCESS/g;
-                                var PatternVerify = pattn.test(res_data_sms['SMSReponse']);
+                            res_data_sms['EmailResponse'].forEach(function(entry) {
+                                var pattn = /Success/g;
+                                var PatternVerify = pattn.test(res_data_sms['EmailResponse']);
                                 if(PatternVerify === true){
-                                    successString = successString.concat(res_data_sms['SMSUserId'][i] + " : " + res_data_sms['SMSReponse'][i], "</br>");
+                                    successString = successString.concat(res_data_sms['EmailUserId'][i] + " : " + res_data_sms['EmailResponse'][i], "</br>");
                                 }else{
-                                    errorString = errorString.concat(res_data_sms['SMSUserId'][i] + " : " + res_data_sms['SMSReponse'][i] , "</br>");
+                                    errorString = errorString.concat(res_data_sms['EmailUserId'][i] + " : " + res_data_sms['EmailResponse'][i] , "</br>");
                                 }
                                 i++;
                             });
@@ -293,13 +341,13 @@ e.preventDefault();
                     
                             }
 
+
+
                             if(UploadedFilePath === 'NA' || UploadedFilePath === ''){
 
                             }else if(UploadedFilePath != '' || UploadedFilePath != 'NA'){
                                 window.open(UploadedFilePath, '_blank');
                             }
-
-
 
 
                         },
@@ -342,46 +390,3 @@ e.preventDefault();
 }
 </style>
 
-<script>
-$(document).on('change', '#Sender_Header', function(event) {
-    var Sender_Header_Id = $(this).val(); // the selected options’s value
-
-    if(Sender_Header_Id == ''){
-        iziToast.warning({
-            title: 'Empty Fields',
-            message: 'Select Valid Field',
-        });
-        return false;
-    }
-
-    $.ajax({
-        url:'./communication/Communication_api.php?Template_From_Header='+'u',
-        type: 'POST',
-        data: {Sender_Header_Id:Sender_Header_Id},
-        success:function(batch_data_res){
-            
-          $('#Sender_Template_Id').html(batch_data_res);
-
-        },
-    });
-
-});
-
-$(document).on('change', '#Sender_Template_Id', function(event) {
-    var Sender_Template_Id = $(this).val(); // the selected options’s value
-
-    if(Sender_Template_Id == ''){
-        iziToast.warning({
-            title: 'Empty Fields',
-            message: 'Select Valid Field',
-        });
-        $('#messageText').val('');
-        return false;
-    }
-    var text = $( "#Sender_Template_Id option:selected" ).text();
-    $('#messageText').val('');
-    $('#messageText').val(text);
-    console.log(text);
-
-});
-</script>

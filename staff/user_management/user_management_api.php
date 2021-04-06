@@ -339,4 +339,61 @@ if(isset($_GET['Batch_Access_Control_User'])){
 }
 //-----------------------------------------------------------------------------------------------------------------------
 
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['SMS_Header_Mapping'])){
+   
+    extract($_POST);
+
+        $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+        $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+        
+        //Deleting UserPageAccess
+        $Deleting_BatchAccess = mysqli_query($mysqli,"DELETE FROM comm_smsheaderIds_access WHERE comm_smsheaderIds_access.userId = '$sms_user_id'");
+
+        if(isset($check)){
+            foreach($check as $index => $value) {
+
+                //Inserting in BatchPageAccess
+                $Inserting_BatchAccess = mysqli_query($mysqli,"INSERT INTO comm_smsheaderIds_access(smsheader_Id, userId) 
+                values ('$check[$index]', '$sms_user_id')");
+                
+            }
+        }
+
+
+        $res['status'] = 'success';
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Email_Header_Mapping'])){
+   
+    extract($_POST);
+
+        $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+        $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+        
+        //Deleting UserPageAccess
+        $Deleting_BatchAccess = mysqli_query($mysqli,"DELETE FROM comm_emaildetails_access WHERE comm_emaildetails_access.userId = '$email_user_id'");
+
+        if(isset($check)){
+            foreach($check as $index => $value) {
+
+                //Inserting in BatchPageAccess
+                $Inserting_BatchAccess = mysqli_query($mysqli,"INSERT INTO comm_emaildetails_access(sectionmaildetails_Id, userId) 
+                values ('$check[$index]', '$email_user_id')");
+                
+            }
+        }
+
+
+        $res['status'] = 'success';
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
 ?>
