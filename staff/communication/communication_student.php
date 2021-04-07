@@ -31,7 +31,7 @@ include_once '../../config/database.php';
                     <select name="list_sel" id="list_sel" class="form-control" style="margin-right:50px;" required>
                                 <option value="">---- Select ----</option>
                                 <option value="BatchSelected" <?php if($_GET['list_sel'] == 'BatchSelected'){ echo 'Selected'; } ?>  class="Batch">Batch</option>
-                                <option value="GroupSelected" <?php if($_GET['list_sel'] == 'GroupSelected'){ echo 'Selected'; } ?>  class="Group">Group</option>
+                                <!-- <option value="GroupSelected" <?php if($_GET['list_sel'] == 'GroupSelected'){ echo 'Selected'; } ?>  class="Group">Group</option> -->
 
                                 
                     </select>
@@ -153,7 +153,8 @@ include_once '../../config/database.php';
               user_studentdetails.fathers_Contact,
               user_studentdetails.mothers_Contact,
               user_studentregister.mobile_no As registeredMobileNo,
-              user_studentregister.email_address As registeredEmailAddress
+              user_studentregister.email_address As registeredEmailAddress,
+              setup_batchmaster.Id As BM_Id
             FROM
             user_studentregister
             INNER JOIN
@@ -189,7 +190,8 @@ include_once '../../config/database.php';
             user_studentregister.GSEmail,
             user_studentregister.student_Id,
             user_studentregister.*,
-            user_studentbatchmaster.Id AS SBM_Id
+            user_studentbatchmaster.Id AS SBM_Id,
+            setup_batchmaster.Id As BM_Id
           FROM
             user_studentbatchmaster
           JOIN
@@ -232,6 +234,13 @@ include_once '../../config/database.php';
         <input type="hidden" name="return_contact_sel" id="contact_sel" class="form-control" value="<?php echo $_GET['contact_sel']; ?>">
         <input type="hidden" name="return_group_sel" id="group_sel" class="form-control" value="<?php echo $_GET['group_sel']; ?>">
 
+        <?php
+            $credit_balance_q = mysqli_query($mysqli, "SELECT comm_sms_credit.* FROM `comm_sms_credit` WHERE comm_sms_credit.batchmaster_Id = '$batch_sel' AND active_status = '1'");
+            $r_credit_balance = mysqli_fetch_array($credit_balance_q);    
+        ?>
+
+            <h4 class="text-warning">SMS Balance: <?php echo $r_credit_balance['balance']; ?></h4>
+       
         <table id="CommunicationReportTable" class="table table-striped table-hover"> 
             <thead>
                 <tr>
@@ -270,7 +279,7 @@ include_once '../../config/database.php';
                             // }
                             
                 ?>
-                
+              
                 <tr>
                     <td><?php echo $i; ?></td> 
                     <td><?php echo $r_Studentlist['admission_no']; ?></td> 

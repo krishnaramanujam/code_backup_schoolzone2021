@@ -56,7 +56,7 @@ include_once '../../config/database.php';
         $end_f   = date('Y-m-d', strtotime(str_replace('/', '-', $end_date)));
     
 
-        $comm_fetch_q = mysqli_query($mysqli, "SELECT comm_message_log.* FROM comm_message_log  WHERE  userIdType = 'SBM_Id' AND moduleType != 'Communication' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00' AND comm_message_log.message_type = '1'");
+        $comm_fetch_q = mysqli_query($mysqli, "SELECT comm_message_log.* FROM comm_message_log JOIN comm_sms_header_ids ON comm_sms_header_ids.Id = comm_message_log.SenderHeader Where comm_sms_header_ids.sectionmaster_Id = '$SectionMaster_Id' AND userIdType = 'SBM_Id' AND moduleType != 'Communication' AND comm_message_log.timestamp >= '$start_f 00:00:00' AND comm_message_log.timestamp <= '$end_f 24:00:00' AND comm_message_log.message_type = '1'");
 
         $rows_comm_fetch = mysqli_num_rows($comm_fetch_q);
         

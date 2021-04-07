@@ -6,12 +6,11 @@ include_once '../../config/database.php';
 
 extract($_POST);
 
+$credit_balance_q = mysqli_query($mysqli, "SELECT comm_sms_credit.* FROM `comm_sms_credit` WHERE comm_sms_credit.batchmaster_Id = '$return_batch_sel' AND active_status = '1'");
+$row_credit_balance = mysqli_num_rows($credit_balance_q);
 
 
-if(isset($_POST['User_Id'])){
-    
-    $formating_User_Id = implode(",",$User_Id);
-
+if($row_credit_balance == '0'){
 
 ?>
 
@@ -21,6 +20,48 @@ if(isset($_POST['User_Id'])){
 <input type="hidden" name="return_list_name" id="return_list_name" class="form-control" value="<?php echo $return_list_name; ?>">
 <input type="hidden" name="return_contact_sel" id="return_contact_sel" class="form-control" value="<?php echo $return_contact_sel; ?>">
 <input type="hidden" name="return_group_sel" id="return_group_sel" class="form-control" value="<?php echo $return_group_sel; ?>">
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-6"><h3><i class="fa fa-envelope text-primary" aria-hidden="true"></i>  SEND MESSAGE</h3></div>
+        <div class="col-md-5">
+            <h2 class="return_btn pull-right"><i class="fa fa-arrow-circle-left"></i></h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+             <div class="alert alert-warning" role="alert">Please Contact Admin, SMS Credit is Not Assign.</div>
+        </div>
+    </div>
+
+</div>
+
+
+<?php
+    
+}elseif(isset($_POST['User_Id'])){
+    
+    $formating_User_Id = implode(",",$User_Id);
+
+    $select_user_count = count($User_Id);
+
+
+    $r_credit_balance = mysqli_fetch_array($credit_balance_q);
+
+?>
+
+<input type="hidden" name="return_batch_sel" id="return_batch_sel" class="form-control" value="<?php echo $return_batch_sel; ?>">
+<input type="hidden" name="return_batch_name" id="return_batch_name" class="form-control" value="<?php echo $return_batch_name; ?>">
+<input type="hidden" name="return_list_sel" id="return_list_sel" class="form-control" value="<?php echo $return_list_sel; ?>">
+<input type="hidden" name="return_list_name" id="return_list_name" class="form-control" value="<?php echo $return_list_name; ?>">
+<input type="hidden" name="return_contact_sel" id="return_contact_sel" class="form-control" value="<?php echo $return_contact_sel; ?>">
+<input type="hidden" name="return_group_sel" id="return_group_sel" class="form-control" value="<?php echo $return_group_sel; ?>">
+
+
+<input type="hidden" name="select_user_count" id="select_user_count" class="form-control" value="<?php echo $select_user_count; ?>">
+
 
 <div class="container col-md-10">
 
@@ -117,7 +158,9 @@ if(isset($_POST['User_Id'])){
             <div class="col-md-12">
 
                 <div class="form-group">
-                      <button type="submit" id="send_sms" name="send_sms" class="btn btn-primary btn-block"><i class="fa fa-send-o" aria-hidden="true"></i>  Send Message</button>                    
+                      <button type="submit" id="send_sms" name="send_sms" class="btn btn-primary btn-block"
+                      <?php if((int)$r_credit_balance['balance'] <= 0){ echo 'disabled'; } ?>
+                      ><i class="fa fa-send-o" aria-hidden="true"></i>  Send Message</button>                    
                 </div>
             </div>
         </div>
@@ -152,10 +195,6 @@ if(isset($_POST['User_Id'])){
 
 </div>
 <?php } ?>
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.css" rel="stylesheet" type="text/css">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" rel="stylesheet" type="text/css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.js"></script>
 
 
 <script>
@@ -220,6 +259,8 @@ e.preventDefault();
     var return_list_sel = $('#return_list_sel').val();
     var return_list_name = $('#return_list_name').val();
     var return_contact_sel = $('#return_contact_sel').val();
+
+    var select_user_count = $('#select_user_count').val();
 
     var FORMDATASMS = $('#SMSDetailsForm').serializeArray();
     $("#loader").css("display", "block");
@@ -298,6 +339,17 @@ e.preventDefault();
                             }else if(UploadedFilePath != '' || UploadedFilePath != 'NA'){
                                 window.open(UploadedFilePath, '_blank');
                             }
+
+
+                            $.ajax({
+                                type:'POST',
+                                url:'./communication/Communication_api.php?SMSCreditUpdate='+'u',
+                                dataType: "json",
+                                data: {batch_sel: return_batch_sel, select_user_count:select_user_count},
+                                success:function(res_data_sms){
+
+                                },
+                            });
 
 
 
