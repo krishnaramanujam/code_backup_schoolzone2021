@@ -49,7 +49,7 @@ if($row_sectiondetail > '0'){
         <div class="row">
 
           <div class="form-group" style="padding:15px;">
-
+            <input type="hidden" class="form-control" id="SM_Id" name="SM_Id"  value="<?php echo $SM_Id; ?>"> 
 
             <label for="email" style="width:100%" class="panel-title">Mobile No (to be used for login)*</label>
             <input type="text" class="form-control" id="register_mobile_no" name="register_mobile_no" placeholder="Enter Mobile No" value=""  pattern= "[0-9].{9,}"  oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" onkeypress='return event.charCode >= 48 && event.charCode <= 57' maxlength = "10">
@@ -98,13 +98,22 @@ if($row_sectiondetail > '0'){
 
       <div class="form-group" style="padding:15px;">
 
-        <input type="text" class="form-control" id="login_username" name="login_username" placeholder="Enter Register Mobile No" value="">
+        <input type="text" class="form-control" id="login_username" name="login_username" placeholder="Enter Register Mobile No" value=""  pattern= "[0-9].{9,}"  oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" onkeypress='return event.charCode >= 48 && event.charCode <= 57' maxlength = "10"> 
+
+        
+          <select class="form-control" id="login_batch_sel" name="login_batch_sel" style="margin-bottom: 8px;">
+            <option value="">---- Select Batch ----</option>
+              <?php 
+                  $batch_fetch = mysqli_query($mysqli,"SELECT setup_batchmaster.*, setup_academicyear.academic_year FROM `setup_batchmaster` JOIN setup_academicyear ON setup_academicyear.Id = setup_batchmaster.academicyear_Id JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_batchmaster.student_registration = '1' AND setup_academicyear.isDefault_Student = '1' AND setup_streammaster.sectionmaster_Id = '$SM_Id' ORDER BY batch_name");
+                  while($r_batch = mysqli_fetch_array($batch_fetch)){ ?>
+                  <option value="<?php echo $r_batch['Id']; ?>" ><?php echo $r_batch['batch_name']; ?></option>
+              <?php }   ?>
+          </select> 
 
         <input type="password" class="form-control" id="login_password" name="login_password" placeholder="Enter Password" value="">
 
 
-        <button type="button" class="btn btn-link pull-right" id="forget_link" name="forget_link">Forgot Password ?</button>
-            
+        <button type="button" class="btn btn-link pull-right" data-toggle="modal" data-target="#myModal">Forgot Password ?</button>
       </div>
 
     </div><!--DD Row2 Close-->
@@ -124,6 +133,46 @@ if($row_sectiondetail > '0'){
 </div><!--Close Col-->
 
 </div><!--Close Container-->
+
+
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Forget Password</h4>
+        </div>
+        <div class="modal-body">
+              <label for="email" class="panel-title">Enter Mobile No*</label>
+                  <input type="text" class="form-control" id="forget_mobileno" name="forget_mobileno" placeholder="Enter Mobile No"   pattern= "[0-9].{9,}"  oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" onkeypress='return event.charCode >= 48 && event.charCode <= 57' maxlength = "10">
+                      
+                  <label for="email" style="width:100%" class="panel-title">Batch*</label>
+              <select class="form-control" id="forget_batch_sel" name="forget_batch_sel" style="margin-bottom: 8px;">
+                <option value="">---- Select Batch ----</option>
+                  <?php 
+                      $batch_fetch = mysqli_query($mysqli,"SELECT setup_batchmaster.*, setup_academicyear.academic_year FROM `setup_batchmaster` JOIN setup_academicyear ON setup_academicyear.Id = setup_batchmaster.academicyear_Id JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_batchmaster.student_registration = '1' AND setup_academicyear.isDefault_Student = '1' AND setup_streammaster.sectionmaster_Id = '$SM_Id' ORDER BY batch_name");
+                      while($r_batch = mysqli_fetch_array($batch_fetch)){ ?>
+                      <option value="<?php echo $r_batch['Id']; ?>" ><?php echo $r_batch['batch_name']; ?></option>
+                  <?php }   ?>
+              </select> 
+   
+        </div>
+        <div class="modal-footer">
+              <button type="button" class="btn save_btn_effect sendotp_mobile_details btn-danger" value="Login" style="padding-left: 40px;    padding-right: 40px;"> CONFIRM & SUBMIT</button>
+<!--                               
+              <button type="button" class="btn save_btn_effect verify_otp_details btn-success" value="Login" style="padding-left: 40px;    padding-right: 40px;" disabled> CONFIRM OTP & SUBMIT</button> -->
+
+          <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 <!----------------------------------------------------------------------------------------------------------------------------------->
 
 
@@ -177,15 +226,6 @@ if($row_sectiondetail > '0'){
 <?php } ?>
 
 <script>
-     $('#user_dob').datepicker({
-          format: 'dd/mm/yyyy',
-          autoclose: true
-      });
-
-      $('#u_dateofbirth').datepicker({
-          format: 'dd/mm/yyyy',
-          autoclose: true
-      });
 
 
 $('.login_details').click(function(e){
@@ -193,8 +233,9 @@ $('.login_details').click(function(e){
     var SM_Id = $('#SM_Id').val();
     var login_username = $('#login_username').val();
     var login_password = $('#login_password').val();
+    var login_batch_sel = $('#login_batch_sel').val();
    
-    if(login_username == '' || login_password == ''){
+    if(login_username == '' || login_password == '' || login_batch_sel == ''){
         iziToast.error({
             title: 'Invalid Fields',
             message: 'All Field is Required',
@@ -211,7 +252,7 @@ $('.login_details').click(function(e){
     $.ajax({
         url: './onlinelogin_api.php?Validate_LoginForm='+'u',
         type: 'POST',
-        data: {login_username:login_username, login_password: login_password, SM_Id:SM_Id},
+        data: {login_username:login_username, login_password: login_password, SM_Id:SM_Id, login_batch_sel:login_batch_sel},
         dataType: "json",
         success:function(srh_gr_response){
 
@@ -314,7 +355,7 @@ $('.register_details').click(function(e){
 
                           $.ajax({
                           type:'GET',
-                          url: './online_mobile_verify.php',
+                          url: './studentlogin_screen.php?SM_Id='+ SM_Id,
                           success:function(response){
                               // console.log(response);
                                 $('#DisplayDiv').html(response);
@@ -322,7 +363,7 @@ $('.register_details').click(function(e){
                                 $("#DisplayDiv").css("display", "block");
 
                                             
-                                alert('You have registered successfully. An SMS has been sent to your Mobile no '+ register_mobile_no +' with your password. Please use the same to login');
+                                alert('You have registered successfully. An SMS has been sent to your Email Id and  Mobile no '+ register_mobile_no +' with your password. Please use the same to login');
 
                             },
                         });
@@ -387,6 +428,140 @@ $('.register_details').click(function(e){
     });      
 
 });
+
+
+
+
+///////////////////////////////////FORGET PASSWORD///////////////////////////////////////////////////////////////
+
+
+$('.sendotp_mobile_details').click(function(e){
+    e.preventDefault();
+    var forget_batch_sel = $('#forget_batch_sel').val();
+    var forget_mobileno = $('#forget_mobileno').val();
+    var SM_Id = $('#SM_Id').val();
+
+    if(forget_batch_sel == '' || forget_mobileno == ''){
+        iziToast.error({
+            title: 'Invalid Fields',
+            message: 'Field is Required',
+        });
+        return false;
+    }
+
+    if(forget_mobileno.length != '10'){
+        $('#register_mobile_no').val('');
+        iziToast.error({
+            title: 'Invalid Fields',
+            message: 'Mobile No Must be 10 Digits',
+        });
+        return false;
+    }
+
+    $("#loader").css("display", "block");
+    $("#DisplayDiv").css("display", "none");
+
+
+    $.ajax({
+        url: './onlinelogin_api.php?Request_ForResendPassword='+'u',
+        type: 'POST',
+        data: {forget_batch_sel:forget_batch_sel, forget_mobileno:forget_mobileno, SM_Id:SM_Id},
+        dataType: "json",
+        success:function(srh_gr_response){
+
+          //Checking Status 
+          if(srh_gr_response['status'] == 'success') {
+            var SR_Id = srh_gr_response['SR_Id'];
+            // --------------SMS--------------------------------------------------------------------------------
+            var CML_Id = srh_gr_response['Comm_Message_Logs_Id'];
+            var smsStatus = '';
+            if(CML_Id === 'NA' || CML_Id === ''){
+                $("#loader").css("display", "none");
+                $("#DisplayDiv").css("display", "block");
+
+                alert('Try Again After Sometimes');
+            }else if(CML_Id != '' || CML_Id != 'NA'){
+                
+                $.ajax({
+                    type:'POST',
+                    url:'https://www.dvsl.in/schoolzone2021/staff/communication/Communication_api.php?SendingStudentSMS='+'u',
+                    dataType: "json",
+                    data: {CML_Id: CML_Id},
+                    success:function(res_data_sms){
+
+
+                      $("#loader").css("display", "none");
+                      $("#DisplayDiv").css("display", "block");
+
+                      alert('Password is sent to your Mobile and Email Id')
+                      $('#forget_batch_sel').val('');
+                      $('#forget_mobileno').val('');
+                      $('#myModal').modal('toggle');
+      
+                    },
+                });
+
+            }
+            // ----------------------------------------------------------------------------------------------
+            // -------------EMAIL----------------------------------------------------------------------------
+            var emailstatus = '';
+            var CEL_Id = srh_gr_response['Comm_Email_Logs_Id'];
+
+            if(CEL_Id === 'NA' || CEL_Id === ''){
+                $("#loader").css("display", "none");
+                $("#DisplayDiv").css("display", "block");
+
+                alert('Try Again Not Able to Create Entries')
+            }else if(CEL_Id != '' || CEL_Id != 'NA'){
+                
+                $.ajax({
+                    type:'POST',
+                    url:'https://www.dvsl.in/schoolzone2021/staff/communication/Communication_api.php?SendingStudentEmails='+'u',
+                    dataType: "json",
+                    data: {CEL_Id: CEL_Id},
+                    success:function(res_data_sms){
+
+                    },
+                });
+
+            }
+            // ----------------------------------------------------------------------------------------------
+
+
+          }else if(srh_gr_response['status'] == 'MobileNoFailed'){
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+            iziToast.error({
+                title: 'Error',
+                message: 'Invalid Details',
+            });
+          }else if(srh_gr_response['status'] == 'PasswordSendLimitReached'){
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+            iziToast.error({
+                title: 'Error',
+                message: 'Oops! You Have reached the max login attempts limit for the day. Your login will be reactivated at the end of day. Please try again tomorrow',
+            });
+          }else{
+
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+            iziToast.error({
+                title: 'Error',
+                message: 'Invalid Details',
+            });
+            
+
+          }//close else
+
+
+     
+       },
+    });
+
+          
+
+}); // close send_otp_details
 
 </script>
 

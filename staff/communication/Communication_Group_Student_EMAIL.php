@@ -70,7 +70,7 @@ if($row_maildetails == '0'){ ?>
         <input type="hidden" name="contact_Person" id="contact_Person" class="form-control" value="<?php echo $return_contact_sel; ?>">
         <input type="hidden" name="SenderName" id="SenderName" class="form-control" value="<?php echo $ActiveStaffLogin_Id; ?>">
         <input type="hidden" name="UserType" id="UserType" class="form-control" value="<?php echo 'Student'; ?>">
-        <input type="hidden" name="Sender_Header" id="Sender_Header" class="form-control" value="<?php echo 'SIWSAD'; ?>">
+        <!-- <input type="hidden" name="Sender_Header" id="Sender_Header" class="form-control" value="<?php echo 'SIWSAD'; ?>"> -->
         
 
         <div class="row">

@@ -109,8 +109,8 @@ if(isset($_GET['SendingStudentSMS'])){
 if(isset($_GET['SendingStudentEmails'])){
 
     extract($_POST);
-//Section Id
-$SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+    //Section Id
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
 
     require '../../assets/plugins/phpmailer/PHPMailerAutoload.php';
     
@@ -161,7 +161,7 @@ $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
 
             }else{
 
-                $maildetails_q = mysqli_query($mysqli, "SELECT setup_sectionmaildetails.* FROM  setup_sectionmaildetails WHERE setup_sectionmaildetails.sectionmaster_Id = '$SectionMaster_Id' AND setup_sectionmaildetails.Id ='$r_fetching_details[SenderHeader]' ");
+                $maildetails_q = mysqli_query($mysqli, "SELECT setup_sectionmaildetails.* FROM  setup_sectionmaildetails WHERE  setup_sectionmaildetails.Id ='$r_fetching_details[SenderHeader]' ");
                 $row_maildetails = mysqli_num_rows($maildetails_q);
 
                 if($row_maildetails > '0'){
@@ -434,7 +434,7 @@ function StudentMessageDecrypt($StudentBatchMaster_Id, $messageText, $contact_Pe
         //     }
 
 
-            $F_StudentData_q = mysqli_query($mysqli,"SELECT user_studentregister.mobile_no AS Student_Contact, user_studentbatchmaster.roll_no, user_studentdetails.Student_name, user_studentdetails.fathers_Contact, user_studentdetails.mothers_Contact, user_studentregister.password AsOTP, setup_batchmaster.batch_name AS Batch_Name, user_studentbatchmaster.Div, user_studentregister.email_address AS registeredEmailAddress, user_studentregister.gr_no AS GR_No, user_studentregister.student_Id FROM user_studentbatchmaster JOIN user_studentregister ON user_studentbatchmaster.studentRegister_Id = user_studentregister.Id JOIN user_studentdetails ON user_studentbatchmaster.studentRegister_Id = user_studentdetails.studentregister_Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id WHERE user_studentbatchmaster.Id = '1'   ");
+            $F_StudentData_q = mysqli_query($mysqli,"SELECT user_studentregister.mobile_no AS Student_Contact, user_studentbatchmaster.roll_no, user_studentdetails.Student_name, user_studentdetails.fathers_Contact, user_studentdetails.mothers_Contact, user_studentregister.password AsOTP, setup_batchmaster.batch_name AS Batch_Name, user_studentbatchmaster.Div, user_studentregister.email_address AS registeredEmailAddress, user_studentregister.gr_no AS GR_No, user_studentregister.student_Id FROM user_studentbatchmaster JOIN user_studentregister ON user_studentbatchmaster.studentRegister_Id = user_studentregister.Id JOIN user_studentdetails ON user_studentbatchmaster.studentRegister_Id = user_studentdetails.studentregister_Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id WHERE user_studentbatchmaster.Id = '$StudentBatchMaster_Id'   ");
 
             $rows_F_StudentData = mysqli_num_rows($F_StudentData_q);
             if($rows_F_StudentData > '0'){
