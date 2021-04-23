@@ -16,21 +16,18 @@ if ( isset( $_SESSION['schoolzone_student']['SectionMaster_Id'] ) AND  isset( $_
 $Admin_Registeration_Id = $Activecandidateregister_Id;
 
 //Fetching User Details
-$data_query = "SELECT user_studentregister.student_name AS username, setup_sectionmaster.abbreviation AS section_abbreviation FROM user_studentregister JOIN setup_sectionmaster ON setup_sectionmaster.Id = user_studentregister.sectionmaster_Id WHERE user_studentregister.Id = '$Activecandidateregister_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id'  ";
+$data_query = "SELECT user_candidateregister.full_name AS username, setup_sectionmaster.abbreviation AS section_abbreviation, setup_batchmaster.batch_name,user_candidateregister.batchmaster_Id FROM user_candidateregister JOIN setup_batchmaster ON setup_batchmaster.Id = user_candidateregister.batchmaster_Id JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = setup_streammaster.sectionmaster_Id WHERE user_candidateregister.Id = '$Admin_Registeration_Id'  ";
 $fetch_data_q = mysqli_query($mysqli,$data_query);
 
 $r_Staffdata_fetch = mysqli_fetch_array($fetch_data_q);
 
 
-
+$BM_Id = $r_Staffdata_fetch['batchmaster_Id'];
 
 
 //finding accessible pages to this particular id
 $query = "
-SELECT `setup_links_access`.`function_id`
-FROM `user_stafflogin`
-    LEFT JOIN `setup_links_access` on `user_stafflogin`.`Id`=`setup_links_access`.`user_id`
-WHERE `user_stafflogin`.`Id`='" . $Activecandidateregister_Id . "'
+SELECT `batchwise_setup_links_access`.`function_Id` As function_id FROM `setup_batchmaster` LEFT JOIN `batchwise_setup_links_access` ON `setup_batchmaster`.`Id` = `batchwise_setup_links_access`.`batchmaster_Id` WHERE setup_batchmaster.Id = '$BM_Id' AND batchwise_setup_links_access.user_type_Id = '2' 
 ";
 
 $result1 = mysqli_query( $mysqli, $query );
@@ -230,12 +227,8 @@ function hasAccess($permission = [])
           */
           ini_set( 'memory_limit', '-1' );
           // get unique PARENT nodes directly under ROOT node
-          
-          if($ActiveStaffLogin_Id == '1'){
-              $search .='SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0  AND link_user_type = 1  AND access_type = 1 ORDER BY parent_sequence,`setup_links`.`Id`';  
-          }else{
-              $search .= 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 1 AND  access_type = 0 ORDER BY parent_sequence,`setup_links`.`Id`';
-          }
+
+          $search .= 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 2 AND  access_type = 0 ORDER BY parent_sequence,`setup_links`.`Id`';
           
 
           $tree_views = QUERY::run( $search )->fetchAll();
@@ -253,11 +246,11 @@ function hasAccess($permission = [])
             {
               global $outerFlag;
 
-              $searchChild = 'SELECT * FROM `setup_links` WHERE `parent` = ? AND link_user_type = 1 ';
+              $searchChild = 'SELECT * FROM `setup_links` WHERE `parent` = ? AND link_user_type = 2 ';
               $views       = QUERY::run( $searchChild, [ $tree_view['Id'] ] )->fetchAll();
-
+              
           //-- if permission -------------------------------------------------------------
-              if ( ($Admin_Registeration_Id == 1 || $Admin_Registeration_Id == 2 ||  hasAccess( [ $tree_view['Id'] ] )) && $tree_view['url'] )
+              if ( ($Admin_Registeration_Id == 1 ||  hasAccess( [ $tree_view['Id'] ] )) && $tree_view['url'] )
               {
                 $functionName = "getPage('".$tree_view['url']."', '".$tree_view['Id']."');";
                 $html .= '
@@ -269,7 +262,7 @@ function hasAccess($permission = [])
                   </li>' . PHP_EOL;
               }
 
-              elseif ( ($Admin_Registeration_Id == 1 || $Admin_Registeration_Id == 2 || hasAccess( [ $tree_view['Id'] ] )) && !$tree_view['url'] )
+              elseif ( ($Admin_Registeration_Id == 1 || hasAccess( [ $tree_view['Id'] ] )) && !$tree_view['url'] )
               {
 
 
@@ -310,7 +303,7 @@ function hasAccess($permission = [])
 
                 if ( $view['header'] && !$view['url'] && (1) ) // if ? array of array then -> recurse
                 {
-                  $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? AND link_user_type = 0 ';
+                  $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? AND link_user_type = 2 ';
                   $subChilds      = QUERY::run( $searchSubChild, [ $view['Id'] ] )->fetchAll(); // GET UNIQUE SUB-CHILDS
 
                   $html .= '

@@ -17,6 +17,8 @@ if ( isset( $_POST['parent_id'] ) ) {
   $url       = $_POST['c_url'] == 'null' || $_POST['c_url'] == 'NULL' ? NULL : $_POST['c_url'];
   $access_type = $_POST['access_type'];
 
+  $link_user_type = $_POST['link_user_type'];
+
   $modulelist_id = $_POST['modulelist_id'];
 
   if ( $parent_id ) {
@@ -29,14 +31,14 @@ if ( isset( $_POST['parent_id'] ) ) {
                  (`parent`, `header`, `depth`, `url`, link_user_type, access_type, modulelist_Id)
                VALUES
                   ( ?,  ?,  ?,  ?, ? , ?, ? )',
-               [ $get['Id'], $header, ++$get['depth'], $url, 0 , $access_type, $modulelist_id ] );
+               [ $get['Id'], $header, ++$get['depth'], $url, $link_user_type , $access_type, $modulelist_id ] );
   }
   else {
     QUERY::run( 'INSERT INTO
                  `setup_links`
                  (`parent`, `header`, `depth`, `url`, link_user_type, access_type, modulelist_Id)
                VALUES
-                  ( ?,  ?,  ?,  ?, ? , ?, ? )', [ 0, $header, 0, $url, 0 , $access_type, $modulelist_id ] );
+                  ( ?,  ?,  ?,  ?, ? , ?, ? )', [ 0, $header, 0, $url, $link_user_type , $access_type, $modulelist_id ] );
   }
 }
 else {
@@ -142,9 +144,9 @@ else {
               <option value="0" class="strong">Root</option>
 
               <?php
-              $pages = QUERY::run( 'SELECT * from setup_links WHERE url IS NULL AND  setup_links.link_user_type = 0' );
+              $pages = QUERY::run( 'SELECT * from setup_links WHERE url IS NULL' );
               foreach ( $pages as $view ) {
-                echo '<option value="' . $view['Id'] . '">' . $view['header'] . '</option>';
+                echo '<option value="' . $view['Id'] . '"  class="' . $view['link_user_type'] . '">' . $view['header'] . '</option>';
               }
               ?>
             </select>
@@ -193,7 +195,7 @@ else {
                 <?php
                 $pages = QUERY::run( 'SELECT * from setup_modulelist' );
                 foreach ( $pages as $view ) {
-                  echo '<option value="' . $view['Id'] . '">' . $view['modulelist'] . '</option>';
+                  echo '<option value="' . $view['Id'] . '" >' . $view['modulelist'] . '</option>';
                 }
                 ?>
               </select>
@@ -201,6 +203,26 @@ else {
             </div>
 
             </div>
+
+
+            <div class="form-group">
+
+              <label class="col-sm-2 input-sm control-label"
+                    for="inputheader"
+                    style="font-size:15px">User Access Type</label>
+              <div class="col-sm-4">
+                <select class="form-control"
+                        required
+                        name="link_user_type"
+                        id="link_user_type"
+                        title="Select User Access Type">
+
+                  <option value="">--Select Insert Page Under First--</option>
+                </select>
+
+              </div>
+
+              </div>
 
 
           </br>
@@ -314,4 +336,28 @@ else {
   </script>
   <?php
 }
+
+
 ?>
+
+
+<script>
+$(document).on('change', '#parent_id', function(event) {
+  var parent_sel = $(this).val(); // the selected options’s value
+  var access_user_access_type = $('select[name="parent_id"] option:selected').attr('class'); 
+
+  if(access_user_access_type == 0){
+    $('#link_user_type').html("<option value=''>Select</option><option value='0'>Staff</option>");
+  }else if(access_user_access_type == 1){
+    $('#link_user_type').html("<option value=''>Select</option><option value='1'>Student</option>");
+  }else if(access_user_access_type == 2){
+    $('#link_user_type').html("<option value=''>Select</option><option value='2'>Candidate</option>");
+  }else{
+    $('#link_user_type').html("<option value=''>Select</option><option value='0'>Staff</option><option value='1'>Student</option><option value='2'>Candidate</option>");
+  }
+
+  return false;
+});
+
+
+</script>

@@ -51,6 +51,10 @@ if($row_sectiondetail > '0'){
           <div class="form-group" style="padding:15px;">
             <input type="hidden" class="form-control" id="SM_Id" name="SM_Id"  value="<?php echo $SM_Id; ?>"> 
 
+            <label for="email" style="width:100%" class="panel-title">Full Name*</label>
+              <input type="text" class="form-control" id="register_first_name" name="register_first_name" placeholder="Enter Full Name" value="" style="text-transform: uppercase;">
+
+
             <label for="email" style="width:100%" class="panel-title">Mobile No (to be used for login)*</label>
             <input type="text" class="form-control" id="register_mobile_no" name="register_mobile_no" placeholder="Enter Mobile No" value=""  pattern= "[0-9].{9,}"  oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" onkeypress='return event.charCode >= 48 && event.charCode <= 57' maxlength = "10">
 
@@ -296,6 +300,7 @@ $('.login_details').click(function(e){
 $('.register_details').click(function(e){
     e.preventDefault();
     var SM_Id = $('#SM_Id').val();
+    var register_first_name = $('#register_first_name').val();
     var register_email_id = $('#register_email_id').val();
     var register_mobile_no = $('#register_mobile_no').val();
 
@@ -303,7 +308,7 @@ $('.register_details').click(function(e){
 
 
 
-    if(register_mobile_no == ''  || register_email_id == '' || register_batch_sel == ''){
+    if(register_mobile_no == ''  || register_email_id == '' || register_batch_sel == '' || register_first_name == ''){
         iziToast.error({
             title: 'Invalid Fields',
             message: 'All Field is Required',
@@ -329,7 +334,7 @@ $('.register_details').click(function(e){
     $.ajax({
         url: './onlinelogin_api.php?Validate_RegisterForm='+'u',
         type: 'POST',
-        data: {register_email_id: register_email_id,register_mobile_no:register_mobile_no, register_batch_sel:register_batch_sel, SM_Id:SM_Id},
+        data: {register_email_id: register_email_id,register_mobile_no:register_mobile_no, register_batch_sel:register_batch_sel, SM_Id:SM_Id, register_first_name:register_first_name},
         dataType: "json",
         success:function(srh_gr_response){
 

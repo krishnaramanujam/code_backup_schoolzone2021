@@ -30,6 +30,7 @@ include_once '../../config/database.php';
         <th width="15%" style="text-align:center">Menu Header</th>
         <th width="15%" style="text-align:center">File Name</th>
         <th width="15%" style="text-align:center">Access Type</th>
+        <th width="15%" style="text-align:center">User Type</th>
         <th width="10%" style="text-align:center">Edit</th>
         <th width="10%" style="text-align:center">Delete</th>
       </tr>
@@ -43,6 +44,10 @@ include_once '../../config/database.php';
         QUERY::run( "SELECT
                        child.Id AS c_id,
                        if(child.access_type = 1, 'Super Admin', 'Users') As Access_Type,
+                       CASE  WHEN child.link_user_type = 0 THEN 'Staff'
+                              WHEN child.link_user_type = 1  THEN 'Student'
+                              WHEN child.link_user_type = 2  THEN 'Candidate'
+                        END AS UserType,
                        CONCAT
                        (
                          ( CASE WHEN greateQuintic.header   IS NULL THEN '' ELSE CONCAT( '/', greateQuintic.header   ) END ),
@@ -75,7 +80,7 @@ include_once '../../config/database.php';
                        LEFT JOIN setup_links greateCube      ON greateCube.Id      = greateCube.parent
                        LEFT JOIN setup_links greatBiquadrate ON greatBiquadrate.Id = greatBiquadrate.parent
                        LEFT JOIN setup_links greateQuintic   ON greateQuintic.Id   = greateQuintic.parent
-                       Where  child.link_user_type = '0'
+                       
                      -- yeah, mysql 5 doesn't have self-referential/recursive queries... upgrade to 8... ASAP 
                      -- sorry for this mess, lol 
                      " );
@@ -89,6 +94,7 @@ include_once '../../config/database.php';
           <td style="vertical - align:middle;text - align:center">' . $header['c_head'] . '</td>
           <td style="vertical - align:middle;text - align:center">' . $header['c_url'] . '</td>
           <td style="vertical - align:middle;text - align:center">' . $header['Access_Type'] . '</td>
+          <td style="vertical - align:middle;text - align:center">' . $header['UserType'] . '</td>
           
           <td style="text-align:center">
                 <a onclick="edit_header(' . $header['c_id'] . ')" type="button" class="btn btn-info btn-flat" title="Edit" tooltip><i class="fa fa-pencil"></i></a>

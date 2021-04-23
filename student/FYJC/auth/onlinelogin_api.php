@@ -41,12 +41,14 @@ if(isset($_GET['Validate_RegisterForm'])){
         Login_Count,
         ContactNo,
         EmailAddress,
-        batchmaster_Id) Values
+        batchmaster_Id,
+        full_name) Values
         ('$pin',
         '0',
         '$register_mobile_no',
         '$register_email_id',
-        '$register_batch_sel')");
+        '$register_batch_sel',
+        '$register_first_name')");
 
         $CR_Id =  mysqli_insert_id($mysqli);
 

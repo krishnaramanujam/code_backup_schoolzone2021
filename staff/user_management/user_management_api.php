@@ -396,4 +396,36 @@ if(isset($_GET['Email_Header_Mapping'])){
 }
 //-----------------------------------------------------------------------------------------------------------------------
 
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['BatchWise_PageAccess'])){
+   
+    extract($_POST);
+
+        $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+        $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+        
+        //Deleting UserPageAccess
+        $Deleting_BatchAccess = mysqli_query($mysqli,"DELETE FROM batchwise_setup_links_access WHERE batchwise_setup_links_access.batchmaster_Id = '$batch_sel' AND user_type_Id = '$usertype'");
+
+        if(isset($check)){
+            foreach($check as $index => $value) {
+
+                
+
+                //Inserting in BatchPageAccess
+                $Inserting_BatchAccess = mysqli_query($mysqli,"INSERT INTO batchwise_setup_links_access(function_Id, batchmaster_Id, user_type_Id) 
+                values ('$check[$index]', '$batch_sel', '$usertype')");
+                
+            }
+        }
+
+
+        $res['status'] = 'success';
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
 ?>
