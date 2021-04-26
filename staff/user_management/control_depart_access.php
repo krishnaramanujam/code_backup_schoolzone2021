@@ -21,50 +21,53 @@ $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
 
 
     <div class="col-md-10">
-    <ul class="list-group" id="list-tab" role="tablist">
-    <li class="list-group-item active">Department Name<span class="pull-right">Permission</span></li>
-    <?php 
+    <table id="header_list" class="table table-bordered table-striped" style="width:100%">
+        <thead>
+        <tr>
+          <th width="5%">Sr No</th>
+          <th width="15%">Department Name</th>
+          <th width="15%">Access Status</th>
+          <th width="15%">Permission</th>
+        </tr>
+        </thead>    
+        <tbody>
+
+        <?php 
             $dept_sel = "select * from setup_departmentmaster Where sectionmaster_Id = '$SectionMaster_Id'";
             $check_sel = mysqli_query($mysqli,$dept_sel);
-       
+            $i = 1;
             while($row = mysqli_fetch_array($check_sel)){
     ?>
     
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-        <?php echo $row['department_name']; ?>
-        <span class="pull-right">
-            <?php 
-                $check_entry = "SELECT * FROM `comm_dept_access` where userId = '$user_id_edit' AND departmentmaster_Id = '".$row['Id']."'";
-                $q_entry = mysqli_query($mysqli,$check_entry);
-                $row_check = mysqli_num_rows($q_entry); 
-                if($row_check > 0){ ?>
+            <tr>
+                <td><?php echo $i; ?></td>
+                <td><?php echo $row['department_name']; ?></td>
+            
+               
+                    <?php 
+                    $check_entry = "SELECT * FROM `comm_batch_access` where userId = '$user_id_edit' AND batchMaster_Id = '".$row['Id']."'";
+                    $q_entry = mysqli_query($mysqli,$check_entry);
+                    $row_check = mysqli_num_rows($q_entry); 
+                    if($row_check > 0){ ?>
+                    <td>Activated</td>
+                    <td>     
+                        <input type="checkbox" class="form-check-label subcheck" checked id="check[<?php echo $row['Id']; ?>]" name="check[]" value="<?php echo $row['Id']; ?>"> 
+                    </td>
+
+                    <?php } else { ?>
+                    <td>Disabled</td>
+                    <td>    
+                        <input type="checkbox" class="form-check-label subcheck" id="check[<?php echo $row['Id']; ?>]" name="check[]" value="<?php echo $row['Id']; ?>">
+                    </td>
+            
+                    <?php } ?>    
                 
-                <div class="pretty p-icon p-smooth">
-                <input type="checkbox" class="form-check-label subcheck" checked id="check[<?php echo $row['Id']; ?>]" name="check[]" value="<?php echo $row['Id']; ?>"> 
-                        <div class="state p-success">
-                            <i class="icon fa fa-check"></i>
-                            <label></label>
-                        </div>
-                </div>     
+            </tr>
 
-                <?php } else {?>
+        <?php  $i++; }  ?> 
 
-                <div class="pretty p-icon p-smooth">
-                <input type="checkbox" class="form-check-label subcheck" id="check[<?php echo $row['Id']; ?>]" name="check[]" value="<?php echo $row['Id']; ?>">
-                        <div class="state p-success">
-                            <i class="icon fa fa-check"></i>
-                            <label></label>
-                        </div>
-                </div>       
-           
-                <?php } ?>    
-        </span>
-    </li>
-    
-    
-    <?php   }  ?> 
-
-    </ul>
+        </body>
+    </table>
     </div>
 
 
@@ -136,4 +139,37 @@ function return_controlaccess() {
 					
 				}
 
+
+
+  
+$('#header_list').DataTable( {
+    dom: 'Bifrtp',
+    bPaginate:false,
+    
+    buttons: [
+    {
+        extend: 'excel',
+        footer: true,
+		title: "Download Format",
+		text: 'Download Format',
+        exportOptions : {
+            columns : ':visible',
+            format : {
+                header : function (mDataProp, columnIdx) {
+            var htmlText = '<span>' + mDataProp + '</span>';
+            var jHtmlObject = jQuery(htmlText);
+            jHtmlObject.find('div').remove();
+            var newHtml = jHtmlObject.text();
+            console.log('My header > ' + newHtml);
+            return newHtml;
+                }
+            }
+        }
+    }
+    ]
+} );
+
+  $('#header_list').dataTable().yadcf([
+    {column_number: 2, filter_match_mode: "exact"}
+  ]);
 </script>

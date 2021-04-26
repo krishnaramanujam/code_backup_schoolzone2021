@@ -845,4 +845,403 @@ if(isset($_GET['Add_TelegramInstance_InBulk'])){
 
 }
 //-----------------------------------------------------------------------------------------------------------------------
+
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_SMSHeaderInstance'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    //checking Department Abbbr & Name
+    $depart_fetch_q = mysqli_query($mysqli,"SELECT comm_sms_header_ids.* FROM comm_sms_header_ids Where comm_sms_header_ids.sectionmaster_Id = '$SectionMaster_Id' AND (comm_sms_header_ids.header_name = '".htmlspecialchars($add_header_name, ENT_QUOTES)."' OR comm_sms_header_ids.PE_Id = '".htmlspecialchars($add_PE_Id, ENT_QUOTES)."')");
+
+
+    $row_depart_fetch = mysqli_num_rows($depart_fetch_q);
+
+    if($row_depart_fetch > 0){
+
+        
+        $res['status'] = 'EXISTS';
+        echo json_encode($res);
+
+    }else{
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into comm_sms_header_ids
+        (sectionmaster_Id, header_name, PE_Id) 
+        Values
+        ('$SectionMaster_Id', '".htmlspecialchars($add_header_name, ENT_QUOTES)."', '".htmlspecialchars($add_PE_Id, ENT_QUOTES)."')");
+        
+        $res['status'] = 'success';
+        echo json_encode($res);
+    }
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_SMSHeaderInstance'])){
+
+    extract($_POST);
+
+     
+    $updating_CalenderInstance = mysqli_query($mysqli,"Update comm_sms_header_ids Set header_name = '".htmlspecialchars($edit_header_name, ENT_QUOTES)."',PE_Id='".htmlspecialchars($edit_PE_Id, ENT_QUOTES)."' where Id  = '$edit_InstanceId'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_SMSHeaderInstance'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM comm_sms_header_ids where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//----------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_SMSHeaderInstance_InBulk'])){
+
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    // check file name is not empty
+    $pathinfo = pathinfo($_FILES["upload_file"]["name"]); //file extension
+
+    $folderMap = '../';
+    $fileLocation = "FileUploadLogs/SMSHeaderMaster_".$SectionMaster_Id."_".date("Y-m-d-h-i-s").'.xlsx';
+    $targetfolder =  $folderMap."".$fileLocation;
+    move_uploaded_file($_FILES['upload_file']['name'], $targetfolder);
+
+    $writer = WriterFactory::create(Type::XLSX); // for XLSX files
+
+    $fileName= $targetfolder;
+    $writer->openToFile($fileName); // write data to a file or to a PHP stream
+    // $writer->openToBrowser($fileName); // stream data directly to the browser
+
+    $singleRow =['Sr No','Header Name','PE Id','Upload Status'];
+    $writer->addRow($singleRow); // add a row at a time
+
+
+
+
+
+   
+    if (($pathinfo['extension'] == 'xlsx' || $pathinfo['extension'] == 'xls') && $_FILES['upload_file']['size'] > 0 ) { //check if file is an excel file && is not empty
+        $inputFileName = $_FILES['upload_file']['tmp_name'];  // Temporary file name
+        
+        // Read excel file by using ReadFactory object.
+        $reader = ReaderFactory::create(Type::XLSX);
+
+        // Open file
+        $reader->open($inputFileName);
+
+
+        $count = 1;
+        $flag = 0;
+
+
+
+        // Number of sheet in excel file
+        foreach ($reader->getSheetIterator() as $sheet) {
+            // Number of Rows in Excel sheet
+            foreach ($sheet->getRowIterator() as $row) {
+                // It reads data after header. In the my excel sheet, header is in the first row.
+                if ($count > 1) {  if(!empty($row[0])){
+
+
+//---------------------------------------------------------------------------------------------------------------                  
+
+    $StreamDetails_q = mysqli_query($mysqli, "SELECT comm_sms_header_ids.* FROM comm_sms_header_ids Where comm_sms_header_ids.sectionmaster_Id = '$SectionMaster_Id' AND (comm_sms_header_ids.header_name = '".htmlspecialchars($row[1], ENT_QUOTES)."' OR comm_sms_header_ids.PE_Id = '".htmlspecialchars($row[2], ENT_QUOTES)."')");
+
+    $row_StreamDetails = mysqli_num_rows($StreamDetails_q);
+
+
+
+    if($row_StreamDetails == '0'){
+
+        //checking Group and Sem Belong to this Program
+
+        
+    
+    
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into comm_sms_header_ids
+        (sectionmaster_Id, header_name, PE_Id) 
+        Values
+        ('$SectionMaster_Id', '".htmlspecialchars($row[1], ENT_QUOTES)."', '".htmlspecialchars($row[2], ENT_QUOTES)."')");
+
+
+
+        if(mysqli_error($mysqli)){
+            $displayMessage[]  = $row[1].' : Query Failed';
+            $uploadMessage = "Query Failed";
+        }else{
+            $displayMessage[]  = $row[1].' : SMS Header Added';
+            $uploadMessage = "SMS Header Added";    
+        }
+
+        
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+        
+    }elseif($row_StreamDetails > '0'){
+        $displayMessage[]  = $row[1].' : SMS Header Already Present';
+        $uploadMessage = "SMS Header Already Added";
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+    }
+    unset($uploadMessage);
+//----------------------------------------------------------------------------------------------------------------------
+                   
+
+        }}
+        $count++;
+        }
+
+        }
+
+
+
+
+        }
+
+
+        $writer->close();
+
+
+        $res['UploadedFilePath'] = $fileLocation;
+        $res['displayMessage'] = $displayMessage;
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Change_SMSHeader_DefaultEntry'])){
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    $Header_Id = $_POST['Header_Id'];
+
+    //Make ALL 0
+    $updating_Attend_Staff = mysqli_query($mysqli,"Update comm_sms_header_ids set isDefault = '0' where sectionmaster_Id = '$SectionMaster_Id'");
+
+
+    //Make Selected 1
+    $updating_Attend_Staff = mysqli_query($mysqli,"Update comm_sms_header_ids set isDefault = '1' where Id = '$Header_Id'");
+
+    echo "200";
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_SMSTemplateInstance'])){
+
+    extract($_POST);
+
+     
+    $updating_CalenderInstance = mysqli_query($mysqli,"Update comm_sms_templates Set 
+    registered_sms_template = '".htmlspecialchars($edit_registered_sms_template, ENT_QUOTES)."',
+    template_Id='".htmlspecialchars($edit_template_Id, ENT_QUOTES)."',
+    date_of_approval= '".date('Y-m-d',strtotime(str_replace('/','-',$edit_date_of_approval)))."',
+    actual_message_template='".htmlspecialchars($edit_actual_message_template, ENT_QUOTES)."'
+    where Id  = '$edit_InstanceId'");
+
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_SMSTemplateInstance'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM comm_sms_templates where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//----------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_SMSTemplateInstance'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    //checking Department Abbbr & Name
+    $depart_fetch_q = mysqli_query($mysqli,"SELECT comm_sms_templates.* FROM comm_sms_templates Where comm_sms_templates.sms_header_Id = '$add_sms_header_Id' AND comm_sms_templates.template_Id = '$add_template_Id' ");
+
+    $row_depart_fetch = mysqli_num_rows($depart_fetch_q);
+
+    if($row_depart_fetch > 0){
+
+        
+        $res['status'] = 'EXISTS';
+        echo json_encode($res);
+
+    }else{
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into comm_sms_templates
+        (sms_header_Id, registered_sms_template, template_Id, date_of_approval, actual_message_template) 
+        Values
+        ('$add_sms_header_Id', '".htmlspecialchars($add_registered_sms_template, ENT_QUOTES)."', '".htmlspecialchars($add_template_Id, ENT_QUOTES)."', '".date('Y-m-d',strtotime(str_replace('/','-',$add_date_of_approval)))."' , '".htmlspecialchars($add_actual_message_template, ENT_QUOTES)."')");
+        
+        $res['status'] = 'success';
+        echo json_encode($res);
+    }
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_SMSTemplateInstance_InBulk'])){
+
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+    $add_sms_header_Id = $_GET['add_sms_header_Id'];
+
+    // check file name is not empty
+    $pathinfo = pathinfo($_FILES["upload_file"]["name"]); //file extension
+
+    $folderMap = '../';
+    $fileLocation = "FileUploadLogs/SMSTemplateMaster_".$SectionMaster_Id."_".date("Y-m-d-h-i-s").'.xlsx';
+    $targetfolder =  $folderMap."".$fileLocation;
+    move_uploaded_file($_FILES['upload_file']['name'], $targetfolder);
+
+    $writer = WriterFactory::create(Type::XLSX); // for XLSX files
+
+    $fileName= $targetfolder;
+    $writer->openToFile($fileName); // write data to a file or to a PHP stream
+    // $writer->openToBrowser($fileName); // stream data directly to the browser
+
+    $singleRow =['Sr No','Registered SMS Template','Template Id','Date Of Approval','Actual Message Template','Upload Status'];
+    $writer->addRow($singleRow); // add a row at a time
+
+
+
+
+
+   
+    if (($pathinfo['extension'] == 'xlsx' || $pathinfo['extension'] == 'xls') && $_FILES['upload_file']['size'] > 0 ) { //check if file is an excel file && is not empty
+        $inputFileName = $_FILES['upload_file']['tmp_name'];  // Temporary file name
+        
+        // Read excel file by using ReadFactory object.
+        $reader = ReaderFactory::create(Type::XLSX);
+
+        // Open file
+        $reader->open($inputFileName);
+
+
+        $count = 1;
+        $flag = 0;
+
+
+
+        // Number of sheet in excel file
+        foreach ($reader->getSheetIterator() as $sheet) {
+            // Number of Rows in Excel sheet
+            foreach ($sheet->getRowIterator() as $row) {
+                // It reads data after header. In the my excel sheet, header is in the first row.
+                if ($count > 1) {  if(!empty($row[0])){
+
+
+//---------------------------------------------------------------------------------------------------------------                  
+
+    $StreamDetails_q = mysqli_query($mysqli, "SELECT comm_sms_templates.* FROM comm_sms_templates Where comm_sms_templates.sms_header_Id = '$add_sms_header_Id' AND comm_sms_templates.template_Id = '".htmlspecialchars($row[2], ENT_QUOTES)."'");
+
+    $row_StreamDetails = mysqli_num_rows($StreamDetails_q);
+
+
+
+    if($row_StreamDetails == '0'){
+
+        //checking Group and Sem Belong to this Program
+
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into comm_sms_templates
+        (sms_header_Id, registered_sms_template, template_Id, date_of_approval, actual_message_template) 
+        Values
+        ('$add_sms_header_Id', '".htmlspecialchars($row[1], ENT_QUOTES)."', '".htmlspecialchars($row[2], ENT_QUOTES)."', '".htmlspecialchars($row[3]->format('Y-m-d'), ENT_QUOTES)."', '".htmlspecialchars($row[4], ENT_QUOTES)."')");
+        
+
+        if(mysqli_error($mysqli)){
+            $displayMessage[]  = $row[1].' : Query Failed';
+            $uploadMessage = "Query Failed";
+        }else{
+            $displayMessage[]  = $row[1].' : SMS Template Added';
+            $uploadMessage = "SMS Template Added";    
+        }
+
+        
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3]->format('Y-m-d'),$row[4],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+        
+    }elseif($row_StreamDetails > '0'){
+        $displayMessage[]  = $row[1].' : SMS Template Already Present';
+        $uploadMessage = "SMS Template Already Added";
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3]->format('Y-m-d'),$row[4],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+    }
+    unset($uploadMessage);
+//----------------------------------------------------------------------------------------------------------------------
+                   
+
+        }}
+        $count++;
+        }
+
+        }
+
+
+
+
+        }
+
+
+        $writer->close();
+
+
+        $res['UploadedFilePath'] = $fileLocation;
+        $res['displayMessage'] = $displayMessage;
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
 ?>

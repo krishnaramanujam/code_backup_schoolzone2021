@@ -162,6 +162,7 @@ if ( isset( $_POST['admin_id'] ) ) {
           <th width="15%">Path</th>
           <th width="15%" style="text-align:center">Immediate Parent</th>
           <th width="15%">Name</th>
+          <th width="15%">Access Status</th>
           <th width="5%"><input type="checkbox" id="master"><br />Control Access</th>
         </tr>
         </thead>
@@ -219,9 +220,9 @@ if ( isset( $_POST['admin_id'] ) ) {
                                   [ $user_stafflogin_id, $header['c_id'] ] )->fetch();
 
           if ( $users_func )
-            $tr_data .= "<td><input type='checkbox' class='sub_chk' checked name='c[" . $header['c_id'] . "]'></td>";
+            $tr_data .= "<td>Activated</td><td><input type='checkbox' class='sub_chk' checked name='c[" . $header['c_id'] . "]'></td>";
           else
-            $tr_data .= "<td><input type='checkbox' class='sub_chk' name='c[" . $header['c_id'] . "]'></td>";
+            $tr_data .= "<td>Disabled</td><td><input type='checkbox' class='sub_chk' name='c[" . $header['c_id'] . "]'></td>";
 
           echo $tr_data;
           ++$id;
@@ -271,7 +272,7 @@ $('#header_list').DataTable( {
 } );
 
   $('#header_list').dataTable().yadcf([
-    {column_number: 2, filter_match_mode: "exact"}
+    {column_number: 2, filter_match_mode: "exact"}, {column_number: 4, filter_match_mode: "exact"}
   ]);
 
   $(function () {

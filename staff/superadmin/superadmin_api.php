@@ -204,6 +204,16 @@ if(isset($_GET['Mapping_Module'])){
         }
     }
 
+    if(isset($checkss)){
+        foreach($checkss as $index => $value) {
+
+            //Inserting in BatchPageAccess
+            $Inserting_BatchAccess = mysqli_query($mysqli,"INSERT INTO setup_modulemapping(modulelist_Id, sectionmaster_Id, userType_Id) 
+            values ('$checkss[$index]', '$selectedSection_Id' , '2')");
+            
+        }
+    }
+
 
 	$res['status'] = 'success';
 	echo json_encode($res);

@@ -412,14 +412,33 @@ if(isset($_GET['BatchWise_PageAccess'])){
         if(isset($check)){
             foreach($check as $index => $value) {
 
+                //Fetching parent of This Entry
+                $parent_fetch_q = mysqli_query($mysqli, "Select * from setup_links where setup_links.Id = '$check[$index]'");
+                $r_parent_fetch = mysqli_fetch_array($parent_fetch_q);
+
                 
+                if($r_parent_fetch['parent'] != '0'){
+                    
+                    $checking_entry_q = mysqli_query($mysqli, "Select * from batchwise_setup_links_access Where batchmaster_Id = '$batch_sel' AND user_type_Id = '$usertype' AND function_Id ='$r_parent_fetch[parent]'");
+                    $row_entry = mysqli_num_rows($checking_entry_q);
+
+                    if($row_entry == '0'){
+                        //Inserting in BatchPageAccess
+                        $Inserting_BatchAccess = mysqli_query($mysqli,"INSERT INTO batchwise_setup_links_access(function_Id, batchmaster_Id, user_type_Id) 
+                        values ('$r_parent_fetch[parent]', '$batch_sel', '$usertype')");
+                    }
+                }
+
 
                 //Inserting in BatchPageAccess
                 $Inserting_BatchAccess = mysqli_query($mysqli,"INSERT INTO batchwise_setup_links_access(function_Id, batchmaster_Id, user_type_Id) 
                 values ('$check[$index]', '$batch_sel', '$usertype')");
-                
-            }
-        }
+
+
+
+
+            }// close Foreach
+        }// close isset
 
 
         $res['status'] = 'success';

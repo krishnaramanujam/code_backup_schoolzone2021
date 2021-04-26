@@ -246,7 +246,9 @@ function hasAccess($permission = [])
             {
               global $outerFlag;
 
-              $searchChild = 'SELECT * FROM `setup_links` WHERE `parent` = ? AND link_user_type = 2 ';
+              $searchChild = 'SELECT setup_links.* FROM `setup_links` 
+              JOIN batchwise_setup_links_access ON batchwise_setup_links_access.function_Id = setup_links.Id 
+            WHERE setup_links.`parent` = ? AND setup_links.link_user_type = 2';
               $views       = QUERY::run( $searchChild, [ $tree_view['Id'] ] )->fetchAll();
               
           //-- if permission -------------------------------------------------------------
@@ -295,6 +297,7 @@ function hasAccess($permission = [])
               }
           //----------------------------------------------------------------------
               $view_inc = 0;
+              $sub_view_inc = 1;
               $numItems = count($views);
               foreach ( $views as $view )
               {
@@ -307,7 +310,7 @@ function hasAccess($permission = [])
                   $subChilds      = QUERY::run( $searchSubChild, [ $view['Id'] ] )->fetchAll(); // GET UNIQUE SUB-CHILDS
 
                   $html .= '
-          <li  id="' . $view['Id'] * 100 . '" class="treeview-menu">' . PHP_EOL;
+          <li  id="' . $view['Id'] * 100 . '" class="treeview-menu" >' . PHP_EOL;
 
                   $html .= printView( $subChilds  , $mysqli); // going in
                   $html .= '
@@ -320,17 +323,18 @@ function hasAccess($permission = [])
           //------ if permission -------------------------------------------------
                   if ( $Admin_Registeration_Id == 1 || $Admin_Registeration_Id == 2 || hasAccess( [ $view['Id'] ] ) )
                   {
+                    $view_inc++;  
                     $functionName = "getPage('".$view['url']."', '".$view['Id']."');";
 
-                    if($view_inc == 0){
-                      $html.=' <ul  id="' . $view['Id'] * 100 . '" class="treeview-menu">';
+                    if($view_inc == 1){
+                      $html.=' <ul  id="' . $view['Id'] * 100 . '" class="treeview-menu '.$view_inc.' ">';
                     }
                     
 
                     
                     $html .= '
 
-            <li class="treelinks">
+            <li class="treelinks" >
               <a onclick="'.$functionName.'" href="#' . $view['header'] . '">
                 <i class="fa fa-circle-o"></i>
                 ' . $view['header'] . '
@@ -338,17 +342,20 @@ function hasAccess($permission = [])
             </li>
           ' . PHP_EOL;
 
+          // print_r("NUM ITem" .$numItems);
+          // print_r("View Ince" .$view_inc);
 
-                  if($view_inc + 1 == $numItems){
-                    $html.=' </ul>';
+                  if($view_inc == $numItems){
+                    $html.='</ul>';
                   }
 
                 //   if ($view['Id'] === end($array)) {
                 //     echo 'LAST ITEM!';
                 //  }
-
+                
                   }
-                  $view_inc ++;
+                  $html.='  ';
+                 
           //----------------------------------------------------------------------
                 }
                 --$innerFlag;

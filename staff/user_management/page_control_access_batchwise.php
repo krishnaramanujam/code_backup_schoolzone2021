@@ -54,13 +54,49 @@ $batch_sel = $_POST['batch_sel'];
           <th width="15%">Path</th>
           <th width="15%" style="text-align:center">Immediate Parent</th>
           <th width="15%">Name</th>
+          <th width="15%">Access Status</th>
           <th width="5%"><input type="checkbox" id="master"><br />Control Access</th>
         </tr>
         </thead>
         <tbody>
 
         <?php
-        $header_result = QUERY::run( "SELECT child.Id AS c_id, CONCAT( ( CASE WHEN gran.header IS NULL THEN '' ELSE CONCAT('/', gran.header) END ), ( CASE WHEN parent.header IS NULL THEN '' ELSE CONCAT('/', parent.header) END ), '/', child.header ) AS PATH, ( CASE WHEN parent.header IS NULL AND child.url IS NULL THEN '--root--' WHEN parent.header IS NOT NULL AND child.url IS NULL THEN '-subroot-' ELSE child.url END ) AS c_url, child.header AS c_head, ( CASE WHEN parent.header IS NULL THEN '-' ELSE parent.header END ) AS p_head FROM setup_links child LEFT JOIN setup_links parent ON parent.Id = child.parent LEFT JOIN setup_links gran ON gran.Id = parent.parent LEFT JOIN setup_links greatgran ON greatgran.Id = gran.parent WHERE parent.header IS NOT NULL AND child.link_user_type = '$usertype' AND child.access_type = '0' " );
+        $header_result = QUERY::run( "SELECT
+        child.Id AS c_id,
+        CONCAT(
+          (
+            CASE WHEN gran.header IS NULL THEN '' ELSE CONCAT('/',
+            gran.header)
+          END
+        ),
+        (
+          CASE WHEN parent.header IS NULL THEN '' ELSE CONCAT('/',
+          parent.header)
+        END
+      ),
+      '/',
+      child.header
+      ) AS PATH,
+      (
+        CASE WHEN parent.header IS NULL AND child.url IS NULL THEN '--root--' WHEN parent.header IS NOT NULL AND child.url IS NULL THEN '-subroot-' ELSE child.url
+      END
+      ) AS c_url,
+      child.header AS c_head,
+      (
+        CASE WHEN parent.header IS NULL THEN '-' ELSE parent.header
+      END
+      ) AS p_head
+      FROM
+        setup_links child
+      LEFT JOIN
+        setup_links parent ON parent.Id = child.parent
+      LEFT JOIN
+        setup_links gran ON gran.Id = parent.parent
+      LEFT JOIN
+        setup_links greatgran ON greatgran.Id = gran.parent
+         JOIN setup_modulemapping ON setup_modulemapping.modulelist_Id = child.modulelist_Id
+      WHERE
+        parent.header IS NOT NULL AND child.link_user_type = '$usertype' AND child.access_type = '0'  AND setup_modulemapping.sectionmaster_Id = '$SectionMaster_Id' AND  setup_modulemapping.userType_Id = '$usertype' " );
 
         $id = 0;
 
@@ -82,9 +118,13 @@ $batch_sel = $_POST['batch_sel'];
                                   [ $batch_sel, $header['c_id'] ] )->fetch();
 
           if ( $users_func )
-            $tr_data .= "<td><input type='checkbox' class='sub_chk' checked name='check[]' value='".$header['c_id']."'></td>";
+            $tr_data .= "
+            <td>Activated</td>
+            <td><input type='checkbox' class='sub_chk' checked name='check[]' value='".$header['c_id']."'></td>";
           else
-            $tr_data .= "<td><input type='checkbox' class='sub_chk' name='check[]' value='".$header['c_id']."'></td>";
+            $tr_data .= "
+            <td>Disabled</td>
+            <td><input type='checkbox' class='sub_chk' name='check[]' value='".$header['c_id']."'></td>";
 
           echo $tr_data;
           ++$id;
@@ -134,7 +174,7 @@ $('#header_list').DataTable( {
 } );
 
   $('#header_list').dataTable().yadcf([
-    {column_number: 2, filter_match_mode: "exact"}
+    {column_number: 1, filter_match_mode: "exact"},{column_number: 3, filter_match_mode: "exact"}
   ]);
 
   $(function () {

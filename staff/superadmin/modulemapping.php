@@ -22,7 +22,7 @@ $form_Title_q = mysqli_query($mysqli, "SELECT setup_sectionmaster.section_name F
 $r_form_Title = mysqli_fetch_array($form_Title_q); 
 
 
-$accessquery = "SELECT setup_modulelist.Id AS ML_Id, setup_modulelist.modulelist, setup_modulemapping.Id AS MM_Id, a.Id As SMM_Id FROM setup_modulelist LEFT JOIN setup_modulemapping ON setup_modulemapping.modulelist_Id = setup_modulelist.Id AND setup_modulemapping.sectionmaster_Id = '$selectedSection_Id' AND setup_modulemapping.userType_Id = '0' LEFT JOIN setup_modulemapping a ON a.modulelist_Id = setup_modulelist.Id AND a.sectionmaster_Id = '$selectedSection_Id' AND a.userType_Id = '1' WHERE 1 GROUP BY setup_modulelist.Id  ";
+$accessquery = "SELECT setup_modulelist.Id AS ML_Id, setup_modulelist.modulelist, setup_modulemapping.Id AS MM_Id, a.Id AS SMM_Id, b.Id AS CMM_Id FROM setup_modulelist LEFT JOIN setup_modulemapping ON setup_modulemapping.modulelist_Id = setup_modulelist.Id AND setup_modulemapping.sectionmaster_Id = '$selectedSection_Id' AND setup_modulemapping.userType_Id = '0' LEFT JOIN setup_modulemapping a ON a.modulelist_Id = setup_modulelist.Id AND a.sectionmaster_Id = '$selectedSection_Id' AND a.userType_Id = '1' LEFT JOIN setup_modulemapping b ON b.modulelist_Id = setup_modulelist.Id AND b.sectionmaster_Id = '$selectedSection_Id' AND b.userType_Id = '2' WHERE 1 GROUP BY setup_modulelist.Id   ";
 
 // echo $applicationquery;
 $access_list_q = mysqli_query($mysqli, $accessquery);
@@ -62,6 +62,9 @@ $access_list_q = mysqli_query($mysqli, $accessquery);
             </th>
             <th>Student <br>
                <input type="checkbox" class="subchecks" id="checks">
+            </th>
+            <th>Candidate <br>
+               <input type="checkbox" class="subcheckss" id="checkss">
             </th>
             </tr>
         </thead>
@@ -111,6 +114,20 @@ $access_list_q = mysqli_query($mysqli, $accessquery);
 
                                  <div class="pretty p-icon p-smooth">
                                           <input type="checkbox" class="subchecks sel_boxs" id="checks<?php echo $r_access_list['ML_Id']; ?>" name="checks[]" value="<?php echo $r_access_list['ML_Id']; ?>"  <?php if(!empty($r_access_list['SMM_Id'])){ echo 'checked'; } ?> >
+                                             <div class="state p-success">
+                                                 <i class="icon fa fa-check"></i>
+                                                 <label></label>
+                                             </div>
+                                 </div> 
+                                  
+                             </td>
+
+
+                             
+                             <td>
+                                 
+                                 <div class="pretty p-icon p-smooth">
+                                          <input type="checkbox" class="subcheckss sel_boxss" id="checkss<?php echo $r_access_list['ML_Id']; ?>" name="checkss[]" value="<?php echo $r_access_list['ML_Id']; ?>"  <?php if(!empty($r_access_list['CMM_Id'])){ echo 'checked'; } ?> >
                                              <div class="state p-success">
                                                  <i class="icon fa fa-check"></i>
                                                  <label></label>
@@ -176,6 +193,17 @@ $('#checks').click(function(){
     }   
 });
 
+$('#checkss').click(function(){
+    if($(this).prop("checked") == false){
+        $(".sel_boxss").removeAttr('checked');
+    
+    }else{
+
+        $(".sel_boxss").prop('checked', true);
+
+    }   
+});
+
 $('#Submit_Access_User').click(function(e){
     e.preventDefault();
     var selectedSection_Id = $('#selectedSection_Id').val();
@@ -216,8 +244,7 @@ $('#Submit_Access_User').click(function(e){
 });
 
 
-
-
+  
 </script>
 
 <style>

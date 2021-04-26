@@ -4,8 +4,9 @@ include_once '../SessionInfo.php';
 //Database File
 include_once '../../config/database.php';
 
+$sms_header_Id = $_GET['sms_header_Id'];
 
-$q = "SELECT setup_academicyear.* FROM setup_academicyear Where setup_academicyear.sectionmaster_Id = '$SectionMaster_Id' Order By sequence_no Desc";
+$q = "SELECT comm_sms_templates.* FROM comm_sms_templates Where comm_sms_templates.sms_header_Id = '$sms_header_Id' ";
 
 ?>
 
@@ -13,10 +14,10 @@ $q = "SELECT setup_academicyear.* FROM setup_academicyear Where setup_academicye
 
 <div class="container">
 
-    <div class="row">
-        <div class="col-md-6"><h3 style="font-weight:bold;font-style:italic;" class="font_all"><i class="fa fa-clock-o text-primary" aria-hidden="true"></i> Academic Year Master</h3>
-        </div>   
-    </div>
+    
+
+<div class="col-md-12"><h4><span class="badge btn btn-primary" onclick="return_controlaccess();"><i class="fa fa-arrow-left"></i></span><i><b>  SMS Template Master</b></i></h4></div>
+
 
 
     <div class="row">
@@ -35,18 +36,14 @@ $q = "SELECT setup_academicyear.* FROM setup_academicyear Where setup_academicye
                             <thead>
                                 <tr>
                                     <th>Sr No</th>
-                                    <th>Academic Year</th>
-                                    <th>Abbrivation</th>
-                                    <th>Start Date (YYYY-MM_DD) Convert to Text Format then Upload</th>
-                                    <th>End Date  (YYYY-MM_DD) Convert to Text Format then Upload</th>
-                                    <th>Sequence No</th>
+                                    <th>Registered SMS Template</th>
+                                    <th>Template Id</th>
+                                    <th>Date Of Approval</th>
+                                    <th>Actual Message Template</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -78,6 +75,7 @@ $q = "SELECT setup_academicyear.* FROM setup_academicyear Where setup_academicye
                         <form id="import_file_form" method="post" enctype="multipart/form-data">
                             <div class="form-group">
                                 <div class="form-group">
+
                                     <label class="col-md-4 input-md control-label" for="name">Select an excel file </label>
                                     <div class="col-md-4">
                                         <input type="file" name="upload_file">
@@ -99,20 +97,101 @@ $q = "SELECT setup_academicyear.* FROM setup_academicyear Where setup_academicye
 
     <div class="row">
     
+    
        <div class="col-md-12"> 
 
-        <div class="col-md-9">
+
+       <div class = "col-md-6">
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+<!------------------------------------------------------------------------------------------------------------------------->
+            <div class="panel panel-default InstanceCreate_Model">
+                <div class="panel-heading" role="tab" id="headingOne">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Add New SMS Template
+                    </a>
+                </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                <div class="panel-body">
+                    <div class="form-group">
+                         <input type="hidden" class="form-control" id="add_sms_header_Id" name="edit_sms_header_Id" value="<?php echo $sms_header_Id; ?>">
+                        <label for="email">SMS Registered Template*  </label>
+                        <input type="text" class="form-control" id="add_registered_sms_template" name="add_registered_sms_template" placeholder="Enter Registered Template">
+                        <br>
+                        <label for="email">Template Id*  </label>
+                        <input type="text" class="form-control" id="add_template_Id" name="add_template_Id" placeholder="Enter Template Id">
+
+                        <br>
+                        <label for="email">Date of Approval*  </label>
+                        <input type="text" class="form-control" id="add_date_of_approval" name="add_date_of_approval" placeholder="Enter Date of Approval">
+                        <br>
+                        <label for="email">Actual message Template*  </label>
+                        <input type="text" class="form-control" id="add_actual_message_template" name="add_actual_message_template" placeholder="Enter Actual Message Template">
+                
+                    </div>
+                </div>
+                <div class="panel-footer">
+                     <input type="submit" name="submit_addinstance" value="Save Changes" id="submit_addinstance" class="btn btn-primary" >  
+                </div>
+
+                </div>
+            </div>
+<!------------------------------------------------------------------------------------------------------------------------->           
+<!------------------------------------------------------------------------------------------------------------------------->
+            <div class="panel panel-default EventSelect_Model" id="Edit_Scroll">
+                <div class="panel-heading" role="tab" id="headingTwo">
+                <h4 class="panel-title">
+                <button type="button" class="close add_instance"><span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#3c8dbc;"></span></button>
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Edit SMS Template
+                    </a>
+                </h4>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
+                <form id="Edit_FormData">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <input type="hidden" class="form-control" id="edit_InstanceId" name="edit_InstanceId">
+                     
+                        <label for="email">SMS Registered Template*  </label>
+                        <input type="text" class="form-control" id="edit_registered_sms_template" name="edit_registered_sms_template" placeholder="Enter Registered Template">
+                        <br>
+                        <label for="email">Template Id*  </label>
+                        <input type="text" class="form-control" id="edit_template_Id" name="edit_template_Id" placeholder="Enter Template Id">
+
+                        <br>
+                        <label for="email">Date of Approval*  </label>
+                        <input type="text" class="form-control" id="edit_date_of_approval" name="edit_date_of_approval" placeholder="Enter Date of Approval">
+                        <br>
+                        <label for="email">Actual message Template*  </label>
+                        <input type="text" class="form-control" id="edit_actual_message_template" name="edit_actual_message_template" placeholder="Enter Actual Message Template">
+                
+                    </div>
+                </div>
+                </form>
+                <div class="panel-footer">
+                     <input type="submit" name="submit_editinstance" value="Save Changes" id="submit_editinstance" class="btn btn-primary">  
+                </div>
+                </div>
+            </div>
+
+<!------------------------------------------------------------------------------------------------------------------------->
+        </div>
+        </div> <!--Close Col-->
+
+
+        <div class="col-md-12">
             <form id="All_instance_form">
             <table class="table table-striped" id="InstanceMaster_Table">
                 <thead>
                     
                     <tr>
                         <th style="width:8%">Sr No.</th>
-                        <th>Academic Year</th>
-                        <th>Abbrivation</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Sequence No</th>
+                        <th style="width:30%">Registered SMS Template</th>
+                        <th style="width:10%">Template Id</th>
+                        <th style="width:20%">Date Of Approval</th>
+                        <th style="width:20%">Actual Message Template</th>
                         <th>Operations</th>
                     </tr>
                 </thead>
@@ -123,47 +202,33 @@ $q = "SELECT setup_academicyear.* FROM setup_academicyear Where setup_academicye
                         <tr>
                             <td><?php echo $i; ?></td>
                             <td>
-                              
-                                <?php echo $r_instance_fetch['academic_year']; ?>
+                                <?php echo $r_instance_fetch['registered_sms_template']; ?>
                             </td>
-                            <td><?php echo $r_instance_fetch['abbreviation']; ?></td>
-                            <td><?php echo $r_instance_fetch['start_date']; ?></td>
-                            <td><?php echo $r_instance_fetch['end_date']; ?></td>
-                            <td><?php echo $r_instance_fetch['sequence_no']; ?></td>
-                        
+                            <td><?php echo $r_instance_fetch['template_Id']; ?></td>
+                            <td><?php echo $r_instance_fetch['date_of_approval']; ?></td>
+                            <td><?php echo $r_instance_fetch['actual_message_template']; ?></td>
+                            
                             <td>
              
                             <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:flex">
                                
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-default delete_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Delete Header" data-toggle="tooltip"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:#ff3547;"></span></button>
+                                </div>
+
+
+                                <div class="btn-group" role="group">
+                                    <a><button type="button" class="btn btn-default edit_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Edit Header" data-toggle="tooltip"><span class="glyphicon glyphicon-edit" aria-hidden="true" style="color:#33b5e5;"></span></button></a>
+                                </div>
+
+
                                
-                                <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-default delete_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Delete Academic" data-toggle="tooltip"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:#ff3547;"></span></button>
-                                </div>
-
-
-                                <div class="btn-group" role="group">
-                                    <a><button type="button" class="btn btn-default edit_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Edit Academic" data-toggle="tooltip"><span class="glyphicon glyphicon-edit" aria-hidden="true" style="color:#33b5e5;"></span></button></a>
-                                </div>
-
-
-                                <?php if($r_instance_fetch['isDefault'] == '0'){  ?>
-                                    <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-default Default_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Make this Default Entry" data-toggle="tooltip"><span class="fa fa-check" aria-hidden="true" style="color:#f5c601;"></span></button>
-                                    </div>
-                                <?php } ?>
-                                <?php if($r_instance_fetch['isDefault'] == '1'){ ?>  
-                                    <span  style="color:#33b5e5;"> Currently Selected</span><br>
-                                <?php } ?>
-
                                 
                                 <input type="hidden" value="<?php echo $r_instance_fetch['Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Id">
-                                <input type="hidden"  value="<?php echo $r_instance_fetch['academic_year']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_academic_year">
-                                <input type="hidden" value="<?php echo $r_instance_fetch['abbreviation']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_abbreviation">
-                                <input type="hidden" value="<?php echo $r_instance_fetch['start_date']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_start_date">
-                                <input type="hidden" value="<?php echo $r_instance_fetch['sequence_no']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_sequence_no">
-                                <input type="hidden" value="<?php echo $r_instance_fetch['end_date']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_end_date">
-                        
-                        
+                                <input type="hidden"  value="<?php echo $r_instance_fetch['registered_sms_template']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_registered_sms_template">
+                                <input type="hidden" value="<?php echo $r_instance_fetch['template_Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_template_Id">
+                                <input type="hidden" value="<?php echo $r_instance_fetch['date_of_approval']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_date_of_approval">
+                                <input type="hidden" value="<?php echo $r_instance_fetch['actual_message_template']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_actual_message_template">
                             </div>
 
                            
@@ -182,87 +247,7 @@ $q = "SELECT setup_academicyear.* FROM setup_academicyear Where setup_academicye
 
      
         
-        <div class = "col-md-3">
-        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-<!------------------------------------------------------------------------------------------------------------------------->
-            <div class="panel panel-default InstanceCreate_Model">
-                <div class="panel-heading" role="tab" id="headingOne">
-                <h4 class="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    Add New Academic Year
-                    </a>
-                </h4>
-                </div>
-                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-                <div class="panel-body">
-                    <div class="form-group">
-                        <label for="email">Academic Year*  </label>
-                        <input type="text" class="form-control" id="add_academic_year" name="add_academic_year" placeholder="Enter Department Name">
-                        <br>
-                        <label for="email">Abbrivation*  </label>
-                        <input type="text" class="form-control" id="add_abbreviation" name="add_abbreviation" placeholder="Enter abbreviation">
-                        <br>
-                        <label for="email">Start Date*  </label>
-                        <input type="text" class="form-control" id="add_start_date" name="add_start_date" placeholder="Enter start_date">
-                        <br>
-                        <label for="email">End Date*  </label>
-                        <input type="text" class="form-control" id="add_end_date" name="add_end_date" placeholder="Enter end_date">
-                        <br>
-                        <label for="email">Sequence No*  </label>
-                        <input type="text" class="form-control" id="add_sequence_no" name="add_sequence_no" placeholder="Enter Sequence No">
-                       
-                    </div>
-                </div>
-                <div class="panel-footer">
-                     <input type="submit" name="submit_addinstance" value="Save Changes" id="submit_addinstance" class="btn btn-primary" >  
-                </div>
-
-                </div>
-            </div>
-<!------------------------------------------------------------------------------------------------------------------------->           
-<!------------------------------------------------------------------------------------------------------------------------->
-            <div class="panel panel-default EventSelect_Model" id="Edit_Scroll">
-                <div class="panel-heading" role="tab" id="headingTwo">
-                <h4 class="panel-title">
-                <button type="button" class="close add_instance"><span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#3c8dbc;"></span></button>
-                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    Edit Academic Year
-                    </a>
-                </h4>
-                </div>
-                <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
-                <form id="Edit_FormData">
-                <div class="panel-body">
-                    <div class="form-group">
-                        <input type="hidden" class="form-control" id="edit_InstanceId" name="edit_InstanceId">
-                     
-                        <label for="email">Academic Year*  </label>
-                        <input type="text" class="form-control" id="edit_academic_year" name="edit_academic_year" placeholder="Enter Department Name">
-                        <br>
-                        <label for="email">Abbrivation*  </label>
-                        <input type="text" class="form-control" id="edit_abbreviation" name="edit_abbreviation" placeholder="Enter abbreviation">
-                        <br>
-                        <label for="email">Start Date*  </label>
-                        <input type="text" class="form-control" id="edit_start_date" name="edit_start_date" placeholder="Enter start_date">
-                        <br>
-                        <label for="email">End Date*  </label>
-                        <input type="text" class="form-control" id="edit_end_date" name="edit_end_date" placeholder="Enter end_date">
-                        <br>
-                        <label for="email">Sequence No*  </label>
-                        <input type="text" class="form-control" id="edit_sequence_no" name="edit_sequence_no" placeholder="Enter Sequence No">
        
-                    </div>
-                </div>
-                </form>
-                <div class="panel-footer">
-                     <input type="submit" name="submit_editinstance" value="Save Changes" id="submit_editinstance" class="btn btn-primary">  
-                </div>
-                </div>
-            </div>
-
-<!------------------------------------------------------------------------------------------------------------------------->
-        </div>
-        </div> <!--Close Col-->
 
       </div> <!--Div Wrap Close-->
 
@@ -274,23 +259,13 @@ $q = "SELECT setup_academicyear.* FROM setup_academicyear Where setup_academicye
 
 <script>
 
-$('#edit_start_date').datepicker({
-    format: 'yyyy-mm-dd',
+$('#add_date_of_approval').datepicker({
+    format: 'dd-mm-yyyy',
     autoclose: true
 });
 
-$('#edit_end_date').datepicker({
-    format: 'yyyy-mm-dd',
-    autoclose: true
-});
-
-$('#add_start_date').datepicker({
-    format: 'yyyy-mm-dd',
-    autoclose: true
-});
-
-$('#add_end_date').datepicker({
-    format: 'yyyy-mm-dd',
+$('#edit_date_of_approval').datepicker({
+    format: 'dd-mm-yyyy',
     autoclose: true
 });
 
@@ -329,19 +304,17 @@ $('.edit_instance_btn').click(function(event){
 
 
     var fetch_Edited_Id = createURL.searchParams.get('fetch_edit_Id');
-    var fetch_Edited_academic_year = createURL.searchParams.get('fetch_edit_academic_year');
-    var fetch_Edited_abbreviation = createURL.searchParams.get('fetch_edit_abbreviation');
-    var fetch_Edited_start_date = createURL.searchParams.get('fetch_edit_start_date');
-    var fetch_Edited_end_date = createURL.searchParams.get('fetch_edit_end_date');
-    var fetch_Edited_sequence_no = createURL.searchParams.get('fetch_edit_sequence_no');
+    var fetch_Edited_registered_sms_template = createURL.searchParams.get('fetch_edit_registered_sms_template');
+    var fetch_Edited_template_Id = createURL.searchParams.get('fetch_edit_template_Id');
+    var fetch_Edited_date_of_approval = createURL.searchParams.get('fetch_edit_date_of_approval');
+    var fetch_Edited_actual_message_template = createURL.searchParams.get('fetch_edit_actual_message_template');
 
     //Assign Value To Editable Compoents
     $('#edit_InstanceId').val(fetch_Edited_Id);
-    $('#edit_academic_year').val(fetch_Edited_academic_year);
-    $('#edit_abbreviation').val(fetch_Edited_abbreviation);
-    $('#edit_start_date').val(fetch_Edited_start_date);
-    $('#edit_end_date').val(fetch_Edited_end_date);
-    $('#edit_sequence_no').val(fetch_Edited_sequence_no);
+    $('#edit_registered_sms_template').val(fetch_Edited_registered_sms_template);
+    $('#edit_template_Id').val(fetch_Edited_template_Id);
+    $('#edit_date_of_approval').val(fetch_Edited_date_of_approval);
+    $('#edit_actual_message_template').val(fetch_Edited_actual_message_template);
 
 });
 //Instance Edit Close----------------------------------------------------------------------------------------------------
@@ -355,26 +328,32 @@ $('#submit_editinstance').click(function(event){
 
 var EditData = $('#Edit_FormData').serializeArray();
 
+var add_sms_header_Id = $('#add_sms_header_Id').val();
+
 $("#loader").css("display", "block");
 $("#DisplayDiv").css("display", "none");
 
 $.ajax({
-    url:'./setup/setup_api.php?Edit_AcademicYearInstance='+'u',
+    url:'./communication/communication_api.php?Edit_SMSTemplateInstance='+'u',
     type:'POST',
     data: EditData,
     dataType: "json",
     success:function(edit_instance_res){  
         if(edit_instance_res == '200'){
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+            alert('Header Edited');
             $.ajax({
-                url:'./setup/academicyearmaster.php',
+                url:'./communication/smstemplatemaster.php?sms_header_Id='+add_sms_header_Id,
                 type:'GET',
+        
                 success:function(sd_logs){
                     $('#DisplayDiv').html(sd_logs);
                     $("#loader").css("display", "none");
                     $("#DisplayDiv").css("display", "block");
                     iziToast.success({
                         title: 'Success',
-                        message: 'Academic Year Edited',
+                        message: 'Header Edited',
                     });
                 },
             });   
@@ -382,8 +361,9 @@ $.ajax({
         }else{
 
             $.ajax({
-                url:'./setup/academicyearmaster.php',
+                url:'./communication/smstemplatemaster.php?sms_header_Id='+add_sms_header_Id,
                 type:'GET',
+            
                 success:function(sd_logs){
                     $('#DisplayDiv').html(sd_logs);
                     $("#loader").css("display", "none");
@@ -407,25 +387,28 @@ $.ajax({
 //Instance Delete----------------------------------------------------------------------------------------------------
 $('.delete_instance_btn').click(function(event){
     var delete_instance_Id = $(this).attr('id');
-    if (confirm('Are you sure you want to Delete Existing Academic Year?')) {
+
+    var add_sms_header_Id = $('#add_sms_header_Id').val();
+    if (confirm('Are you sure you want to Delete Existing Template?')) {
         $.ajax({
-            url:'./setup/setup_api.php?Delete_AcademicYearInstance='+'u',
+            url:'./communication/communication_api.php?Delete_SMSTemplateInstance='+'u',
             type: 'POST',
             data: {delete_instance_Id:delete_instance_Id},
             success:function(del_msg){
                 if(del_msg == '200'){
-                    
+                    $("#loader").css("display", "none");
+                    $("#DisplayDiv").css("display", "block");
+    
+                    alert('Template Deleted');
                     $.ajax({
-                        url:'./setup/academicyearmaster.php',
+                        url:'./communication/smstemplatemaster.php?sms_header_Id='+add_sms_header_Id,
                         type:'GET',
+
                         success:function(st_logs){
                             $('#DisplayDiv').html(st_logs);
                             $("#loader").css("display", "none");
                             $("#DisplayDiv").css("display", "block");
-                            iziToast.success({
-                                title: 'Success',
-                                message: 'Academic Year Deleted',
-                            });
+                        
                         },
                     });   
 
@@ -438,16 +421,18 @@ $('.delete_instance_btn').click(function(event){
 //Instance Delete Close----------------------------------------------------------------------------------------------------
 
 
+
+
 //INSTANCE ADD-----------------------------------------------------------------------------------------------------------
 
 $('#submit_addinstance').click(function(event){
-   var add_academic_year = $('#add_academic_year').val();
-   var add_abbreviation = $('#add_abbreviation').val();
-   var add_start_date = $('#add_start_date').val();
-   var add_end_date = $('#add_end_date').val();
-   var add_sequence_no = $('#add_sequence_no').val();
+    var add_sms_header_Id = $('#add_sms_header_Id').val();
+   var add_registered_sms_template = $('#add_registered_sms_template').val();
+   var add_template_Id = $('#add_template_Id').val();
+   var add_date_of_approval = $('#add_date_of_approval').val();
+   var add_actual_message_template = $('#add_actual_message_template').val();
 
-    if(add_academic_year == '' || add_abbreviation == '' || add_start_date == '' || add_end_date == '' || add_sequence_no == ''){
+    if(add_sms_header_Id == '' || add_registered_sms_template == '' || add_template_Id == '' || add_date_of_approval == '' || add_actual_message_template == ''){
         iziToast.warning({
             title: 'Empty Fields',
             message: 'All fields is mandatory',
@@ -455,30 +440,34 @@ $('#submit_addinstance').click(function(event){
         return false;
     }
 
+
     $("#loader").css("display", "block");
     $("#DisplayDiv").css("display", "none");
 
     $.ajax({
-        url:'./setup/setup_api.php?Add_AcademicYearInstance='+'u',
+        url:'./communication/communication_api.php?Add_SMSTemplateInstance='+'u',
         type:'POST',
-        data: {add_academic_year:add_academic_year, add_abbreviation:add_abbreviation, add_start_date:add_start_date, add_end_date:add_end_date, add_sequence_no:add_sequence_no},  
+        data: {add_sms_header_Id:add_sms_header_Id, add_registered_sms_template:add_registered_sms_template, add_template_Id:add_template_Id, add_date_of_approval:add_date_of_approval, add_actual_message_template:add_actual_message_template},   
         dataType: "json",
         success:function(add_instance_res){  
             console.log(add_instance_res['success']);
             if(add_instance_res['status'] == 'success'){
-                $.ajax({
-                    url:'./setup/academicyearmaster.php',
-                    type:'GET',
-                    success:function(st_logs){
-                        $('#DisplayDiv').html(st_logs);
-                        $("#loader").css("display", "none");
-                        $("#DisplayDiv").css("display", "block");
-                        iziToast.success({
-                            title: 'Success',
-                            message: 'Academic Year Added',
-                        });
-                    },
-                });   
+                    
+                    $("#loader").css("display", "none");
+                    $("#DisplayDiv").css("display", "block");
+    
+                    alert('Template Added');
+                    $.ajax({
+                        url:'./communication/smstemplatemaster.php?sms_header_Id='+add_sms_header_Id,
+                        type:'GET',
+
+                        success:function(st_logs){
+                            $('#DisplayDiv').html(st_logs);
+                            $("#loader").css("display", "none");
+                            $("#DisplayDiv").css("display", "block");
+                        
+                        },
+                    });   
 
             }else if(add_instance_res['status'] == 'EXISTS'){
                        
@@ -486,7 +475,7 @@ $('#submit_addinstance').click(function(event){
                         $("#DisplayDiv").css("display", "block");
                         iziToast.error({
                             title: 'Duplicate',
-                            message: 'Academic Year Already Exist Or Sequence No Already Exist',
+                            message: 'Header Already Exist',
                         });
             }
 
@@ -496,6 +485,8 @@ $('#submit_addinstance').click(function(event){
 });
 
 //Instance Add Close----------------------------------------------------------------------------------------------------
+
+
 
 $('#InstanceMaster_Table').DataTable( {
     dom: 'Bifrtp',
@@ -528,7 +519,7 @@ $('#InstanceMaster_Table').DataTable( {
 
 $('#import_file_submit').on('click', function(event){
     event.preventDefault();
-
+    var add_sms_header_Id = $('#add_sms_header_Id').val();
     $('#contact_dialog').modal('hide');
     let form = $('#import_file_form')[0];
     let data = new FormData(form);
@@ -537,7 +528,7 @@ $('#import_file_submit').on('click', function(event){
         $("#loader").css("display", "block");
         $("#DisplayDiv").css("display", "none");
         jQuery.ajax({
-            url: './setup/setup_api.php?Add_AcademicYearInstance_InBulk=u',
+            url: './communication/communication_api.php?Add_SMSTemplateInstance_InBulk=u&add_sms_header_Id='+add_sms_header_Id,
             type: 'POST',
             enctype: 'multipart/form-data',
             processData: false,  // Important!
@@ -590,8 +581,9 @@ $('#import_file_submit').on('click', function(event){
 
 
 					jQuery.ajax({
-						url: './setup/academicyearmaster.php',
+						url:'./communication/smstemplatemaster.php?sms_header_Id='+add_sms_header_Id,
 						type: "GET",
+            
 						success:function(data){
 							$('#DisplayDiv').html(data);
 							$("#loader").css("display", "none");
@@ -637,47 +629,28 @@ $('#online_table').DataTable( {
     ]
 } );
 
-//Instance Delete----------------------------------------------------------------------------------------------------
-$('.Default_instance_btn').click(function(event){
-    var AY_Id = $(this).attr('id');
 
-    Status_Txt = 'Are you sure you want to make this Academic Year Entry as Default?';
-   
-
-    if (confirm(Status_Txt)) {
-        
-        $("#loader").css("display", "block");
-        $("#DisplayDiv").css("display", "none");
-        
-        $.ajax({
-            url: './setup/setup_api.php?Change_AcademicYearInstance_DefaultEntry=u',
-            type: 'POST',
-            data: {AY_Id:AY_Id},
-            success:function(del_msg){
-                if(del_msg == '200'){
-                    
-                    $.ajax({
-                        url: './setup/academicyearmaster.php',
-                        type:'GET',
-                        success:function(st_logs){
-                            $('#DisplayDiv').html(st_logs);
-                            $("#loader").css("display", "none");
-                            $("#DisplayDiv").css("display", "block");
-                            iziToast.success({
-                                title: 'Success',
-                                message: 'You have Successfully Changed Default Entry',
-                            });
-                        },
-                    });   
-
-                }
-            },
-        });
-
-    }
-
-});
-//Instance Delete Close----------------------------------------------------------------------------------------------------
+function return_controlaccess() {
+			$("#loader").css("display", "block");
+	$("#DisplayDiv").css("display", "none");	
+						jQuery.ajax({
+        url: './communication/smsheadermaster.php',
+        type: 'GET',
+        dataType : 'html',
+        success: function(response, textStatus, jqXHR){
+      $('#DisplayDiv').html(response);
+			$("#loader").css("display", "none");
+	$("#DisplayDiv").css("display", "block");
+    },
+        error: function(xhr, textStatus, errorThrown) {
+           // console.log();
+			$('#DisplayDiv').html(textStatus.reponseText);
+			$("#loader").css("display", "none");
+			$("#DisplayDiv").css("display", "block");
+        }
+    });
+					
+				}
 
 </script>
 
@@ -773,3 +746,9 @@ border-bottom: 2px solid #3c8dbc;
 }
 
 </style>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.css" rel="stylesheet" type="text/css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" rel="stylesheet" type="text/css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.js"></script>
+
