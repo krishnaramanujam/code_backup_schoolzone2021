@@ -8,7 +8,7 @@ ini_set('display_errors',1);
 error_reporting(E_ALL);
 
 
-include('../../../config/database_student.php');
+include('../../../config/database_candidate.php');
 
 //-----------------------------------------------------------------------------------------------------------------------
 if(isset($_GET['Validate_RegisterForm'])){
@@ -156,23 +156,33 @@ if(isset($_GET['Validate_LoginForm'])){
 
            $CR_Id = $r_checking_number['Id']; 
 
+           $staffLoginStatus = $r_checking_number['candidate_status'];
+
+           if($staffLoginStatus == '1'){
+
+                    
+                    $count_Inc = (int)$r_checking_number['Login_Count'];
+                        
+                    $newCount = $count_Inc + 1;
+
+                    //Updating Login Count
+                    $updating_SR = mysqli_query($mysqli,"Update user_candidateregister set user_candidateregister.Login_Count = '$newCount' Where Id = '$CR_Id'");
+
+                    //Inserting Log in Activity log
+                    $Inserting_UserDetails = mysqli_query($mysqli,"Insert into user_activitylog (activityType_Id, user_Id, userType, timeStamp) values ('1', '$CR_Id' ,'1', '$time' )");
+
+                    $_SESSION['schoolzone_student']['SectionMaster_Id'] = $SM_Id;
+                    $_SESSION['schoolzone_student']['Activecandidateregister_Id'] = $CR_Id;
+
+                    $res['status'] = 'success';
+                    echo json_encode($res);
+
+            }else{
+                //Login Status Disabled
+                $res['status'] = 'NOPERMISSION';
+                echo json_encode($res); 
+            }
             
-            $count_Inc = (int)$r_checking_number['Login_Count'];
-                
-            $newCount = $count_Inc + 1;
-
-            //Updating Login Count
-            $updating_SR = mysqli_query($mysqli,"Update user_candidateregister set user_candidateregister.Login_Count = '$newCount' Where Id = '$CR_Id'");
-
-            //Inserting Log in Activity log
-            $Inserting_UserDetails = mysqli_query($mysqli,"Insert into user_activitylog (activityType_Id, user_Id, userType, timeStamp) values ('1', '$CR_Id' ,'1', '$time' )");
-
-            $_SESSION['schoolzone_student']['SectionMaster_Id'] = $SM_Id;
-            $_SESSION['schoolzone_student']['Activecandidateregister_Id'] = $CR_Id;
-
-            $res['status'] = 'success';
-            echo json_encode($res);
-
    
 	   } else {
 

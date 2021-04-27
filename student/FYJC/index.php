@@ -1,6 +1,6 @@
 <?php
 session_start();
-include_once '../../config/database_student.php';
+include_once '../../config/database_candidate.php';
 ini_set( 'max_execution_time', 300 );
 
 

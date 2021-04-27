@@ -242,6 +242,16 @@ if ( isset( $_POST['admin_id'] ) ) {
 </div>
 
 <script>
+$('#master').click(function(){
+    if($(this).prop("checked") == false){
+        $(".sub_chk").removeAttr('checked');
+    
+    }else{
+
+        $(".sub_chk").prop('checked', true);
+
+    }   
+});
 
   
 $('#header_list').DataTable( {

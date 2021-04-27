@@ -32,7 +32,7 @@ mysqli_query( $mysqli, 'SET collation_connection=utf8_general_ci' );
     FROM
       `setup_academicyear`
   WHERE 
-    `setup_academicyear`.isDefault_Student = 1 AND sectionmaster_Id = '". $_SESSION['schoolzone_student']['SectionMaster_Id'] . "' Order By sequence_no Asc " );
+    `setup_academicyear`.isDefault_Candidate = 1 AND sectionmaster_Id = '". $_SESSION['schoolzone_student']['SectionMaster_Id'] . "' Order By sequence_no Asc " );
 
   $AY_res = mysqli_fetch_assoc( $AY_result );
 

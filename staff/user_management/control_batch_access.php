@@ -10,6 +10,7 @@ session_start();
 include_once '../../config/database.php';
 
 
+$SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
 
 ?>
 
@@ -41,7 +42,7 @@ include_once '../../config/database.php';
                     <select name="batch_sel" id="batch_sel" class="form-control" style="margin-right:50px;" required>
                                 <option value="">---- Select Batch ----</option>
                                 <?php 
-                                    $batch_fetch = mysqli_query($mysqli,"SELECT * FROM `setup_batchmaster` Where academicYear_Id = '$Acadmic_Year_ID'  ORDER BY `academicYear_Id` DESC ");
+                                    $batch_fetch = mysqli_query($mysqli,"SELECT setup_batchmaster.* FROM `setup_batchmaster` JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_batchmaster.academicyear_Id = '$Acadmic_Year_ID' AND setup_streammaster.sectionmaster_Id = '$SectionMaster_Id' ");
                                     while($r_batch = mysqli_fetch_array($batch_fetch)){ ?>
                                     <option value="<?php echo $r_batch['Id']; ?>" <?php if($r_batch['Id'] == $_GET['batch_sel']){ echo 'Selected'; } ?>  class="<?php echo $r_batch['batch_name']; ?>"><?php echo $r_batch['batch_name']; ?></option>
                                 <?php }   ?>
@@ -73,7 +74,7 @@ include_once '../../config/database.php';
         $batch_sel = $_GET['batch_sel'];
         $batch_name = $_GET['batch_name'];
 
-        $accessquery = "SELECT user_stafflogin.username as fullName, user_stafflogin.Id AS Staff_LoginId, comm_batch_access.id AS batchaccessid, comm_batch_access.batchMaster_Id AS BM_Id, user_stafflogin.username AS UserName FROM user_stafflogin LEFT JOIN comm_batch_access ON comm_batch_access.userId = user_stafflogin.Id AND comm_batch_access.batchMaster_Id = '$batch_sel' WHERE 1 GROUP BY user_stafflogin.Id  ";
+        $accessquery = "SELECT user_stafflogin.username AS fullName, user_stafflogin.Id AS Staff_LoginId, comm_batch_access.id AS batchaccessid, comm_batch_access.batchMaster_Id AS BM_Id, user_stafflogin.username AS UserName FROM user_stafflogin LEFT JOIN setup_departmentmaster ON setup_departmentmaster.Id = user_stafflogin.departmentmaster_Id LEFT JOIN comm_batch_access ON comm_batch_access.userId = user_stafflogin.Id AND comm_batch_access.batchMaster_Id = '$batch_sel' WHERE setup_departmentmaster.sectionmaster_Id = '$SectionMaster_Id' GROUP BY user_stafflogin.Id  ";
 
         // echo $applicationquery;
         $access_list_q = mysqli_query($mysqli, $accessquery);

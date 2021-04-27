@@ -6,7 +6,7 @@ ini_set('memory_limit','-1');
 ini_set('display_errors',1);
 error_reporting(E_ALL);
 
-include('../../../config/database.php');
+include('../../../config/database_candidate.php');
 
 $SM_Id = $_GET['SM_Id'];
 
@@ -16,7 +16,7 @@ $row_sectiondetail = mysqli_num_rows($sectiondetail_q);
 if($row_sectiondetail > '0'){
 
   $r_sectiondetail = mysqli_fetch_array($sectiondetail_q);
-  $OpenLogin = $r_sectiondetail['open_login'];
+  $OpenLogin = $r_sectiondetail['open_login_candidate'];
 
   $Section_Name = $r_sectiondetail['section_name'];
 
@@ -26,7 +26,7 @@ if($row_sectiondetail > '0'){
 
   <img src="../../../<?php echo $r_sectiondetail['section_logo']; ?>" height="150px" style="max-width:220px;display: block;margin: 0 auto;"/>
   <h3 class="text-center" style="background-color: #a72826; padding: 8px;border-radius: 49px;font-weight: 700;color: white;"><?php echo $Section_Name; ?></h3>
-  <h3 class="text-center">Welcome to Existing Student Portal</h3>
+  <h3 class="text-center">Welcome to FYJC Student Portal</h3>
 
   <?php if($OpenLogin == '1'){ ?>
 
@@ -65,7 +65,7 @@ if($row_sectiondetail > '0'){
             <select class="form-control" id="register_batch_sel" name="register_batch_sel">
               <option value="">---- Select Batch ----</option>
                 <?php 
-                    $batch_fetch = mysqli_query($mysqli,"SELECT setup_batchmaster.*, setup_academicyear.academic_year FROM `setup_batchmaster` JOIN setup_academicyear ON setup_academicyear.Id = setup_batchmaster.academicyear_Id JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_batchmaster.student_registration = '1' AND setup_academicyear.isDefault_Student = '1' AND setup_streammaster.sectionmaster_Id = '$SM_Id' ORDER BY batch_name");
+                    $batch_fetch = mysqli_query($mysqli,"SELECT setup_batchmaster.*, setup_academicyear.academic_year FROM `setup_batchmaster` JOIN setup_academicyear ON setup_academicyear.Id = setup_batchmaster.academicyear_Id JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_batchmaster.student_registration = '1' AND setup_academicyear.isDefault_Candidate = '1' AND setup_streammaster.sectionmaster_Id = '$SM_Id' ORDER BY batch_name");
                     while($r_batch = mysqli_fetch_array($batch_fetch)){ ?>
                     <option value="<?php echo $r_batch['Id']; ?>" ><?php echo $r_batch['batch_name']; ?></option>
                 <?php }   ?>
@@ -108,7 +108,7 @@ if($row_sectiondetail > '0'){
           <select class="form-control" id="login_batch_sel" name="login_batch_sel" style="margin-bottom: 8px;">
             <option value="">---- Select Batch ----</option>
               <?php 
-                  $batch_fetch = mysqli_query($mysqli,"SELECT setup_batchmaster.*, setup_academicyear.academic_year FROM `setup_batchmaster` JOIN setup_academicyear ON setup_academicyear.Id = setup_batchmaster.academicyear_Id JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_batchmaster.student_registration = '1' AND setup_academicyear.isDefault_Student = '1' AND setup_streammaster.sectionmaster_Id = '$SM_Id' ORDER BY batch_name");
+                  $batch_fetch = mysqli_query($mysqli,"SELECT setup_batchmaster.*, setup_academicyear.academic_year FROM `setup_batchmaster` JOIN setup_academicyear ON setup_academicyear.Id = setup_batchmaster.academicyear_Id JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE setup_batchmaster.student_registration = '1' AND setup_academicyear.isDefault_Candidate = '1' AND setup_streammaster.sectionmaster_Id = '$SM_Id' ORDER BY batch_name");
                   while($r_batch = mysqli_fetch_array($batch_fetch)){ ?>
                   <option value="<?php echo $r_batch['Id']; ?>" ><?php echo $r_batch['batch_name']; ?></option>
               <?php }   ?>
@@ -198,7 +198,7 @@ if($row_sectiondetail > '0'){
         </div>
         <div class="modal-body">
           
-        <h3 style="text-align:center;"><?php echo $r_sectiondetail['maintenance_message']; ?></h3>          
+        <h3 style="text-align:center;"><?php echo $r_sectiondetail['maintenance_message_candidate']; ?></h3>          
 
           </div>
         </div><!-- /.modal-content -->
@@ -272,6 +272,14 @@ $('.login_details').click(function(e){
             $("#DisplayDiv").css("display", "block");
             window.open('../index.php','_self');
 
+          }else if(srh_gr_response['status'] == 'NOPERMISSION'){
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+            iziToast.error({
+                title: 'Error',
+                message: 'Please Contact to Admin, Your Not Allowed to Login',
+            });
+            
           }else{
 
             $("#loader").css("display", "none");

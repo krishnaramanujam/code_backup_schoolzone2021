@@ -97,7 +97,7 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where 1";
                             <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:flex">
                                
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-default delete_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Delete Section Details" data-toggle="tooltip"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:#ff3547;"></span></button>
+                                    <button type="button" class="btn btn-default delete_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Delete Section Details" data-toggle="tooltip" disabled><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:#ff3547;"></span></button>
                                 </div>
 
 
@@ -132,6 +132,9 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where 1";
                             
                                 <input type="hidden"  value="<?php echo $r_instance_fetch['open_login_student']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_open_login_student">
                                 <input type="hidden"  value="<?php echo $r_instance_fetch['maintenance_message_student']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_maintenance_message_student">
+
+                                <input type="hidden"  value="<?php echo $r_instance_fetch['open_login_candidate']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_open_login_candidate">
+                                <input type="hidden"  value="<?php echo $r_instance_fetch['maintenance_message_candidate']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_maintenance_message_candidate">
                             
                             </div>
 
@@ -235,6 +238,20 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where 1";
                          <option value="0">Disabled</option>
                      </select>
 
+
+                     <br>
+               
+               
+               <label for="email">Maintenance Message Candidate*  </label>
+               <input type="text" class="form-control" id="add_maintenance_message_candidate" name="add_maintenance_message_candidate" placeholder="Enter Maintenance Message" required>
+               <br>
+               <label for="email">Section Candidate Login Status*  </label>
+               <select class="form-control design_sel" name="add_open_login_candidate" id="add_open_login_candidate" required>
+                   <option value=''>Select</option>
+                   <option value="1">Active</option>
+                   <option value="0">Disabled</option>
+               </select>
+
             </div>  
 
 
@@ -326,7 +343,18 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where 1";
                      <br>
                      <label for="email">Section Logo*  </label>
                      <input type='file'  id="sectionlogo" class="btn btn-block save_btn_effect fontbtn" name="sectionlogo" style="background-color:#d9edf7;color:#31708f;border-radius: 25px;" accept="image/jpeg, image/png"/>  
-
+                     <br>
+          
+                        <label for="email">Maintenance Message Candidate*  </label>
+                        <input type="text" class="form-control" id="edit_maintenance_message_candidate" name="edit_maintenance_message_candidate" placeholder="Enter Maintenance Message" required>
+                        <br>
+                        <label for="email">Section Candidate Login Status*  </label>
+                        <select class="form-control design_sel" name="edit_open_login_candidate" id="edit_open_login_candidate" required>
+                            <option value=''>Select</option>
+                            <option value="1">Active</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                        <br>
 
             </div>  
 
@@ -432,6 +460,9 @@ $('.edit_instance_btn').click(function(event){
     var fetch_Edited_open_login_student = createURL.searchParams.get('fetch_edit_open_login_student');
     var fetch_Edited_maintenance_message_student = createURL.searchParams.get('fetch_edit_maintenance_message_student');
 
+    var fetch_Edited_open_login_candidate = createURL.searchParams.get('fetch_edit_open_login_candidate');
+    var fetch_Edited_maintenance_message_candidate = createURL.searchParams.get('fetch_edit_maintenance_message_candidate');
+
 
     //Assign Value To Editable Compoents
     $('#edit_InstanceId').val(fetch_Edited_Id);
@@ -453,6 +484,9 @@ $('.edit_instance_btn').click(function(event){
 
     $('#edit_open_login_student').val(fetch_Edited_open_login_student);
     $('#edit_maintenance_message_student').val(fetch_Edited_maintenance_message_student);
+
+    $('#edit_open_login_candidate').val(fetch_Edited_open_login_candidate);
+    $('#edit_maintenance_message_candidate').val(fetch_Edited_maintenance_message_candidate);
 
 });
 //Instance Edit Close----------------------------------------------------------------------------------------------------

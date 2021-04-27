@@ -79,6 +79,9 @@ $q = "SELECT user_stafflogin.*, setup_sectionmaster.section_name FROM user_staff
 
             <button type="button" class="btn btn-default batchAccessLink"
             data-toggle="tooltip" data-placement="top" title="Batch Access" id="<?php echo $r_instance_fetch['Id']; ?>"><span class="glyphicon glyphicon-tasks" aria-hidden="true" style="color:#fa573c;"></span>Batch Access</button>
+
+            <button type="button" class="btn btn-default screenAccessLink"
+            data-toggle="tooltip" data-placement="top" title="Screen Access" id="<?php echo $r_instance_fetch['Id']; ?>"><span class="glyphicon glyphicon-tasks" aria-hidden="true" style="color:#fa573c;"></span>Screen Access</button>
         </div>
 
 
@@ -143,7 +146,7 @@ $q = "SELECT user_stafflogin.*, setup_sectionmaster.section_name FROM user_staff
                             <td><?php echo $r_instance_fetch['username']; ?></td>
                             <td><?php echo $r_instance_fetch['reg_mobile_no']; ?></td>
                             <td><?php echo $r_instance_fetch['reg_email_address']; ?></td>
-                            <td><?php echo $r_instance_fetch['date_of_birth']; ?></td>
+                            <td><?php echo date('d/m/Y',strtotime(str_replace('/','-',$r_instance_fetch['date_of_birth']))); ?></td>
                             <td><?php echo $r_instance_fetch['section_name']; ?></td>
                             <td>
              
@@ -211,7 +214,7 @@ $q = "SELECT user_stafflogin.*, setup_sectionmaster.section_name FROM user_staff
 
      
         
-        <div class = "col-md-3">
+        <div class = "col-md-2">
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 <!------------------------------------------------------------------------------------------------------------------------->
             <div class="panel panel-default InstanceCreate_Model">
@@ -559,6 +562,22 @@ $('.batchAccessLink').click(function(event){
 //Manage Instance Btn close----------------------------------------------------------------------------------------------------------
 
 //Manage Instance Btn----------------------------------------------------------------------------------------------------------
+$('.screenAccessLink').click(function(event){
+    var selected_instance_Id = $(this).attr('id');
+    $.ajax({
+        url:'./user_management/control_screen_access.php',
+        type:'GET',
+        success:function(si_logs){
+            $('#DisplayDiv').html(si_logs);
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+        },
+    });  
+
+});
+//Manage Instance Btn close----------------------------------------------------------------------------------------------------------
+
+//Manage Instance Btn----------------------------------------------------------------------------------------------------------
 $('.batchAccessUserLink').click(function(event){
     var selected_instance_Id = $(this).attr('id');
     $.ajax({
@@ -730,6 +749,43 @@ $('.SMSHeaderMappingTableLink').click(function(event){
 
 });
 //Manage Instance Btn close----------------------------------------------------------------------------------------------------------
+
+
+
+var table = $('#InstanceMaster_Table').DataTable( {
+    dom: 'Bifrtp',
+    bPaginate:false,
+    buttons: [
+    {
+        extend: 'excel',
+        footer: true,
+		title: "Download Format",
+		text: 'Download Format',
+        
+        exportOptions : {
+            columns : ':visible',
+            format : {
+                header : function (mDataProp, columnIdx) {
+            var htmlText = '<span>' + mDataProp + '</span>';
+            var jHtmlObject = jQuery(htmlText);
+            jHtmlObject.find('div').remove();
+            var newHtml = jHtmlObject.text();
+            console.log('My header > ' + newHtml);
+            return newHtml;
+                }
+            }
+        }
+    },{
+        extend: 'colvis',
+		text: 'Column Visiblity',
+    }
+    ]
+} );
+
+table.columns( [ 5 ] ).visible( false, false );
+table.columns.adjust().draw( false ); // adjust column sizing and redraw
+
+
 
 </script>
 

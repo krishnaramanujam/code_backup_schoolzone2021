@@ -29,33 +29,44 @@ if(isset($_GET['Validate_LoginForm'])){
 
            $savedPass = $r_checking_number['password'];
       
-           if(password_verify($login_password,$savedPass)){
+           $staffLoginStatus = $r_checking_number['student_status'];
 
-                
-                $count_Inc = (int)$r_checking_number['login_count'];
-                    
-                $newCount = $count_Inc + 1;
+           if($staffLoginStatus == '1'){
 
-                //Updating Login Count
-                $updating_SR = mysqli_query($mysqli,"Update user_studentregister set user_studentregister.login_count = '$newCount' Where Id = '$studentregister_Id'");
 
-                //Inserting Log in Activity log
-                $Inserting_UserDetails = mysqli_query($mysqli,"Insert into user_activitylog (activityType_Id, user_Id, userType, timeStamp) values ('1', '$studentregister_Id' ,'1', '$time' )");
+                if(password_verify($login_password,$savedPass)){
 
-                $_SESSION['schoolzone_student']['SectionMaster_Id'] = $SM_Id;
-                $_SESSION['schoolzone_student']['Activestudentregister_Id'] = $studentregister_Id;
+                        
+                        $count_Inc = (int)$r_checking_number['login_count'];
+                            
+                        $newCount = $count_Inc + 1;
 
-                $res['status'] = 'success';
-                echo json_encode($res);
- 
-           }else{
+                        //Updating Login Count
+                        $updating_SR = mysqli_query($mysqli,"Update user_studentregister set user_studentregister.login_count = '$newCount' Where Id = '$studentregister_Id'");
 
- 
-            $res['status'] = 'failed';
-            echo json_encode($res); 
-           }
+                        //Inserting Log in Activity log
+                        $Inserting_UserDetails = mysqli_query($mysqli,"Insert into user_activitylog (activityType_Id, user_Id, userType, timeStamp) values ('1', '$studentregister_Id' ,'1', '$time' )");
 
-   
+                        $_SESSION['schoolzone_student']['SectionMaster_Id'] = $SM_Id;
+                        $_SESSION['schoolzone_student']['Activestudentregister_Id'] = $studentregister_Id;
+
+                        $res['status'] = 'success';
+                        echo json_encode($res);
+        
+                }else{
+
+        
+                    $res['status'] = 'failed';
+                    echo json_encode($res); 
+                }
+
+            }else{
+                //Login Status Disabled
+                $res['status'] = 'NOPERMISSION';
+                echo json_encode($res); 
+            }   
+
+
 	   } else {
 
            

@@ -447,4 +447,76 @@ if(isset($_GET['BatchWise_PageAccess'])){
 }
 //-----------------------------------------------------------------------------------------------------------------------
 
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Allow_Screen_Access'])){
+
+    extract($_POST);
+
+    if(isset($checks)){
+        foreach($checks as $index => $value) {
+            //Deleting UserPageAccess
+            $Deleting_BatchAccess = mysqli_query($mysqli,"DELETE FROM setup_links_access WHERE setup_links_access.function_id = '$screen_sel' AND setup_links_access.user_id = '$checks[$index]'");        
+        }
+    }
+
+
+    if(isset($check)){
+        foreach($check as $index => $value) {
+
+
+            //Fetching parent of This Entry
+            $parent_fetch_q = mysqli_query($mysqli, "Select * from setup_links where setup_links.Id = '$screen_sel'");
+            $r_parent_fetch = mysqli_fetch_array($parent_fetch_q);
+
+            
+            if($r_parent_fetch['parent'] != '0'){
+                
+                $checking_entry_q = mysqli_query($mysqli, "Select * from setup_links_access Where user_id = '$check[$index]' AND   function_Id ='$r_parent_fetch[parent]'");
+                $row_entry = mysqli_num_rows($checking_entry_q);
+
+                if($row_entry == '0'){
+                    //Inserting in BatchPageAccess
+                    $Inserting_BatchAccess = mysqli_query($mysqli,"INSERT INTO setup_links_access(user_id, function_id) 
+                    values ('$check[$index]', '$r_parent_fetch[parent]')");
+                }
+            }
+            
+
+            //Inserting in BatchPageAccess
+            $Inserting_BatchAccess = mysqli_query($mysqli,"INSERT INTO setup_links_access(user_id, function_id) 
+            values ('$check[$index]', '$screen_sel')");
+            
+        }
+    }
+
+
+	$res['status'] = 'success';
+	echo json_encode($res);
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Sequencing_Pages'])){
+
+    extract($_POST);
+
+    if(isset($page_Id)){
+        foreach($page_Id as $index => $value) {
+            //Deleting UserPageAccess
+            $Updating_Sequence = mysqli_query($mysqli,"
+                Update setup_links Set parent_sequence = '$c_sequence[$index]'
+                where Id  = '$page_Id[$index]'
+            ");        
+        }
+    }
+
+	$res['status'] = 'success';
+	echo json_encode($res);
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
 ?>

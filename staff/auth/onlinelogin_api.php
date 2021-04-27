@@ -27,34 +27,43 @@ if(isset($_GET['Validate_LoginForm'])){
 
            $stafflogin_Id = $r_checking_number['Id']; 
 
-           $savedPass = $r_checking_number['password'];
-      
-           if(password_verify($login_password,$savedPass)){
+           $staffLoginStatus = $r_checking_number['staff_status'];
 
-                
-                $count_Inc = (int)$r_checking_number['login_count'];
-                    
-                $newCount = $count_Inc + 1;
+           if($staffLoginStatus == '1'){
 
-                //Updating Login Count
-                $updating_SR = mysqli_query($mysqli,"Update user_stafflogin set user_stafflogin.login_count = '$newCount' Where Id = '$stafflogin_Id'");
+                $savedPass = $r_checking_number['password'];
+            
+                if(password_verify($login_password,$savedPass)){
 
-                //Inserting Log in Activity log
-                $Inserting_UserDetails = mysqli_query($mysqli,"Insert into user_activitylog (activityType_Id, user_Id, userType, timeStamp) values ('1', '$stafflogin_Id' ,'0', '$time' )");
+                        
+                        $count_Inc = (int)$r_checking_number['login_count'];
+                            
+                        $newCount = $count_Inc + 1;
 
-                $_SESSION['schoolzone']['SectionMaster_Id'] = $SM_Id;
-                $_SESSION['schoolzone']['ActiveStaffLogin_Id'] = $stafflogin_Id;
+                        //Updating Login Count
+                        $updating_SR = mysqli_query($mysqli,"Update user_stafflogin set user_stafflogin.login_count = '$newCount' Where Id = '$stafflogin_Id'");
 
-                $res['status'] = 'success';
-                echo json_encode($res);
- 
+                        //Inserting Log in Activity log
+                        $Inserting_UserDetails = mysqli_query($mysqli,"Insert into user_activitylog (activityType_Id, user_Id, userType, timeStamp) values ('1', '$stafflogin_Id' ,'0', '$time' )");
+
+                        $_SESSION['schoolzone']['SectionMaster_Id'] = $SM_Id;
+                        $_SESSION['schoolzone']['ActiveStaffLogin_Id'] = $stafflogin_Id;
+
+                        $res['status'] = 'success';
+                        echo json_encode($res);
+        
+                }else{
+
+        
+                    $res['status'] = 'failed';
+                    echo json_encode($res); 
+                }
+
            }else{
-
- 
-            $res['status'] = 'failed';
-            echo json_encode($res); 
+                //Login Status Disabled
+                $res['status'] = 'NOPERMISSION';
+                echo json_encode($res); 
            }
-
    
 	   } else {
 

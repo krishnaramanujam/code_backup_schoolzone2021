@@ -145,7 +145,9 @@ $q = "SELECT comm_sms_header_ids.* FROM comm_sms_header_ids Where comm_sms_heade
                                     </div>
                                 <?php } ?>
                                 <?php if($r_instance_fetch['isDefault'] == '1'){ ?>  
-                                    <span  style="color:#33b5e5;"> Currently Selected</span><br>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-default" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Currently Selected" data-toggle="tooltip"><span class="fa fa-check" aria-hidden="true" style="color:green;"></span></button>
+                                    </div>
                                 <?php } ?>
 
                                 

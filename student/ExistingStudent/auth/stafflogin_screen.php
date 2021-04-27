@@ -258,6 +258,14 @@ $('.login_details').click(function(e){
             $("#DisplayDiv").css("display", "block");
             window.open('../index.php','_self');
 
+          }else if(srh_gr_response['status'] == 'NOPERMISSION'){
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+            iziToast.error({
+                title: 'Error',
+                message: 'Please Contact to Admin, Your Not Allowed to Login',
+            });
+            
           }else{
 
             $("#loader").css("display", "none");

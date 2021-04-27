@@ -80,6 +80,7 @@ function hasAccess($permission = [])
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- <link rel="icon" href="1.ico"> -->
   <title>Home | SchoolZone</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
@@ -130,7 +131,7 @@ function hasAccess($permission = [])
 
         
       
-        <li class="dropdown user user-menu academic-year" style='padding-top:8px;'>
+        <li class="dropdown user user-menu academic-year <?php if($ActiveStaffLogin_Id == '1'){ echo 'hidden'; } ?>" style='padding-top:8px;'>
 
         <div class="dropdown">
           <button class="btn btn-warning dropdown-toggle" type="button" data-toggle="dropdown" style="border-radius: 50px; border-color: #e08e0b;background: #2c2f31 !important ; ">
@@ -268,9 +269,9 @@ function hasAccess($permission = [])
           // get unique PARENT nodes directly under ROOT node
           
           if($ActiveStaffLogin_Id == '1'){
-              $search .='SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0  AND link_user_type = 0  AND access_type = 1 ORDER BY parent_sequence,`setup_links`.`Id`';  
+              $search .='SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0  AND link_user_type = 0  AND access_type = 1 ORDER BY parent_sequence ASC';  
           }else{
-              $search .= 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 0 AND  access_type = 0 ORDER BY parent_sequence,`setup_links`.`Id`';
+              $search .= 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 0 AND  access_type = 0 ORDER BY parent_sequence ASC';
           }
           
 
@@ -289,7 +290,7 @@ function hasAccess($permission = [])
             {
               global $outerFlag;
 
-              $searchChild = 'SELECT * FROM `setup_links` WHERE `parent` = ? AND link_user_type = 0 ';
+              $searchChild = 'SELECT * FROM `setup_links` WHERE `parent` = ? AND link_user_type = 0 ORDER BY parent_sequence ASC';
               $views       = QUERY::run( $searchChild, [ $tree_view['Id'] ] )->fetchAll();
 
           //-- if permission -------------------------------------------------------------
@@ -310,7 +311,7 @@ function hasAccess($permission = [])
 
 
                   //checking Parent Count
-                $parent_count_q = mysqli_query($mysqli, "SELECT * FROM `setup_links` WHERE `url` IS NULL AND Id = '$tree_view[Id]' ");
+                $parent_count_q = mysqli_query($mysqli, "SELECT * FROM `setup_links` WHERE `url` IS NULL AND Id = '$tree_view[Id]' ORDER BY parent_sequence ASC ");
                 $row_parent_count = mysqli_fetch_array($parent_count_q);
               
 
@@ -346,7 +347,7 @@ function hasAccess($permission = [])
 
                 if ( $view['header'] && !$view['url'] && (1) ) // if ? array of array then -> recurse
                 {
-                  $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? AND link_user_type = 0 ';
+                  $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? AND link_user_type = 0 ORDER BY parent_sequence ASC';
                   $subChilds      = QUERY::run( $searchSubChild, [ $view['Id'] ] )->fetchAll(); // GET UNIQUE SUB-CHILDS
 
                   $html .= '

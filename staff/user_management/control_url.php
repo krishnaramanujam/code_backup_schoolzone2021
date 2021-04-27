@@ -11,7 +11,7 @@ error_reporting( E_ALL );
 session_start();
 include_once '../../config/database.php';
 ?>
-<div class="box col-xs-12">
+<div class="box col-xs-8 col-md-8">
   <div class="box-header">
     <h3 class="box-title">Pages/Links in Index hierarchy</h3>
   </div>
@@ -25,14 +25,16 @@ include_once '../../config/database.php';
     <table id="header_list" class="table table-hover table-bordered">
       <thead>
       <tr>
-        <th width="10%" style="text-align:center">Sr No</th>
-        <th width="20%" style="text-align:center">Path</th>
-        <th width="15%" style="text-align:center">Menu Header</th>
-        <th width="15%" style="text-align:center">File Name</th>
-        <th width="15%" style="text-align:center">Access Type</th>
-        <th width="15%" style="text-align:center">User Type</th>
-        <th width="10%" style="text-align:center">Edit</th>
-        <th width="10%" style="text-align:center">Delete</th>
+        <th width="5%" style="text-align:center">Sr No</th>
+        <th style="text-align:center">Immediate Parent</th>
+        <th  style="text-align:center">Path</th>
+        <th  style="text-align:center">Menu Header</th>
+        <th  style="text-align:center">File Name</th>
+        <th  style="text-align:center">Access Type</th>
+        <th  style="text-align:center">User Type</th>
+        <th  style="text-align:center">Change Page Sequence</th>
+        <th style="text-align:center">Edit</th>
+        <th style="text-align:center">Delete</th>
       </tr>
       </thead>
       <tbody>
@@ -69,7 +71,25 @@ include_once '../../config/database.php';
                            ELSE child.url 
                          END 
                        ) AS c_url,
-                       child.header AS c_head  
+                       child.header AS c_head,
+                       ( 
+                         CASE 
+                           WHEN parent.header IS NULL THEN CONCAT
+                       (
+                         ( CASE WHEN greateQuintic.header   IS NULL THEN '' ELSE CONCAT( '', greateQuintic.header   ) END ),
+                         ( CASE WHEN greatBiquadrate.header IS NULL THEN '' ELSE CONCAT( '', greatBiquadrate.header ) END ),
+                         ( CASE WHEN greateCube.header      IS NULL THEN '' ELSE CONCAT( '', greateCube.header      ) END ),
+                         ( CASE WHEN greateSquare.header    IS NULL THEN '' ELSE CONCAT( '', greateSquare.header    ) END ),
+                         
+                         ( CASE WHEN greatgran.header IS NULL THEN '' ELSE CONCAT( '', greatgran.header   ) END ),
+                         ( CASE WHEN gran.header      IS NULL THEN '' ELSE CONCAT( '', gran.header   ) END ),
+                         ( CASE WHEN parent.header    IS NULL THEN '' ELSE CONCAT( '', parent.header ) END ),
+                         
+                         '', child.header
+                       )
+                           ELSE parent.header
+                         END 
+                       ) AS p_head
                      FROM
                        setup_links child
                        LEFT JOIN setup_links parent    ON parent.Id    = child.parent 
@@ -90,12 +110,24 @@ include_once '../../config/database.php';
         echo '
         <tr>
           <td style="vertical - align:middle;text - align:center">' . $list_index++ . '</td>
+          <td style="vertical - align:middle;text - align:center">' . $header['p_head'] . '</td>
           <td style="vertical - align:middle;text - align:center">' . $header['PATH'] . '</td>
           <td style="vertical - align:middle;text - align:center">' . $header['c_head'] . '</td>
           <td style="vertical - align:middle;text - align:center">' . $header['c_url'] . '</td>
           <td style="vertical - align:middle;text - align:center">' . $header['Access_Type'] . '</td>
-          <td style="vertical - align:middle;text - align:center">' . $header['UserType'] . '</td>
+          <td style="vertical - align:middle;text - align:center">' . $header['UserType'] . '</td> ';
           
+          if($header['c_url'] == '--root--'){
+            echo '<td style="text-align:center">
+                        <a onclick="sequence_header(' . $header['c_id'] . ')" type="button" class="btn btn-info btn-flat" title="Change Page Sequence" tooltip><span class="glyphicon glyphicon-tasks" aria-hidden="true" style="color:#FFFFFF;"></a>
+                  </td>';
+          }else{
+            echo '<td style="text-align:center">
+                      
+                  </td>';
+          }
+          
+          echo '
           <td style="text-align:center">
                 <a onclick="edit_header(' . $header['c_id'] . ')" type="button" class="btn btn-info btn-flat" title="Edit" tooltip><i class="fa fa-pencil"></i></a>
           </td>
@@ -113,7 +145,7 @@ include_once '../../config/database.php';
 
 <script>
 
-$('#header_list').DataTable( {
+var table = $('#header_list').DataTable( {
     dom: 'Bifrtp',
     bPaginate:false,
     
@@ -136,13 +168,19 @@ $('#header_list').DataTable( {
                 }
             }
         }
+    },{
+        extend: 'colvis',
+		    text: 'Column Visiblity',
     }
     ]
 } );
 
   $('#header_list').dataTable().yadcf([
-    {column_number: 2, filter_match_mode: "exact"}
+    {column_number: 1, filter_match_mode: "exact"}
   ]);
+
+  table.columns( [ 2,4 ] ).visible( false, false );
+  table.columns.adjust().draw( false ); // adjust column sizing and redraw
 
 
   function edit_header(c_id) {
@@ -227,4 +265,31 @@ $('#header_list').DataTable( {
     });
 
   }
+
+  function sequence_header(c_id) {
+    $("#loader").css("display", "block");
+    $("#DisplayDiv").css("display", "none");
+
+    jQuery.ajax({
+      url: './user_management/control_url_sequence.php',
+      type: 'POST',
+      data: {
+        c_id: c_id,
+      },
+      dataType: 'html',
+
+      success: function (response, textStatus, jqXHR) {
+        $('#DisplayDiv').html(response);
+        $("#loader").css("display", "none");
+        $("#DisplayDiv").css("display", "block");
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        // console.log();
+        $('#DisplayDiv').html(textStatus.reponseText);
+        $("#loader").css("display", "none");
+        $("#DisplayDiv").css("display", "block");
+      }
+    });
+  }
+
 </script>

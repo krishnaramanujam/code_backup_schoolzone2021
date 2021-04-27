@@ -52,7 +52,9 @@ if(isset($_GET['Edit_SectionInstance'])){
         open_login = '".htmlspecialchars($edit_open_login, ENT_QUOTES)."',
         maintenance_message = '".htmlspecialchars($edit_maintenance_message, ENT_QUOTES)."',
         open_login_student = '".htmlspecialchars($edit_open_login_student, ENT_QUOTES)."',
-        maintenance_message_student = '".htmlspecialchars($edit_maintenance_message_student, ENT_QUOTES)."'
+        maintenance_message_student = '".htmlspecialchars($edit_maintenance_message_student, ENT_QUOTES)."',
+        open_login_candidate = '".htmlspecialchars($edit_open_login_candidate, ENT_QUOTES)."',
+        maintenance_message_candidate = '".htmlspecialchars($edit_maintenance_message_candidate, ENT_QUOTES)."'
         where Id  = '$edit_InstanceId'");
 
 
@@ -117,8 +119,8 @@ if(isset($_GET['Add_SectionInstance'])){
     
         //Inserting data in comm_message_log
         $Inserting_UserDetails = mysqli_query($mysqli,"Insert into setup_sectionmaster 
-        (section_name, abbreviation, school_type, board, address, contact_no, principal, principal_contact_no, principal_mobile, principal_email, website, udise_no, funding_type, open_login, maintenance_message, open_login_student, maintenance_message_student) values 
-        ('".htmlspecialchars($add_section_name, ENT_QUOTES)."', '".htmlspecialchars($add_abbreviation, ENT_QUOTES)."', '".htmlspecialchars($add_school_type, ENT_QUOTES)."', '".htmlspecialchars($add_board, ENT_QUOTES)."', '".htmlspecialchars($add_address, ENT_QUOTES)."', '".htmlspecialchars($add_contact_no, ENT_QUOTES)."', '".htmlspecialchars($add_principal, ENT_QUOTES)."', '".htmlspecialchars($add_principal_contact_no, ENT_QUOTES)."', '".htmlspecialchars($add_principal_mobile, ENT_QUOTES)."', '".htmlspecialchars($add_principal_email, ENT_QUOTES)."', '".htmlspecialchars($add_website, ENT_QUOTES)."', '".htmlspecialchars($add_udise_no, ENT_QUOTES)."', '".htmlspecialchars($add_funding_type, ENT_QUOTES)."', '".htmlspecialchars($add_open_login, ENT_QUOTES)."', '".htmlspecialchars($add_maintenance_message, ENT_QUOTES)."', '".htmlspecialchars($add_open_login_student, ENT_QUOTES)."', '".htmlspecialchars($add_maintenance_message_student, ENT_QUOTES)."')");
+        (section_name, abbreviation, school_type, board, address, contact_no, principal, principal_contact_no, principal_mobile, principal_email, website, udise_no, funding_type, open_login, maintenance_message, open_login_student, maintenance_message_student, open_login_candidate, maintenance_message_candidate) values 
+        ('".htmlspecialchars($add_section_name, ENT_QUOTES)."', '".htmlspecialchars($add_abbreviation, ENT_QUOTES)."', '".htmlspecialchars($add_school_type, ENT_QUOTES)."', '".htmlspecialchars($add_board, ENT_QUOTES)."', '".htmlspecialchars($add_address, ENT_QUOTES)."', '".htmlspecialchars($add_contact_no, ENT_QUOTES)."', '".htmlspecialchars($add_principal, ENT_QUOTES)."', '".htmlspecialchars($add_principal_contact_no, ENT_QUOTES)."', '".htmlspecialchars($add_principal_mobile, ENT_QUOTES)."', '".htmlspecialchars($add_principal_email, ENT_QUOTES)."', '".htmlspecialchars($add_website, ENT_QUOTES)."', '".htmlspecialchars($add_udise_no, ENT_QUOTES)."', '".htmlspecialchars($add_funding_type, ENT_QUOTES)."', '".htmlspecialchars($add_open_login, ENT_QUOTES)."', '".htmlspecialchars($add_maintenance_message, ENT_QUOTES)."', '".htmlspecialchars($add_open_login_student, ENT_QUOTES)."', '".htmlspecialchars($add_maintenance_message_student, ENT_QUOTES)."', '".htmlspecialchars($add_open_login_candidate, ENT_QUOTES)."', '".htmlspecialchars($add_maintenance_message_candidate, ENT_QUOTES)."')");
 
         $last_id = mysqli_insert_id($mysqli);
 

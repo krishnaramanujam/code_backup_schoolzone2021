@@ -1119,6 +1119,43 @@ if(isset($_GET['Change_AcademicYearInstance_DefaultEntry'])){
     echo "200";
 }
 //-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Change_AcademicYearInstance_DefaultEntry_Student'])){
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    $AY_Id = $_POST['AY_Id'];
+
+    //Make ALL 0
+    $updating_Attend_Staff = mysqli_query($mysqli,"Update setup_academicyear set isDefault_Student = '0' where sectionmaster_Id = '$SectionMaster_Id'");
+
+
+    //Make Selected 1
+    $updating_Attend_Staff = mysqli_query($mysqli,"Update setup_academicyear set isDefault_Student = '1' where Id = '$AY_Id'");
+
+    echo "200";
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Change_AcademicYearInstance_DefaultEntry_Candidate'])){
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    $AY_Id = $_POST['AY_Id'];
+
+    //Make ALL 0
+    $updating_Attend_Staff = mysqli_query($mysqli,"Update setup_academicyear set isDefault_Candidate = '0' where sectionmaster_Id = '$SectionMaster_Id'");
+
+
+    //Make Selected 1
+    $updating_Attend_Staff = mysqli_query($mysqli,"Update setup_academicyear set isDefault_Candidate = '1' where Id = '$AY_Id'");
+
+    echo "200";
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
 //-----------------------------------------------------------------------------------------------------------------------
 if(isset($_GET['Edit_BatchInstance'])){
 

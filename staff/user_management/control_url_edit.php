@@ -51,7 +51,8 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
                                         `parent`.`header` AS `p_head`,
                                         `parent`.`url`    AS `p_url`,
                                         child.access_type As c_access_type,
-                                        child.modulelist_Id As modulelist_Id
+                                        child.modulelist_Id As modulelist_Id,
+                                        child.link_user_type As link_user_type
 
                                        FROM
                                         `setup_links` `child`
@@ -227,6 +228,24 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
                     echo '<option value="' . $view['Id'] . '">' . $view['modulelist'] . '</option>';
                 }
                 ?>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 input-sm control-label"
+                   for="inputfee_header_name"
+                   style="font-size:15px">User Type</label>
+            <div class="col-sm-4">
+              <select class="form-control"
+                      
+                      name="usertype_id"
+                      id="usertype_id"
+                      title="Select User Type" disabled>
+
+              <option value="0" class="strong" <?php if($fetch_header_result['link_user_type'] == '0'){ echo 'Selected'; } ?> >Staff</option>
+              <option value="1" class="strong" <?php if($fetch_header_result['link_user_type'] == '1'){ echo 'Selected'; } ?> >Student</option>
+              <option value="2" class="strong" <?php if($fetch_header_result['link_user_type'] == '2'){ echo 'Selected'; } ?> >Candidate</option>
               </select>
             </div>
           </div>

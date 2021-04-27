@@ -148,12 +148,40 @@ $q = "SELECT setup_academicyear.* FROM setup_academicyear Where setup_academicye
 
                                 <?php if($r_instance_fetch['isDefault'] == '0'){  ?>
                                     <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-default Default_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Make this Default Entry" data-toggle="tooltip"><span class="fa fa-check" aria-hidden="true" style="color:#f5c601;"></span></button>
+                                        <button type="button" class="btn btn-default Default_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Make this Staff Default Entry" data-toggle="tooltip"><span class="fa fa-check" aria-hidden="true" style="color:#f5c601;"></span></button>
                                     </div>
                                 <?php } ?>
                                 <?php if($r_instance_fetch['isDefault'] == '1'){ ?>  
-                                    <span  style="color:#33b5e5;"> Currently Selected</span><br>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-default" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Staff Currently Selected" data-toggle="tooltip"><span class="fa fa-check" aria-hidden="true" style="color:green;"></span></button>
+                                    </div>
                                 <?php } ?>
+
+
+                                
+                                <?php if($r_instance_fetch['isDefault_Student'] == '0'){  ?>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-default Student_Default_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Make this Student Default Entry" data-toggle="tooltip"><span class="fa fa-check" aria-hidden="true" style="color:#f5c601;"></span></button>
+                                    </div>
+                                <?php } ?>
+                                <?php if($r_instance_fetch['isDefault_Student'] == '1'){ ?>  
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-default" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Student Currently Selected" data-toggle="tooltip"><span class="fa fa-check" aria-hidden="true" style="color:green;"></span></button>
+                                    </div>
+                                <?php } ?>
+
+                                         
+                                <?php if($r_instance_fetch['isDefault_Candidate'] == '0'){  ?>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-default Candidate_Default_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Make this Candidate Default Entry" data-toggle="tooltip"><span class="fa fa-check" aria-hidden="true" style="color:#f5c601;"></span></button>
+                                    </div>
+                                <?php } ?>
+                                <?php if($r_instance_fetch['isDefault_Candidate'] == '1'){ ?>  
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-default" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Candidate Currently Selected" data-toggle="tooltip"><span class="fa fa-check" aria-hidden="true" style="color:green;"></span></button>
+                                    </div>
+                                <?php } ?>
+
 
                                 
                                 <input type="hidden" value="<?php echo $r_instance_fetch['Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Id">
@@ -641,7 +669,7 @@ $('#online_table').DataTable( {
 $('.Default_instance_btn').click(function(event){
     var AY_Id = $(this).attr('id');
 
-    Status_Txt = 'Are you sure you want to make this Academic Year Entry as Default?';
+    Status_Txt = 'Are you sure you want to make this Academic Year Entry as Default for Staff?';
    
 
     if (confirm(Status_Txt)) {
@@ -679,6 +707,91 @@ $('.Default_instance_btn').click(function(event){
 });
 //Instance Delete Close----------------------------------------------------------------------------------------------------
 
+
+
+//Instance Delete----------------------------------------------------------------------------------------------------
+$('.Student_Default_instance_btn').click(function(event){
+    var AY_Id = $(this).attr('id');
+
+    Status_Txt = 'Are you sure you want to make this Academic Year Entry as Default for Student?';
+   
+
+    if (confirm(Status_Txt)) {
+        
+        $("#loader").css("display", "block");
+        $("#DisplayDiv").css("display", "none");
+        
+        $.ajax({
+            url: './setup/setup_api.php?Change_AcademicYearInstance_DefaultEntry_Student=u',
+            type: 'POST',
+            data: {AY_Id:AY_Id},
+            success:function(del_msg){
+                if(del_msg == '200'){
+                    
+                    $.ajax({
+                        url: './setup/academicyearmaster.php',
+                        type:'GET',
+                        success:function(st_logs){
+                            $('#DisplayDiv').html(st_logs);
+                            $("#loader").css("display", "none");
+                            $("#DisplayDiv").css("display", "block");
+                            iziToast.success({
+                                title: 'Success',
+                                message: 'You have Successfully Changed Default Entry',
+                            });
+                        },
+                    });   
+
+                }
+            },
+        });
+
+    }
+
+});
+//Instance Delete Close----------------------------------------------------------------------------------------------------
+
+//Instance Delete----------------------------------------------------------------------------------------------------
+$('.Candidate_Default_instance_btn').click(function(event){
+    var AY_Id = $(this).attr('id');
+
+    Status_Txt = 'Are you sure you want to make this Academic Year Entry as Default for Candidate?';
+   
+
+    if (confirm(Status_Txt)) {
+        
+        $("#loader").css("display", "block");
+        $("#DisplayDiv").css("display", "none");
+        
+        $.ajax({
+            url: './setup/setup_api.php?Change_AcademicYearInstance_DefaultEntry_Candidate=u',
+            type: 'POST',
+            data: {AY_Id:AY_Id},
+            success:function(del_msg){
+                if(del_msg == '200'){
+                    
+                    $.ajax({
+                        url: './setup/academicyearmaster.php',
+                        type:'GET',
+                        success:function(st_logs){
+                            $('#DisplayDiv').html(st_logs);
+                            $("#loader").css("display", "none");
+                            $("#DisplayDiv").css("display", "block");
+                            iziToast.success({
+                                title: 'Success',
+                                message: 'You have Successfully Changed Default Entry',
+                            });
+                        },
+                    });   
+
+                }
+            },
+        });
+
+    }
+
+});
+//Instance Delete Close----------------------------------------------------------------------------------------------------
 </script>
 
 <style>
