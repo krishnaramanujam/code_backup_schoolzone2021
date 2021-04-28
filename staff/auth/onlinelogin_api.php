@@ -115,10 +115,11 @@ if(isset($_GET['Validate_LoginForm'])){
 if(isset($_GET['Request_ForChangeMobileNo'])){
 
     extract($_POST);
+    include('../communication/functions.php');
 
     
     // Checking the Number is Valid or Not
-    $checking_pnr = mysqli_query($mysqli, "SELECT user_stafflogin.Id AS SL_Id, user_stafflogin.reg_mobile_no As registeredMobileNo,user_stafflogin.reg_email_address, user_stafflogin.verificationCode FROM user_stafflogin JOIN setup_departmentmaster ON setup_departmentmaster.Id = user_stafflogin.departmentmaster_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = setup_departmentmaster.sectionmaster_Id WHERE user_stafflogin.username = '$user_loginId' AND setup_sectionmaster.Id = '$SM_Id' "); 
+    $checking_pnr = mysqli_query($mysqli, "SELECT user_stafflogin.Id AS SL_Id, user_stafflogin.reg_mobile_no As registeredMobileNo,user_stafflogin.reg_email_address, user_stafflogin.verificationCode, user_stafflogin.staff_status FROM user_stafflogin JOIN setup_departmentmaster ON setup_departmentmaster.Id = user_stafflogin.departmentmaster_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = setup_departmentmaster.sectionmaster_Id WHERE user_stafflogin.username = '$user_loginId' AND setup_sectionmaster.Id = '$SM_Id' "); 
 
     $row_check = mysqli_num_rows($checking_pnr);
     
@@ -131,72 +132,105 @@ if(isset($_GET['Request_ForChangeMobileNo'])){
         $user_mobileno = $r_detail_fetch['registeredMobileNo'];
         $user_emailaddress = $r_detail_fetch['reg_email_address'];
 
-        if(!empty($user_mobileno)){
+        $staffLoginStatus = $r_detail_fetch['staff_status'];
 
-            $pin = mt_rand(100000, 999999);
-       
+        if($staffLoginStatus == '1'){
 
-            $updating_studentregister = mysqli_query($mysqli,"Update user_stafflogin set verificationCode = 'V$pin' Where Id = '$SL_Id'");
-            $message = "Dear Staff, Your Verfication Pin : V" . $pin;
-    
-    
-    
-            $no_of_charater = strlen($message);
-            $userIdType = 'StaffLoginId';
-            $time = date("Y-m-d h:m:s");
-            $template_Id = '1207161192523376255';
+                if(!empty($user_mobileno)){
+            
+                                
+                    //Fetching Template
+                    $fetching_header_ids_q = mysqli_query($mysqli,"SELECT comm_sms_header_ids.sectionmaster_Id, comm_sms_header_ids.Id As CSHI_Id, comm_sms_header_ids.header_name, comm_sms_header_ids.PE_Id, comm_sms_templates.registered_sms_template, comm_sms_templates.template_Id, comm_sms_templates.msg_type,  comm_sms_templates.Id As CST_Id, comm_sms_templates.actual_message_template FROM comm_sms_header_ids JOIN comm_sms_templates ON comm_sms_templates.sms_header_Id = comm_sms_header_ids.Id WHERE comm_sms_header_ids.isDefault = '1' AND comm_sms_header_ids.sectionmaster_Id = '$SM_Id' AND comm_sms_templates.msg_type = '1' ");
+                    $r_fetch_header_ids = mysqli_fetch_array($fetching_header_ids_q);
 
-            $format_message =  htmlspecialchars($message, ENT_QUOTES);
-    
-            $Inserting_UserDetails = mysqli_query($mysqli,"Insert into comm_message_log (User_Id, message_type, sender_address, no_of_characters, Decrypt_Msg, sender_name, timestamp, SenderHeader, userIdType, moduleType, template_Id) values ('$SL_Id', 'SMS' ,'$user_mobileno', '$no_of_charater' , '".$format_message."', '1', '$time' , 'SIWSAD', '$userIdType', 'UserVerfication', '$template_Id')");
+                    $sender_header_Id = $r_fetch_header_ids['CSHI_Id'];
+                    $template_Id = $r_fetch_header_ids['CST_Id'];
 
-    
-            if(mysqli_error($mysqli)){
-                $Generating_Error[] = 'Mobile Error Occurred : '; 
-            }else{
-                $CML_Id_Array[] = mysqli_insert_id($mysqli);
-            }              
-    
-            if(isset($CML_Id_Array)){
-                $format_CML_Id = implode(",",$CML_Id_Array);
-            }else{
-                $format_CML_Id = 'NA';
-            }
-  
+                    $message_template = $r_fetch_header_ids['actual_message_template'];
+
+                    $Student_Res = StaffMessageDecrypt($SL_Id, $message_template, $mysqli);
+            
+                    $message = $Student_Res['Decrypt_Message'];
+                    $pin = $Student_Res['VerficationCode'];
+
+                    
+                    $updating_studentregister = mysqli_query($mysqli,"Update user_stafflogin set verificationCode = '$pin' Where Id = '$SL_Id'");
+            
+                    
+           
+                    $no_of_charater = strlen($message);
+                    $userIdType = 'SL_Id';
+                    $time = date("Y-m-d h:m:s");
+                
+                    $format_message =  htmlspecialchars($message, ENT_QUOTES);
+
             
 
-            if(!empty($user_emailaddress)){
-                $Inserting_UserDetails = mysqli_query($mysqli,"Insert into comm_message_log (User_Id, message_type, sender_address, no_of_characters, Decrypt_Msg, sender_name, timestamp, SenderHeader, userIdType, moduleType, email_Subjects) values ('$SL_Id', 'Email' ,'$user_emailaddress', '$no_of_charater' , '".$format_message."', '1', '$time' , 'SIWSAD', '$userIdType', 'UserVerfication', 'Verfication Code')");
-    
-                if(mysqli_error($mysqli)){
-                    $Generating_Error[] = 'Email Error Occurred : '; 
+                    $Inserting_UserDetails = mysqli_query($mysqli,"Insert into comm_message_log (User_Id, message_type, recipient_address, no_of_characters, Decrypt_Msg, sender_name, timestamp, SenderHeader, userIdType, moduleType, template_Id) values ('$SL_Id', '1' ,'$user_mobileno', '$no_of_charater' , '".$format_message."', '1', '$time' , '$sender_header_Id', '$userIdType', 'StaffPortal', '$template_Id')");
+
+                
+                    if(mysqli_error($mysqli)){
+                        $Generating_Error[] = 'Mobile Error Occurred : '; 
+                    }else{
+                        $CML_Id_Array[] = mysqli_insert_id($mysqli);
+                    }              
+
+                    if(isset($CML_Id_Array)){
+                        $format_CML_Id = implode(",",$CML_Id_Array);
+                    }else{
+                        $format_CML_Id = 'NA';
+                    }
+
+        
+                    
+
+                    if(!empty($user_emailaddress)){
+                       //Fetching Mail Details
+                       $mail_detail_q = mysqli_query($mysqli, "SELECT setup_sectionmaildetails.* FROM `setup_sectionmaildetails` WHERE setup_sectionmaildetails.sectionmaster_Id = '$SM_Id' AND setup_sectionmaildetails.isDefault = '1' ");
+                       $r_mail_detail = mysqli_fetch_array($mail_detail_q);
+   
+                       $mail_sender_header = $r_mail_detail['Id'];
+                       $emailSubjects = 'Verfication Code';
+   
+                       
+                       $Inserting_UserDetailsa = mysqli_query($mysqli,"Insert into comm_message_log (User_Id, message_type, recipient_address, no_of_characters, Decrypt_Msg, sender_name, timestamp, SenderHeader, userIdType, moduleType, template_Id , email_Subjects, Status) values ('$SL_Id', '2' ,'$user_emailaddress', '$no_of_charater' , '".$format_message."', '1', '$time' , '$mail_sender_header', '$userIdType', 'StaffPortal', '$template_Id', '$emailSubjects', 'Pending')");
+                       
+   
+                       if(mysqli_error($mysqli)){
+                           $Generating_Error[] = 'Email Error Occurred : '; 
+                       }else{
+                           $CEL_Id_Array[] = mysqli_insert_id($mysqli);
+                       }              
+   
+                       if(isset($CEL_Id_Array)){
+                           $format_CEL_Id = implode(",",$CEL_Id_Array);
+                       }else{
+                           $format_CEL_Id = 'NA';
+                       }
+                    }//close email ematy
+                    
+                
+
+
+
+                    $res['Error_Message'] = $Generating_Error;
+                    $res['Comm_Message_Logs_Id'] = $format_CML_Id;
+                    $res['Comm_Email_Logs_Id'] = $format_CEL_Id;
+            
+                    $res['SL_Id'] = $SL_Id;
+
+                    $res['status'] = 'success';
+                    echo json_encode($res);
+                // close empty       
                 }else{
-                    $CEL_Id_Array[] = mysqli_insert_id($mysqli);
-                }              
-    
-                if(isset($CEL_Id_Array)){
-                    $format_CEL_Id = implode(",",$CEL_Id_Array);
-                }else{
-                    $format_CEL_Id = 'NA';
+                    $res['status'] = 'MobileNoFailed';
+                    echo json_encode($res);     
                 }
-            }//close email ematy
-            
-          
 
-
-
-            $res['Error_Message'] = $Generating_Error;
-            $res['Comm_Message_Logs_Id'] = $format_CML_Id;
-            $res['Comm_Email_Logs_Id'] = $format_CEL_Id;
-    
-            $res['SL_Id'] = $SL_Id;
-
-            $res['status'] = 'success';
-            echo json_encode($res);
-         // close empty       
         }else{
-            $res['status'] = 'MobileNoFailed';
-            echo json_encode($res);     
+            //Login Status Disabled
+            $res['status'] = 'NOPERMISSION';
+            echo json_encode($res); 
         }
 
      } else {

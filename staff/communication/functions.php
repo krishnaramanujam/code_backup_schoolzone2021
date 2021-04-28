@@ -74,4 +74,52 @@ function CandidateMessageDecrypt($CR_Id, $messageText, $mysqli){
 
 }// close functions
 
+
+
+//Function For Decrypting Message
+function StaffMessageDecrypt($SL_Id, $messageText, $mysqli){
+
+    if(isset($SL_Id) AND isset($messageText)){ 
+      
+            $patterns = array();
+            $patterns[0] = '/#VerficationCode/i';
+    
+        
+            $replacements = array();
+            $replacements[0] = '#VerficationCode';
+    
+            $pin = mt_rand(100000, 999999);
+
+
+
+            $F_StudentData_q = mysqli_query($mysqli,"SELECT user_stafflogin.Id AS SL_Id, user_stafflogin.reg_mobile_no As registeredMobileNo,user_stafflogin.reg_email_address, user_stafflogin.verificationCode, user_stafflogin.staff_status FROM user_stafflogin JOIN setup_departmentmaster ON setup_departmentmaster.Id = user_stafflogin.departmentmaster_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = setup_departmentmaster.sectionmaster_Id WHERE user_stafflogin.Id = '$SL_Id' ");
+
+            $rows_F_StudentData = mysqli_num_rows($F_StudentData_q);
+            if($rows_F_StudentData > '0'){
+                $r_Fetching_StudentData = mysqli_fetch_array($F_StudentData_q);
+
+                //Replaceing Value in Tags-----------------------------------------------------------------------------------
+
+                    $replacements[0] = $pin;
+
+                //------------------------------------------------------------------------------------------------------------
+
+                    
+                $replace_special_text = preg_replace( $patterns, $replacements, $messageText);
+                $sms = $replace_special_text;
+
+     
+                
+                $Student_Res['Decrypt_Message'] = $sms;
+                $Student_Res['VerficationCode'] = $pin;
+                
+                return $Student_Res;
+
+            }// close if
+
+    }// close isset
+
+}// close functions
+
+
 ?>

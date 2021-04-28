@@ -555,6 +555,14 @@ $('.sendotp_mobile_details').click(function(e){
                 title: 'Error',
                 message: 'Oops! You Have reached the max login attempts limit for the day. Your login will be reactivated at the end of day. Please try again tomorrow',
             });
+          }else if(srh_gr_response['status'] == 'NOPERMISSION'){
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+            iziToast.error({
+                title: 'Error',
+                message: 'Please Contact to Admin, Your Not Allowed to Login',
+            });
+            
           }else{
 
             $("#loader").css("display", "none");

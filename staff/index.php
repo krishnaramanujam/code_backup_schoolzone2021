@@ -17,7 +17,7 @@ if ( isset( $_SESSION['schoolzone']['SectionMaster_Id'] ) AND  isset( $_SESSION[
 $Admin_Registeration_Id = $ActiveStaffLogin_Id;
 
 //Fetching User Details
-$data_query = "SELECT user_stafflogin.username,setup_sectionmaster.abbreviation As section_abbreviation FROM user_stafflogin LEFT JOIN setup_departmentmaster ON setup_departmentmaster.Id = user_stafflogin.departmentmaster_Id LEFT JOIN setup_sectionmaster ON setup_sectionmaster.Id = setup_departmentmaster.sectionmaster_Id WHERE user_stafflogin.Id = '$ActiveStaffLogin_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id' ";
+$data_query = "SELECT user_stafflogin.username,setup_sectionmaster.abbreviation As section_abbreviation,setup_sectionmaster.section_logo FROM user_stafflogin LEFT JOIN setup_departmentmaster ON setup_departmentmaster.Id = user_stafflogin.departmentmaster_Id LEFT JOIN setup_sectionmaster ON setup_sectionmaster.Id = setup_departmentmaster.sectionmaster_Id WHERE user_stafflogin.Id = '$ActiveStaffLogin_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id' ";
 $fetch_data_q = mysqli_query($mysqli,$data_query);
 
 $r_Staffdata_fetch = mysqli_fetch_array($fetch_data_q);
@@ -80,7 +80,7 @@ function hasAccess($permission = [])
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <!-- <link rel="icon" href="1.ico"> -->
+  <link rel="icon" href="../<?php echo $r_Staffdata_fetch['section_logo']; ?>">
   <title>Home | SchoolZone</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
