@@ -6,8 +6,34 @@ include_once '../../config/database.php';
 
 include("../testing/jsOperations.php"); 
 
+require_once("../autoload.php");
 
-$q = "SELECT setup_semestermaster.* FROM setup_semestermaster Where setup_semestermaster.sectionmaster_Id = '$SectionMaster_Id'";
+// $q = "SELECT setup_semestermaster.* FROM setup_semestermaster Where setup_semestermaster.sectionmaster_Id = '$SectionMaster_Id'";
+use datavista_lib\tableax as tx;
+use datavista_lib\formaux as fx;
+
+
+$Qi = mysqli_query($mysqli,"SELECT  Semester_Name, odd_even, Previous_Semester_Id, Id FROM setup_semestermaster Where setup_semestermaster.sectionmaster_Id = '$SectionMaster_Id'");
+
+print_r($Qi);
+
+$Qz=[];
+while($Qix=mysqli_fetch_array($Qi))
+{
+    array_push($Qz, $Qix);
+}
+print_r($Qz);
+$cols=["Semester Name","Old Even","Previous Semester Id"];
+$iid="InstanceMaster_Table";
+$button_detail=[['manage_instance_btn','edit_instance_btn','delete_instance_btn'],
+                ['glyphicon-tasks','glyphicon-edit','glyphicon-trash'],
+                ['#00c851','#33b5e5','#ff3547'],
+                ['Visit Section Master','Edit Semester ','Delete Semester']];
+$val_par=['Semester_Name','odd_even', 'Previous_Semester_Id'];
+$hidden=[["Id","Semester_Name","odd_even","Previous_Semester_Id"],
+         ["fetch_edit_Id","fetch_edit_Semester_Name","fetch_edit_odd_even","fetch_edit_Previous_Semester_Id"],'Id'];
+$tb = new tx($cols,$Qz,$iid,$param=1,$id_par='Id',$val_par,$button_detail,$hidden);
+$structure=$tb->create_table();
 
 ?>
 
@@ -101,64 +127,7 @@ $q = "SELECT setup_semestermaster.* FROM setup_semestermaster Where setup_semest
 
         <div class="col-md-9">
             <form id="All_instance_form">
-            <table class="table table-striped" id="InstanceMaster_Table">
-                <thead>
-                    
-                    <tr>
-                        <th style="width:8%">Sr No.</th>
-                        <th>Semester Name</th>
-                        <th>Old Even</th>
-                        <th>Previous Semester Id</th>
-                        <th>Operations</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php  $instance_fetch_q = mysqli_query($mysqli,$q);
-                    $i = 1; while($r_instance_fetch = mysqli_fetch_array($instance_fetch_q)){  ?>
-
-                        <tr>
-                            <td><?php echo $i; ?></td>
-                            <td><?php echo $r_instance_fetch['Semester_Name']; ?></td>
-                            <td><?php echo $r_instance_fetch['odd_even']; ?></td>
-                            <td><?php echo $r_instance_fetch['Previous_Semester_Id']; ?></td>
-                        
-                            <td>
-             
-                            <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:flex">
-                               
-                               
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-default delete_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Delete Semester" data-toggle="tooltip"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:#ff3547;"></span></button>
-                            </div>
-
-
-                                <div class="btn-group" role="group">
-                                    <a><button type="button" class="btn btn-default edit_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Edit Semester" data-toggle="tooltip"><span class="glyphicon glyphicon-edit" aria-hidden="true" style="color:#33b5e5;"></span></button></a>
-                                </div>
-
-                                <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-default manage_instance_btn" data-toggle="tooltip" data-placement="top" title="Visit Section master" id="<?php echo $r_instance_fetch['Id']; ?>"><span class="glyphicon glyphicon-tasks" aria-hidden="true" style="color:#00c851;"></span></button>
-                                </div>
-
-                                
-                                <input type="hidden" value="<?php echo $r_instance_fetch['Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Id">
-                                <input type="hidden"  value="<?php echo $r_instance_fetch['Semester_Name']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Semester_Name">
-                                <input type="hidden" value="<?php echo $r_instance_fetch['odd_even']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_odd_even">
-                                <input type="hidden" value="<?php echo $r_instance_fetch['Previous_Semester_Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Previous_Semester_Id">
-                        
-                            </div>
-
-                           
-
-                            </td>
-                        </tr>
-
-
-
-                    <?php $i++; } ?>
-
-                </tbody>
-            </table>
+                <?php echo $structure;?>
             </form>
         </div> <!--Col Close-->
 
@@ -434,32 +403,32 @@ $('#submit_addinstance').click(function(event){
 
 
 
-$('#InstanceMaster_Table').DataTable( {
-    dom: 'Bifrtp',
-    bPaginate:false,
+// $('#InstanceMaster_Table').DataTable( {
+//     dom: 'Bifrtp',
+//     bPaginate:false,
     
-    buttons: [
-    {
-        extend: 'excel',
-        footer: true,
-		title: "Download Format",
-		text: 'Download Format',
-        exportOptions : {
-            columns : ':visible',
-            format : {
-                header : function (mDataProp, columnIdx) {
-            var htmlText = '<span>' + mDataProp + '</span>';
-            var jHtmlObject = jQuery(htmlText);
-            jHtmlObject.find('div').remove();
-            var newHtml = jHtmlObject.text();
-            console.log('My header > ' + newHtml);
-            return newHtml;
-                }
-            }
-        }
-    }
-    ]
-} );
+//     buttons: [
+//     {
+//         extend: 'excel',
+//         footer: true,
+// 		title: "Download Format",
+// 		text: 'Download Format',
+//         exportOptions : {
+//             columns : ':visible',
+//             format : {
+//                 header : function (mDataProp, columnIdx) {
+//             var htmlText = '<span>' + mDataProp + '</span>';
+//             var jHtmlObject = jQuery(htmlText);
+//             jHtmlObject.find('div').remove();
+//             var newHtml = jHtmlObject.text();
+//             console.log('My header > ' + newHtml);
+//             return newHtml;
+//                 }
+//             }
+//         }
+//     }
+//     ]
+// } );
 
 
 
