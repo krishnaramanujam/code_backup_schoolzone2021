@@ -122,4 +122,75 @@ function StaffMessageDecrypt($SL_Id, $messageText, $mysqli){
 }// close functions
 
 
+
+
+//Function For Decrypting Message
+function ExistingStudentMessageDecrypt($SR_Id, $messageText, $mysqli){
+
+    if(isset($SR_Id) AND isset($messageText)){
+            $pin = mt_rand(100000, 999999);
+ 
+      
+            $patterns = array();
+            $patterns[0] = '/#CANDIDATEBATCH/i';
+            $patterns[1] = '/#CANDIDATEMOBILE/i';
+            $patterns[2] = '/#CANDIDATEEMAIL/i';
+            $patterns[3] = '/#CANDIDATEPASSWORD/i';
+        
+            $replacements = array();
+            $replacements[0] = '#CANDIDATEBATCH';
+            $replacements[1] = '#CANDIDATEMOBILE';
+            $replacements[2] = '#CANDIDATEEMAIL';
+            $replacements[3] = '#CANDIDATEPASSWORD';
+
+            $F_StudentData_q = mysqli_query($mysqli,"SELECT user_studentregister.mobile_no As ContactNo, user_studentregister.email_address As EmailAddress,user_studentregister.student_Id FROM `user_studentregister` WHERE user_studentregister.Id = '$SR_Id'  ");
+
+            $rows_F_StudentData = mysqli_num_rows($F_StudentData_q);
+            if($rows_F_StudentData > '0'){
+                $r_Fetching_StudentData = mysqli_fetch_array($F_StudentData_q);
+
+                //Replaceing Value in Tags-----------------------------------------------------------------------------------
+                if(is_null($r_Fetching_StudentData['student_Id']) or $r_Fetching_StudentData['student_Id'] == ''){
+                    $replacements[0] = '-';
+                }else{
+                    $replacements[0] = $r_Fetching_StudentData['student_Id'];
+                }   
+              
+                if(is_null($r_Fetching_StudentData['ContactNo']) or $r_Fetching_StudentData['ContactNo'] == ''){
+                    $replacements[1] = '-';
+                }else{
+                    $replacements[1] = $r_Fetching_StudentData['ContactNo'];
+                }
+
+
+                if(is_null($r_Fetching_StudentData['EmailAddress']) or $r_Fetching_StudentData['EmailAddress'] == ''){
+                    $replacements[2] = '-';
+                }else{
+                    $replacements[2] = $r_Fetching_StudentData['EmailAddress'];
+                }
+
+
+                
+                $replacements[3] = $pin;
+                
+              
+
+                //------------------------------------------------------------------------------------------------------------
+
+                    
+                $replace_special_text = preg_replace( $patterns, $replacements, $messageText);
+                $sms = $replace_special_text;
+
+     
+                
+                $Student_Res['Decrypt_Message'] = $sms;
+                $Student_Res['pin'] = $pin;
+                return $Student_Res;
+
+            }// close if
+
+    }// close isset
+
+}// close functions
+
 ?>

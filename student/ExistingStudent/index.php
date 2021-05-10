@@ -16,21 +16,17 @@ if ( isset( $_SESSION['schoolzone_student']['SectionMaster_Id'] ) AND  isset( $_
 $Admin_Registeration_Id = $Activestudentregister_Id;
 
 //Fetching User Details
-$data_query = "SELECT user_studentregister.student_name AS username, setup_sectionmaster.abbreviation AS section_abbreviation FROM user_studentregister JOIN setup_sectionmaster ON setup_sectionmaster.Id = user_studentregister.sectionmaster_Id WHERE user_studentregister.Id = '$Activestudentregister_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id'  ";
+$data_query = "SELECT user_studentregister.student_name AS username, setup_sectionmaster.abbreviation AS section_abbreviation , setup_batchmaster.batch_name, user_studentbatchmaster.batchMaster_Id FROM user_studentregister JOIN user_studentbatchmaster ON user_studentbatchmaster.Id = user_studentregister.SBM_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = user_studentregister.sectionmaster_Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id WHERE user_studentregister.Id = '$Activestudentregister_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id'  ";
 $fetch_data_q = mysqli_query($mysqli,$data_query);
 
 $r_Staffdata_fetch = mysqli_fetch_array($fetch_data_q);
 
 
-
-
+$BM_Id = $r_Staffdata_fetch['batchMaster_Id'];
 
 //finding accessible pages to this particular id
 $query = "
-SELECT `setup_links_access`.`function_id`
-FROM `user_stafflogin`
-    LEFT JOIN `setup_links_access` on `user_stafflogin`.`Id`=`setup_links_access`.`user_id`
-WHERE `user_stafflogin`.`Id`='" . $Activestudentregister_Id . "'
+SELECT `batchwise_setup_links_access`.`function_Id` As function_id FROM `setup_batchmaster` LEFT JOIN `batchwise_setup_links_access` ON `setup_batchmaster`.`Id` = `batchwise_setup_links_access`.`batchmaster_Id` WHERE setup_batchmaster.Id = '$BM_Id' AND batchwise_setup_links_access.user_type_Id = '1' 
 ";
 
 $result1 = mysqli_query( $mysqli, $query );
@@ -53,6 +49,7 @@ function hasAccess($permission = [])
   // check if user has a specific privilege
   return array_intersect( $permission, $function_array );
 }
+
 
 
 
@@ -201,147 +198,191 @@ function hasAccess($permission = [])
 
         <?php
 
-        /*
-         * $tree_views will be our page structure at Level 1, Level 0 being Root
-         * $tree_view will be our page structure at Level 2, Level 1 being Parent
-         * so on recursively...
-         *
-         *----ROOT                         Level 0
-         *    |
-         *    +-- PARENT 1                 Level 1
-         *    |   |
-         *    |   +-- CHILD 1.1            Level 2
-         *    |   |
-         *    |   +-- CHILD 1.2            Level 2
-         *    |
-         *    +-- PARENT 2                 Level1
-         *        |
-         *        +-- CHILD 2.1            Level2
-         *            |
-         *            +-- CHILD 2.2        Level3
-         *
-         */
-        ini_set( 'memory_limit', '-1' );
-        // get unique PARENT nodes directly under ROOT node
-        $search     = 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 1 ORDER BY `setup_links`.`Id`';
-        $tree_views = QUERY::run( $search )->fetchAll();
-        $innerFlag  = 0;
-        $outerFlag  = 0;
+/*
+* $tree_views will be our page structure at Level 1, Level 0 being Root
+* $tree_view will be our page structure at Level 2, Level 1 being Parent
+* so on recursively...
+*
+*----ROOT                         Level 0
+*    |
+*    +-- PARENT 1                 Level 1
+*    |   |
+*    |   +-- CHILD 1.1            Level 2
+*    |   |
+*    |   +-- CHILD 1.2            Level 2
+*    |
+*    +-- PARENT 2                 Level1
+*        |
+*        +-- CHILD 2.1            Level2
+*            |
+*            +-- CHILD 2.2        Level3
+*
+*/
+ini_set( 'memory_limit', '-1' );
+// get unique PARENT nodes directly under ROOT node
 
-        function printView($tree_views)
-        {
-          global $Admin_Registeration_Id;
+$search .= 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 1 AND  access_type = 0 ORDER BY parent_sequence,`setup_links`.`Id`';
 
-          $html = '' . PHP_EOL;
 
-          foreach ( $tree_views as $tree_view )
-          {
-            global $outerFlag;
+$tree_views = QUERY::run( $search )->fetchAll();
+$innerFlag  = 0;
+$outerFlag  = 0;
 
-            $searchChild = 'SELECT * FROM `setup_links` WHERE `parent` = ? AND link_user_type = 1';
-            $views       = QUERY::run( $searchChild, [ $tree_view['Id'] ] )->fetchAll();
+function printView($tree_views , $mysqli)
+{
 
+  global $Admin_Registeration_Id;
+
+  $html = '' . PHP_EOL;
+
+  foreach ( $tree_views as $tree_view )
+  {
+    global $outerFlag;
+
+    $searchChild = 'SELECT setup_links.* FROM `setup_links` 
+    JOIN batchwise_setup_links_access ON batchwise_setup_links_access.function_Id = setup_links.Id 
+  WHERE setup_links.`parent` = ? AND setup_links.link_user_type = 1';
+    $views       = QUERY::run( $searchChild, [ $tree_view['Id'] ] )->fetchAll();
+    
 //-- if permission -------------------------------------------------------------
-            if ( ($Admin_Registeration_Id == 1 || hasAccess( [ $tree_view['Id'] ] )) && $tree_view['url'] )
-            {
-              $functionName = "getPage('".$tree_view['url']."', '".$tree_view['Id']."');";
-              $html .= '
-          <li class="treelinks">
-            <a onclick="getPage('.$functionName.');" href="#' . $tree_view['header'] . '">
-              <i class="fa fa-circle-o"></i>
-              ' . $tree_view['header'] . '
-            </a>
-          </li>' . PHP_EOL;
-            }
+    if ( ($Admin_Registeration_Id == 1 ||  hasAccess( [ $tree_view['Id'] ] )) && $tree_view['url'] )
+    {
+      $functionName = "getPage('".$tree_view['url']."', '".$tree_view['Id']."');";
+      $html .= '
+        <li class="treelinks">
+          <a onclick="getPage('.$functionName.');" href="#' . $tree_view['header'] . '">
+            <i class="fa fa-folder" style="color: #f5c601"></i>
+            ' . $tree_view['header'] . '
+          </a>
+        </li>' . PHP_EOL;
+    }
 
-            elseif ( ($Admin_Registeration_Id == 1 || hasAccess( [ $tree_view['Id'] ] )) && !$tree_view['url'] )
-            {
+    elseif ( ($Admin_Registeration_Id == 1 || hasAccess( [ $tree_view['Id'] ] )) && !$tree_view['url'] )
+    {
 
-              $html .= '
-  <li  id="' . $tree_view['Id'] . '" class="treeview">
 
-    <a href="#">
-      <i class="fa fa-circle-o"></i>
-      <span>
-        ' . $tree_view['header'] . '
-      </span>
-      <span class="pull-right-container">
-        <i class="fa fa-angle-left pull-right"></i>
-      </span>
-    </a>' . PHP_EOL;
-              // if ( $tree_view['depth'] == 0 )
-              //  $html .= '<ul class="treeview-menu"></ul>' . PHP_EOL;
-              ++$outerFlag;
-            }
+        //checking Parent Count
+      $parent_count_q = mysqli_query($mysqli, "SELECT * FROM `setup_links` WHERE `url` IS NULL AND Id = '$tree_view[Id]' ");
+      $row_parent_count = mysqli_fetch_array($parent_count_q);
+    
+
+      // if($row_parent_count['depth'] == $row_parent_count){
+      //   $html .= ' </ul>';
+      //   $parentFolder = 0;
+      // }
+
+
+      $html .= '
+          <li  id="' . $tree_view['Id'] . '" class="treeview">
+
+          <a href="#">
+          <i class="fa fa-folder"  style="color: #f5c601"></i>
+          <span>
+          ' . $tree_view['header'] . ' 
+          </span>
+          <span class="pull-right-container">
+          <i class="fa fa-angle-left pull-right"></i>
+          </span>
+          </a>' . PHP_EOL;
+      // if ( $tree_view['depth'] == 0 )
+      //  $html .= '<ul class="treeview-menu"></ul>' . PHP_EOL;
+      ++$outerFlag;
+    }
 //----------------------------------------------------------------------
-            foreach ( $views as $view )
-            {
-              global $innerFlag;
-              global $outerFlag;
+    $view_inc = 0;
+    $sub_view_inc = 1;
+    $numItems = count($views);
+    foreach ( $views as $view )
+    {
+      global $innerFlag;
+      global $outerFlag;
 
-              if ( $view['header'] && !$view['url'] && (1) ) // if ? array of array then -> recurse
-              {
-                $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? AND link_user_type = 1';
-                $subChilds      = QUERY::run( $searchSubChild, [ $view['Id'] ] )->fetchAll(); // GET UNIQUE SUB-CHILDS
+      if ( $view['header'] && !$view['url'] && (1) ) // if ? array of array then -> recurse
+      {
+        $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? AND link_user_type = 1 ';
+        $subChilds      = QUERY::run( $searchSubChild, [ $view['Id'] ] )->fetchAll(); // GET UNIQUE SUB-CHILDS
 
-                $html .= '
-<ul  id="' . $view['Id'] * 100 . '" class="treeview-menu">' . PHP_EOL;
+        $html .= '
+<li  id="' . $view['Id'] * 100 . '" class="treeview-menu" >' . PHP_EOL;
 
-                $html .= printView( $subChilds ); // going in
-                $html .= '
-      </ul>' . PHP_EOL;
+        $html .= printView( $subChilds  , $mysqli); // going in
+        $html .= '
+</li>' . PHP_EOL;
 
-                ++$innerFlag;
-              }
-              else
-              {
+        ++$innerFlag;
+      }
+      else
+      {
 //------ if permission -------------------------------------------------
-                if ( $Admin_Registeration_Id == 1 || hasAccess( [ $view['Id'] ] ) )
-                {
-                  $functionName = "getPage('".$view['url']."', '".$view['Id']."');";
-                  
-                  $html .= '
-      <ul  id="' . $view['Id'] * 100 . '" class="treeview-menu">
-          <li class="treelinks">
-            <a onclick="'.$functionName.'" href="#' . $view['header'] . '">
-              <i class="fa fa-circle-o"></i>
-              ' . $view['header'] . '
-            </a>
-          </li>
-      </ul>' . PHP_EOL;
-                }
-//----------------------------------------------------------------------
-              }
-              --$innerFlag;
-            }
-            for ( $i = 0; $i < $innerFlag; --$innerFlag )
-            {
-              $html .= '</li>' . PHP_EOL;
-            }
-            --$outerFlag;
-          }
-          for ( $i = 0; $i < $outerFlag; --$outerFlag )
-          {
-            $html .= '</li>' . PHP_EOL;
-          }
+        if (  hasAccess( [ $view['Id'] ] ) )
+        {
+          $view_inc++;  
+          $functionName = "getPage('".$view['url']."', '".$view['Id']."');";
 
-          return $html;
+          if($view_inc == 1){
+            $html.=' <ul  id="' . $view['Id'] * 100 . '" class="treeview-menu '.$view_inc.' ">';
+          }
+          
+
+          
+          $html .= '
+
+  <li class="treelinks" >
+    <a onclick="'.$functionName.'" href="#' . $view['header'] . '">
+      <i class="fa fa-circle-o"></i>
+      ' . $view['header'] . '
+    </a>
+  </li>
+' . PHP_EOL;
+
+// print_r("NUM ITem" .$numItems);
+// print_r("View Ince" .$view_inc);
+
+        if($view_inc == $numItems){
+          $html.='</ul>';
         }
 
-        $page = printView( $tree_views );
-        ini_set( 'memory_limit', '128M' );
+      //   if ($view['Id'] === end($array)) {
+      //     echo 'LAST ITEM!';
+      //  }
+      
+        }
+        $html.='  ';
+       
+//----------------------------------------------------------------------
+      }
+      --$innerFlag;
+    }
+    for ( $i = 0; $i < $innerFlag; --$innerFlag )
+    {
+      $html .= '</li>' . PHP_EOL;
+    }
+    --$outerFlag;
+  }
+  for ( $i = 0; $i < $outerFlag; --$outerFlag )
+  {
+    $html .= '</li>' . PHP_EOL;
+  }
 
-        //ob_start();
+  return $html;
+}
 
-        //echo $page;
+$page = printView( $tree_views  , $mysqli);
+ini_set( 'memory_limit', '128M' );
 
-        //$out = ob_get_clean();
+//ob_start();
 
-        //file_put_contents('out.php', $out);
-        file_put_contents( 'out.php', $page );
+//echo $page;
 
-        include 'out.php';
-        ?>
+//$out = ob_get_clean();
+
+//file_put_contents('out.php', $out);\
+
+echo $page;
+// file_put_contents( 'out.php', $page );
+
+// include 'out.php';
+?>
 
 <!-- ---------------------------------------------------------------------------------------------------------------- -->
 

@@ -84,7 +84,7 @@ if(isset($_GET['Validate_LoginForm'])){
 
 //-----------------------------------------------------------------------------------------------------------------------
 if(isset($_GET['Request_ForChangeMobileNo'])){
-
+    include('../../../staff/communication/functions.php');
     extract($_POST);
 
     $DOB = date('Y-m-d',strtotime(str_replace('/','-',$user_dob)));
@@ -105,22 +105,36 @@ if(isset($_GET['Request_ForChangeMobileNo'])){
 
         if(!empty($user_mobileno)){
 
-            $pin = mt_rand(100000, 999999);
        
 
-            $updating_studentregister = mysqli_query($mysqli,"Update user_studentregister set verificationCode = 'V$pin' Where Id = '$SR_Id'");
-            $message = "Dear Student, Your New Password : " . $pin;
-    
-    
-    
-            $no_of_charater = strlen($message);
-            $userIdType = 'StudentNewPassword';
-            $time = date("Y-m-d h:m:s");
-            $template_Id = '1207161192523376255';
 
-            $format_message =  htmlspecialchars($message, ENT_QUOTES);
+            //Fetching Template
+            $fetching_header_ids_q = mysqli_query($mysqli,"SELECT comm_sms_header_ids.sectionmaster_Id, comm_sms_header_ids.Id As CSHI_Id, comm_sms_header_ids.header_name, comm_sms_header_ids.PE_Id, comm_sms_templates.registered_sms_template, comm_sms_templates.template_Id, comm_sms_templates.msg_type,  comm_sms_templates.Id As CST_Id, comm_sms_templates.actual_message_template FROM comm_sms_header_ids JOIN comm_sms_templates ON comm_sms_templates.sms_header_Id = comm_sms_header_ids.Id WHERE comm_sms_header_ids.isDefault = '1' AND comm_sms_header_ids.sectionmaster_Id = '$SM_Id' AND comm_sms_templates.msg_type = '0' ");
+            $r_fetch_header_ids = mysqli_fetch_array($fetching_header_ids_q);
+
+            $sender_header_Id = $r_fetch_header_ids['CSHI_Id'];
+            $template_Id = $r_fetch_header_ids['CST_Id'];
+
+            $message_template = $r_fetch_header_ids['actual_message_template'];
+
+            $Student_Res = ExistingStudentMessageDecrypt($SR_Id, $message_template, $mysqli);
     
-            $Inserting_UserDetails = mysqli_query($mysqli,"Insert into comm_message_log (User_Id, message_type, sender_address, no_of_characters, Decrypt_Msg, sender_name, timestamp, SenderHeader, userIdType, moduleType, template_Id) values ('$SR_Id', 'SMS' ,'$user_mobileno', '$no_of_charater' , '".$format_message."', '1', '$time' , 'SIWSAD', '$userIdType', 'UserVerfication', '$template_Id')");
+
+            
+            
+            $message = $Student_Res['Decrypt_Message'];
+            $pin = $Student_Res['pin'];
+
+            $no_of_charater = strlen($message);
+            $userIdType = 'SR_Id';
+            $time = date("Y-m-d h:m:s");
+        
+            $format_message =  htmlspecialchars($message, ENT_QUOTES);
+
+    
+
+            $Inserting_UserDetails = mysqli_query($mysqli,"Insert into comm_message_log (User_Id, message_type, recipient_address, no_of_characters, Decrypt_Msg, sender_name, timestamp, SenderHeader, userIdType, moduleType, template_Id) values ('$SR_Id', '1' ,'$user_mobileno', '$no_of_charater' , '".$format_message."', '1', '$time' , '$sender_header_Id', '$userIdType', 'Admission', '$template_Id')");
+        
 
     
             if(mysqli_error($mysqli)){
@@ -138,7 +152,17 @@ if(isset($_GET['Request_ForChangeMobileNo'])){
             
 
             if(!empty($user_emailaddress)){
-                $Inserting_UserDetails = mysqli_query($mysqli,"Insert into comm_message_log (User_Id, message_type, sender_address, no_of_characters, Decrypt_Msg, sender_name, timestamp, SenderHeader, userIdType, moduleType, email_Subjects) values ('$SR_Id', 'Email' ,'$user_emailaddress', '$no_of_charater' , '".$format_message."', '1', '$time' , 'SIWSAD', '$userIdType', 'UserVerfication', 'New Password')");
+
+                //Fetching Mail Details
+                $mail_detail_q = mysqli_query($mysqli, "SELECT setup_sectionmaildetails.* FROM `setup_sectionmaildetails` WHERE setup_sectionmaildetails.sectionmaster_Id = '$SM_Id' AND setup_sectionmaildetails.isDefault = '1' ");
+                $r_mail_detail = mysqli_fetch_array($mail_detail_q);
+
+                $mail_sender_header = $r_mail_detail['Id'];
+                $emailSubjects = 'Registration Details';
+
+                
+                $Inserting_UserDetailsa = mysqli_query($mysqli,"Insert into comm_message_log (User_Id, message_type, recipient_address, no_of_characters, Decrypt_Msg, sender_name, timestamp, SenderHeader, userIdType, moduleType, template_Id , email_Subjects, Status) values ('$SR_Id', '2' ,'$user_emailaddress', '$no_of_charater' , '".$format_message."', '1', '$time' , '$mail_sender_header', '$userIdType', 'Admission', '$template_Id', '$emailSubjects', 'Pending')");
+                            
     
                 if(mysqli_error($mysqli)){
                     $Generating_Error[] = 'Email Error Occurred : '; 
