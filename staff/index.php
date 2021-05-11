@@ -351,11 +351,11 @@ function hasAccess($permission = [])
                   $subChilds      = QUERY::run( $searchSubChild, [ $view['Id'] ] )->fetchAll(); // GET UNIQUE SUB-CHILDS
 
                   $html .= '
-          <li  id="' . $view['Id'] * 100 . '" class="treeview-menu">' . PHP_EOL;
+          <ul  id="' . $view['Id'] * 100 . '" class="treeview-menu">' . PHP_EOL;
 
                   $html .= printView( $subChilds  , $mysqli); // going in
                   $html .= '
-          </li>' . PHP_EOL;
+          </ul>' . PHP_EOL;
 
                   ++$innerFlag;
                 }
@@ -366,26 +366,26 @@ function hasAccess($permission = [])
                   {
                     $functionName = "getPage('".$view['url']."', '".$view['Id']."');";
 
-                    if($view_inc == 0){
-                      $html.=' <ul  id="' . $view['Id'] * 100 . '" class="treeview-menu">';
-                    }
+                    // if($view_inc == 0){
+                    //   $html.=' ';
+                    // }
                     
 
                     
                     $html .= '
-
+                    <ul  id="' . $view['Id'] * 100 . '" class="treeview-menu">
             <li class="treelinks">
               <a onclick="'.$functionName.'" href="#' . $view['header'] . '">
                 <i class="fa fa-circle-o"></i>
                 ' . $view['header'] . '
               </a>
-            </li>
+            </li></ul>
           ' . PHP_EOL;
 
 
-                  if($view_inc + 1 == $numItems){
-                    $html.=' </ul>';
-                  }
+                  // if($view_inc + 1 == $numItems){
+                  //   $html.=' ';
+                  // }
 
                 //   if ($view['Id'] === end($array)) {
                 //     echo 'LAST ITEM!';

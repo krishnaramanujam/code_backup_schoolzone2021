@@ -214,7 +214,7 @@ $('.return_btn').click(function(event){
     $("#loader").css("display", "block");
     $("#DisplayDiv").css("display", "none");
     $.ajax({
-        url:'./communication/communication_student.php?Generate_View='+'u',
+        url:'./communication/communication_student_email.php?Generate_View='+'u',
         type:'GET',
         data: {batch_sel:return_batch_sel, batch_name:return_batch_name, list_sel:return_list_sel, list_name:return_list_name, contact_sel:return_contact_sel, group_sel: return_group_sel},
         success:function(response){

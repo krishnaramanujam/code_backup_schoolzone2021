@@ -234,12 +234,6 @@ include_once '../../config/database.php';
         <input type="hidden" name="return_contact_sel" id="contact_sel" class="form-control" value="<?php echo $_GET['contact_sel']; ?>">
         <input type="hidden" name="return_group_sel" id="group_sel" class="form-control" value="<?php echo $_GET['group_sel']; ?>">
 
-        <?php
-            $credit_balance_q = mysqli_query($mysqli, "SELECT comm_sms_credit.* FROM `comm_sms_credit` WHERE comm_sms_credit.batchmaster_Id = '$batch_sel' AND active_status = '1'");
-            $r_credit_balance = mysqli_fetch_array($credit_balance_q);    
-        ?>
-
-            <h4 class="text-warning">SMS Balance: <?php echo $r_credit_balance['balance']; ?></h4>
        
         <table id="CommunicationReportTable" class="table table-striped table-hover"> 
             <thead>
@@ -324,8 +318,8 @@ include_once '../../config/database.php';
 
         </div><!--Panel BOdy Close-->
         <div class="panel-footer" style="text-align: center;"> 
-            <button type="button" class="btn btn-primary" id="save_sms_list">Save Selected Student(SMS)</button>
-     
+          
+            <button type="button" class="btn btn-primary" id="save_email_list">Save Selected Student(EMAIL)</button>
             <!-- <button class="btn btn-primary" id="savingSmsList">Fetch JS API(Testing)</button> -->
         </div>
         </div>
@@ -443,7 +437,7 @@ $('#search_access').click(function(e){
     $("#DisplayDiv").css("display", "none");
     
     $.ajax({
-        url:'./communication/communication_student.php?Generate_View='+'u',
+        url:'./communication/communication_student_email.php?Generate_View='+'u',
         type:'GET',
         data: formdata,
         success:function(srh_response){

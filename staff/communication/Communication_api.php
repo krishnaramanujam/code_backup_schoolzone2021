@@ -1244,4 +1244,213 @@ if(isset($_GET['Add_SMSTemplateInstance_InBulk'])){
 }
 //-----------------------------------------------------------------------------------------------------------------------
 
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_EmailsInstance'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM setup_sectionmaildetails where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_EmailsInstance'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    //checking Department Abbbr & Name
+    $depart_fetch_q = mysqli_query($mysqli,"SELECT setup_sectionmaildetails.* FROM setup_sectionmaildetails Where setup_sectionmaildetails.sectionmaster_Id  = '$SectionMaster_Id' AND setup_sectionmaildetails.username = '".htmlspecialchars($add_username, ENT_QUOTES)."' ");
+
+
+    $row_depart_fetch = mysqli_num_rows($depart_fetch_q);
+
+    if($row_depart_fetch > 0){
+
+        
+        $res['status'] = 'EXISTS';
+        echo json_encode($res);
+
+    }else{
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into setup_sectionmaildetails
+        (sectionmaster_Id, host, username, password, setFromAddress, setFromName) 
+        Values
+        ('$SectionMaster_Id', '".htmlspecialchars($add_host, ENT_QUOTES)."', '".htmlspecialchars($add_username, ENT_QUOTES)."', '".htmlspecialchars($add_password, ENT_QUOTES)."', '$add_setFromAddress', '$add_setFromName')");
+        
+        $res['status'] = 'success';
+        echo json_encode($res);
+    }
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_EmailsInstance'])){
+
+    extract($_POST);
+
+     
+    $updating_CalenderInstance = mysqli_query($mysqli,"Update setup_sectionmaildetails Set 
+    host ='".htmlspecialchars($edit_host, ENT_QUOTES)."',
+    username = '".htmlspecialchars($edit_username, ENT_QUOTES)."',
+    password='".htmlspecialchars($edit_password, ENT_QUOTES)."',
+    setFromAddress='".htmlspecialchars($edit_setFromAddress, ENT_QUOTES)."',
+    setFromName='".htmlspecialchars($edit_setFromName, ENT_QUOTES)."'
+    where Id  = '$edit_InstanceId'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_EmailsInstance_InBulk'])){
+
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+  
+    // check file name is not empty
+    $pathinfo = pathinfo($_FILES["upload_file"]["name"]); //file extension
+
+    $folderMap = '../';
+    $fileLocation = "FileUploadLogs/EmailTemplateMaster_".$SectionMaster_Id."_".date("Y-m-d-h-i-s").'.xlsx';
+    $targetfolder =  $folderMap."".$fileLocation;
+    move_uploaded_file($_FILES['upload_file']['name'], $targetfolder);
+
+    $writer = WriterFactory::create(Type::XLSX); // for XLSX files
+
+    $fileName= $targetfolder;
+    $writer->openToFile($fileName); // write data to a file or to a PHP stream
+    // $writer->openToBrowser($fileName); // stream data directly to the browser
+
+    $singleRow =['Sr No','Host','Username','Password','Set From Address','Set From Name','Upload Status'];
+    $writer->addRow($singleRow); // add a row at a time
+
+
+
+
+
+   
+    if (($pathinfo['extension'] == 'xlsx' || $pathinfo['extension'] == 'xls') && $_FILES['upload_file']['size'] > 0 ) { //check if file is an excel file && is not empty
+        $inputFileName = $_FILES['upload_file']['tmp_name'];  // Temporary file name
+        
+        // Read excel file by using ReadFactory object.
+        $reader = ReaderFactory::create(Type::XLSX);
+
+        // Open file
+        $reader->open($inputFileName);
+
+
+        $count = 1;
+        $flag = 0;
+
+
+
+        // Number of sheet in excel file
+        foreach ($reader->getSheetIterator() as $sheet) {
+            // Number of Rows in Excel sheet
+            foreach ($sheet->getRowIterator() as $row) {
+                // It reads data after header. In the my excel sheet, header is in the first row.
+                if ($count > 1) {  if(!empty($row[0])){
+
+
+//---------------------------------------------------------------------------------------------------------------                  
+
+    $StreamDetails_q = mysqli_query($mysqli, "SELECT setup_sectionmaildetails.* FROM setup_sectionmaildetails Where setup_sectionmaildetails.sectionmaster_Id  = '$SectionMaster_Id' AND setup_sectionmaildetails.username = '".htmlspecialchars($row[2], ENT_QUOTES)."'");
+
+    $row_StreamDetails = mysqli_num_rows($StreamDetails_q);
+
+
+
+    if($row_StreamDetails == '0'){
+
+        //checking Group and Sem Belong to this Program
+
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into setup_sectionmaildetails
+        (sectionmaster_Id, host, username, password, setFromAddress, setFromName) 
+        Values
+        ('$SectionMaster_Id', '".htmlspecialchars($row[1], ENT_QUOTES)."', '".htmlspecialchars($row[2], ENT_QUOTES)."', '".htmlspecialchars($row[3], ENT_QUOTES)."', '$row[4]', '$row[5]')");
+        
+
+        if(mysqli_error($mysqli)){
+            $displayMessage[]  = $row[1].' : Query Failed';
+            $uploadMessage = "Query Failed";
+        }else{
+            $displayMessage[]  = $row[1].' : Email Template Added';
+            $uploadMessage = "Email Template Added";    
+        }
+
+        
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3],$row[4],$row[5],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+        
+    }elseif($row_StreamDetails > '0'){
+        $displayMessage[]  = $row[1].' : Email Template Already Present';
+        $uploadMessage = "Email Template Already Added";
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3],$row[4],$row[5],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+    }
+    unset($uploadMessage);
+//----------------------------------------------------------------------------------------------------------------------
+                   
+
+        }}
+        $count++;
+        }
+
+        }
+
+
+
+
+        }
+
+
+        $writer->close();
+
+
+        $res['UploadedFilePath'] = $fileLocation;
+        $res['displayMessage'] = $displayMessage;
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Change_EmailsInstance_DefaultEntry'])){
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    $AY_Id = $_POST['AY_Id'];
+
+    //Make ALL 0
+    $updating_Attend_Staff = mysqli_query($mysqli,"Update setup_sectionmaildetails set isDefault = '0' where sectionmaster_Id = '$SectionMaster_Id'");
+
+
+    //Make Selected 1
+    $updating_Attend_Staff = mysqli_query($mysqli,"Update setup_sectionmaildetails set isDefault = '1' where Id = '$AY_Id'");
+
+    echo "200";
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+
 ?>
