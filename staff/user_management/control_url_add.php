@@ -170,6 +170,8 @@ else {
               <option value="">--Select--</option>
               <option value="1" class="strong">Super Admin</option>
               <option value="0" class="strong">Users</option>
+              <option value="3" class="strong">Application Page (Student Only)</option>
+              <option value="4" class="strong">Fees Payment (Student Only)</option>
               ?>
             </select>
 

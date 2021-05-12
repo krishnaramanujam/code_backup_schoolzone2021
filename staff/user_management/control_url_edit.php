@@ -198,6 +198,8 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
               <option value="">--Select--</option>
               <option value="1" class="strong" <?php if($fetch_header_result['c_access_type'] == '1'){ echo 'Selected'; } ?> >Super Admin</option>
               <option value="0" class="strong" <?php if($fetch_header_result['c_access_type'] == '0'){ echo 'Selected'; } ?> >Users</option>
+              <option value="3" class="strong" <?php if($fetch_header_result['c_access_type'] == '3'){ echo 'Selected'; } ?> >Application Page (Student Only)</option>
+              <option value="4" class="strong" <?php if($fetch_header_result['c_access_type'] == '4'){ echo 'Selected'; } ?> >Fees Payment (Student Only)</option>
               ?>
             </select>
 

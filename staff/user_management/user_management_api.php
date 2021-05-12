@@ -8,8 +8,9 @@ session_start();
 date_default_timezone_set("Asia/Calcutta");
 include_once '../../config/database.php';
 
-
 use Box\Spout\Reader\ReaderFactory;
+use Box\Spout\Writer\WriterFactory;
+
 use Box\Spout\Common\Type;
 
 require_once '../../assets/plugins/spout-2.4.3/src/Spout/Autoloader/autoload.php';
@@ -518,5 +519,215 @@ if(isset($_GET['Sequencing_Pages'])){
     
 }
 //-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_bankAccountInstance'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    //checking Department Abbbr & Name
+    $depart_fetch_q = mysqli_query($mysqli,"SELECT setup_bankaccountmaster.* FROM setup_bankaccountmaster Where  setup_bankaccountmaster.account_no = '".htmlspecialchars($add_account_no, ENT_QUOTES)."' AND  setup_bankaccountmaster.sectionmaster_Id = '$SectionMaster_Id'");
+
+
+    $row_depart_fetch = mysqli_num_rows($depart_fetch_q);
+
+    if($row_depart_fetch > 0){
+
+        
+        $res['status'] = 'EXISTS';
+        echo json_encode($res);
+
+    }else{
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into setup_bankaccountmaster
+        (sectionmaster_Id, bankmaster_Id, account_no, IFSC_code) 
+        Values
+        ('$SectionMaster_Id', '".htmlspecialchars($add_bankmaster_Id, ENT_QUOTES)."', '".htmlspecialchars($add_account_no, ENT_QUOTES)."', '".htmlspecialchars($add_IFSC_code, ENT_QUOTES)."')");
+        
+        $res['status'] = 'success';
+        echo json_encode($res);
+    }
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_bankAccountInstance'])){
+
+    extract($_POST);
+
+     
+    $updating_CalenderInstance = mysqli_query($mysqli,"Update setup_bankaccountmaster Set bankmaster_Id = '".htmlspecialchars($edit_bankmaster_Id, ENT_QUOTES)."',account_no='".htmlspecialchars($edit_account_no, ENT_QUOTES)."',IFSC_code='".htmlspecialchars($edit_IFSC_code, ENT_QUOTES)."' where Id  = '$edit_InstanceId'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_bankAccountInstance'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM setup_bankaccountmaster where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_bankAccountInstance_InBulk'])){
+
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    // check file name is not empty
+    $pathinfo = pathinfo($_FILES["upload_file"]["name"]); //file extension
+
+    $folderMap = '../';
+    $fileLocation = "FileUploadLogs/BankAccountMaster_".$SectionMaster_Id."_".date("Y-m-d-h-i-s").'.xlsx';
+    $targetfolder =  $folderMap."".$fileLocation;
+    move_uploaded_file($_FILES['upload_file']['name'], $targetfolder);
+
+    $writer = WriterFactory::create(Type::XLSX); // for XLSX files
+
+    $fileName= $targetfolder;
+    $writer->openToFile($fileName); // write data to a file or to a PHP stream
+    // $writer->openToBrowser($fileName); // stream data directly to the browser
+
+    $singleRow =['Sr No','Bank No','Account No','IFSC Code','Upload Status'];
+    $writer->addRow($singleRow); // add a row at a time
+
+
+
+
+
+   
+    if (($pathinfo['extension'] == 'xlsx' || $pathinfo['extension'] == 'xls') && $_FILES['upload_file']['size'] > 0 ) { //check if file is an excel file && is not empty
+        $inputFileName = $_FILES['upload_file']['tmp_name'];  // Temporary file name
+        
+        // Read excel file by using ReadFactory object.
+        $reader = ReaderFactory::create(Type::XLSX);
+
+        // Open file
+        $reader->open($inputFileName);
+
+
+        $count = 1;
+        $flag = 0;
+
+
+
+        // Number of sheet in excel file
+        foreach ($reader->getSheetIterator() as $sheet) {
+            // Number of Rows in Excel sheet
+            foreach ($sheet->getRowIterator() as $row) {
+                // It reads data after header. In the my excel sheet, header is in the first row.
+                if ($count > 1) {  if(!empty($row[0])){
+
+
+//---------------------------------------------------------------------------------------------------------------                  
+
+    $StreamDetails_q = mysqli_query($mysqli, "SELECT setup_bankaccountmaster.* FROM setup_bankaccountmaster Where  setup_bankaccountmaster.account_no = '".htmlspecialchars($row[2], ENT_QUOTES)."' AND  setup_bankaccountmaster.sectionmaster_Id = '$SectionMaster_Id'");
+
+    $row_StreamDetails = mysqli_num_rows($StreamDetails_q);
+
+
+
+    if($row_StreamDetails == '0'){
+
+        //checking Group and Sem Belong to this Program
+
+        $checkinggroupDetails_q = mysqli_query($mysqli, "SELECT setup_bankmaster.* FROM setup_bankmaster WHERE setup_bankmaster.Id =  '$row[1]'");
+        $row_checkinggroupDetails = mysqli_num_rows($checkinggroupDetails_q);
+
+        if($row_checkinggroupDetails > '0'){
+
+        
+            $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into setup_bankaccountmaster
+            (sectionmaster_Id, bankmaster_Id, account_no, IFSC_code) 
+            Values
+            ('$SectionMaster_Id', '".htmlspecialchars($row[1], ENT_QUOTES)."', '".htmlspecialchars($row[2], ENT_QUOTES)."', '".htmlspecialchars($row[3], ENT_QUOTES)."')");
+
+
+
+            if(mysqli_error($mysqli)){
+                $displayMessage[]  = $row[2].' : Query Failed';
+                $uploadMessage = "Query Failed";
+            }else{
+                $displayMessage[]  = $row[2].' : Bank Account Added';
+                $uploadMessage = "Bank Account Added";    
+            }
+
+         //close checking Details
+        }else{
+
+            $displayMessage[]  = $row[2].' : Invalid Bank No';
+            $uploadMessage = "Invalid Bank No";    
+        }// clsoe else
+        
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+        
+    }elseif($row_StreamDetails > '0'){
+        $displayMessage[]  = $row[2].' : Bank Account Already Present';
+        $uploadMessage = "Bank Account Already Added";
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+    }
+    unset($uploadMessage);
+//----------------------------------------------------------------------------------------------------------------------
+                   
+
+        }}
+        $count++;
+        }
+
+        }
+
+
+
+
+        }
+
+
+        $writer->close();
+
+
+        $res['UploadedFilePath'] = $fileLocation;
+        $res['displayMessage'] = $displayMessage;
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Change_BankAccountInstance_DefaultEntry'])){
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    $AY_Id = $_POST['AY_Id'];
+
+    //Make Selected 1
+    $updating_Attend_Staff = mysqli_query($mysqli,"Update setup_bankaccountmaster set status = '1' where Id = '$AY_Id'");
+
+    echo "200";
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
 
 ?>

@@ -61,7 +61,8 @@ $batch_sel = $_POST['batch_sel'];
         <tbody>
 
         <?php
-        $header_result = QUERY::run( "SELECT
+
+        $q = "SELECT
         child.Id AS c_id,
         CONCAT(
           (
@@ -96,7 +97,9 @@ $batch_sel = $_POST['batch_sel'];
         setup_links greatgran ON greatgran.Id = gran.parent
          JOIN setup_modulemapping ON setup_modulemapping.modulelist_Id = child.modulelist_Id
       WHERE
-        parent.header IS NOT NULL AND child.link_user_type = '$usertype' AND child.access_type = '0'  AND setup_modulemapping.sectionmaster_Id = '$SectionMaster_Id' AND  setup_modulemapping.userType_Id = '$usertype' " );
+        parent.header IS NOT NULL AND child.link_user_type = '$usertype' AND child.access_type IN (0,3,4)  AND setup_modulemapping.sectionmaster_Id = '$SectionMaster_Id' AND  setup_modulemapping.userType_Id = '$usertype' ";
+
+        $header_result = QUERY::run( $q );
 
         $id = 0;
 

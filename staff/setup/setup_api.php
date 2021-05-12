@@ -2358,3 +2358,188 @@ if(isset($_GET['Add_ExamInstance_InBulk'])){
 
 }
 //-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_FeeHeaderTypeInstance'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    //checking Department Abbbr & Name
+    $depart_fetch_q = mysqli_query($mysqli,"SELECT fee_headertype.* FROM fee_headertype Where ( fee_headertype.headertype_name = '".htmlspecialchars($add_headertype_name, ENT_QUOTES)."' OR fee_headertype.abbreviation = '".htmlspecialchars($add_abbreviation, ENT_QUOTES)."' ) ");
+
+
+    $row_depart_fetch = mysqli_num_rows($depart_fetch_q);
+
+    if($row_depart_fetch > 0){
+
+        
+        $res['status'] = 'EXISTS';
+        echo json_encode($res);
+
+    }else{
+
+        $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into fee_headertype
+        ( headertype_name, abbreviation, sequence) 
+        Values
+        ( '".htmlspecialchars($add_headertype_name, ENT_QUOTES)."', '".htmlspecialchars($add_abbreviation, ENT_QUOTES)."', '".htmlspecialchars($add_sequence, ENT_QUOTES)."')");
+        
+        $res['status'] = 'success';
+        echo json_encode($res);
+    }
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_FeeHeaderTypeInstance'])){
+
+    extract($_POST);
+
+     
+    $updating_CalenderInstance = mysqli_query($mysqli,"Update fee_headertype Set headertype_name = '".htmlspecialchars($edit_headertype_name, ENT_QUOTES)."',abbreviation='".htmlspecialchars($edit_abbreviation, ENT_QUOTES)."',sequence='".htmlspecialchars($edit_sequence, ENT_QUOTES)."' where Id  = '$edit_InstanceId'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_FeeHeaderTypeInstance'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM fee_headertype where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_FeeHeaderTypeInstance_InBulk'])){
+
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];  
+
+    // check file name is not empty
+    $pathinfo = pathinfo($_FILES["upload_file"]["name"]); //file extension
+
+    $folderMap = '../';
+    $fileLocation = "FileUploadLogs/FeeHeaderTypeMaster_".$SectionMaster_Id."_".date("Y-m-d-h-i-s").'.xlsx';
+    $targetfolder =  $folderMap."".$fileLocation;
+    move_uploaded_file($_FILES['upload_file']['name'], $targetfolder);
+
+    $writer = WriterFactory::create(Type::XLSX); // for XLSX files
+
+    $fileName= $targetfolder;
+    $writer->openToFile($fileName); // write data to a file or to a PHP stream
+    // $writer->openToBrowser($fileName); // stream data directly to the browser
+
+    $singleRow =['Sr No','Header Type Name','Abbreviation','Sequence','Upload Status'];
+    $writer->addRow($singleRow); // add a row at a time
+
+
+
+
+
+   
+    if (($pathinfo['extension'] == 'xlsx' || $pathinfo['extension'] == 'xls') && $_FILES['upload_file']['size'] > 0 ) { //check if file is an excel file && is not empty
+        $inputFileName = $_FILES['upload_file']['tmp_name'];  // Temporary file name
+        
+        // Read excel file by using ReadFactory object.
+        $reader = ReaderFactory::create(Type::XLSX);
+
+        // Open file
+        $reader->open($inputFileName);
+
+
+        $count = 1;
+        $flag = 0;
+
+
+
+        // Number of sheet in excel file
+        foreach ($reader->getSheetIterator() as $sheet) {
+            // Number of Rows in Excel sheet
+            foreach ($sheet->getRowIterator() as $row) {
+                // It reads data after header. In the my excel sheet, header is in the first row.
+                if ($count > 1) {  if(!empty($row[0])){
+
+
+//---------------------------------------------------------------------------------------------------------------                  
+
+    $StreamDetails_q = mysqli_query($mysqli, "SELECT fee_headertype.* FROM fee_headertype Where ( fee_headertype.headertype_name = '".htmlspecialchars($row[1], ENT_QUOTES)."' OR fee_headertype.abbreviation = '".htmlspecialchars($row[2], ENT_QUOTES)."' ) ");
+
+    $row_StreamDetails = mysqli_num_rows($StreamDetails_q);
+
+
+
+    if($row_StreamDetails == '0'){
+
+        //checking Group and Sem Belong to this Program
+
+        
+            $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into fee_headertype
+            ( headertype_name, abbreviation, sequence) 
+            Values
+            ('".htmlspecialchars($row[1], ENT_QUOTES)."', '".htmlspecialchars($row[2], ENT_QUOTES)."', '".htmlspecialchars($row[3], ENT_QUOTES)."')");
+
+
+
+            if(mysqli_error($mysqli)){
+                $displayMessage[]  = $row[2].' : Query Failed';
+                $uploadMessage = "Query Failed";
+            }else{
+                $displayMessage[]  = $row[2].' : Fee Header Added';
+                $uploadMessage = "Fee Header Added";    
+            }
+
+         //close checking Details
+        
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+        
+    }elseif($row_StreamDetails > '0'){
+        $displayMessage[]  = $row[2].' : Fee Header Already Present';
+        $uploadMessage = "Fee Header Already Added";
+
+        $multipleRows=[
+            [$row[0],$row[1],$row[2],$row[3],$uploadMessage],
+        ];
+        $writer->addRows($multipleRows); // add multiple rows at a time
+
+    }
+    unset($uploadMessage);
+//----------------------------------------------------------------------------------------------------------------------
+                   
+
+        }}
+        $count++;
+        }
+
+        }
+
+
+
+
+        }
+
+
+        $writer->close();
+
+
+        $res['UploadedFilePath'] = $fileLocation;
+        $res['displayMessage'] = $displayMessage;
+        echo json_encode($res);
+
+}
+//-----------------------------------------------------------------------------------------------------------------------

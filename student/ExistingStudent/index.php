@@ -26,7 +26,7 @@ $BM_Id = $r_Staffdata_fetch['batchMaster_Id'];
 
 //finding accessible pages to this particular id
 $query = "
-SELECT `batchwise_setup_links_access`.`function_Id` As function_id FROM `setup_batchmaster` LEFT JOIN `batchwise_setup_links_access` ON `setup_batchmaster`.`Id` = `batchwise_setup_links_access`.`batchmaster_Id` WHERE setup_batchmaster.Id = '$BM_Id' AND batchwise_setup_links_access.user_type_Id = '1' 
+SELECT `batchwise_setup_links_access`.`function_Id` AS function_id, setup_links.access_type FROM `setup_batchmaster` LEFT JOIN `batchwise_setup_links_access` ON `setup_batchmaster`.`Id` = `batchwise_setup_links_access`.`batchmaster_Id` LEFT JOIN setup_links ON setup_links.Id = batchwise_setup_links_access.function_Id WHERE setup_batchmaster.Id = '$BM_Id' AND batchwise_setup_links_access.user_type_Id = '1' AND  (  setup_links.access_type = 3 OR setup_links.depth = 0)
 ";
 
 $result1 = mysqli_query( $mysqli, $query );
@@ -195,6 +195,65 @@ function hasAccess($permission = [])
         <a onClick="window.location.reload()">
           <i class="fa fa-folder " style="color:#FA573C"></i> <span>Home</span>
         </a>
+        
+
+        <!-- Checking Batch in Current Year -->
+
+    <?php
+        $checking_sbm_cy = mysqli_query($mysqli, "SELECT user_studentregister.SBM_Id, user_studentbatchmaster.batchMaster_Id, setup_batchmaster.academicyear_Id, user_studentbatchmaster.promoted_batch, a1.academicyear_Id As Promoted_AY FROM user_studentbatchmaster JOIN user_studentregister ON user_studentbatchmaster.studentRegister_Id = user_studentregister.Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id LEFT JOIN setup_batchmaster a1 ON a1.Id = user_studentbatchmaster.promoted_batch WHERE user_studentregister.Id = '$Activestudentregister_Id'  ");
+        $r_checking_sbm_cy = mysqli_fetch_array($checking_sbm_cy);
+
+        if($r_checking_sbm_cy['academicyear_Id'] != $Acadmic_Year_ID){
+            //Checking next Year 
+            if(empty($r_checking_sbm_cy['promoted_batch']) OR $r_checking_sbm_cy['Promoted_AY'] != $Acadmic_Year_ID){
+                //Premoted Batch Not Present Remove Access 
+                unset($function_array);
+                $function_array = [];  
+                echo 'Contact College';
+            }elseif(!empty($r_checking_sbm_cy['promoted_batch'])){
+                $BM_Id = $r_checking_sbm_cy['promoted_batch'];
+        
+                 $query = "
+                SELECT `batchwise_setup_links_access`.`function_Id` AS function_id, setup_links.access_type FROM `setup_batchmaster` LEFT JOIN `batchwise_setup_links_access` ON `setup_batchmaster`.`Id` = `batchwise_setup_links_access`.`batchmaster_Id` LEFT JOIN setup_links ON setup_links.Id = batchwise_setup_links_access.function_Id WHERE setup_batchmaster.Id = '$BM_Id' AND batchwise_setup_links_access.user_type_Id = '1' AND  (  setup_links.access_type = 3 OR setup_links.depth = 0)
+                ";
+                $result1 = mysqli_query( $mysqli, $query );
+
+                if ( $result1 != null )
+                {
+                  while ( $res = mysqli_fetch_assoc( $result1 ) )
+                  {
+                    $function_array[] = $res['function_id'];
+                  }
+                }
+
+
+            }
+
+
+        }elseif($r_checking_sbm_cy['academicyear_Id'] == $Acadmic_Year_ID){
+            $BM_Id = $r_checking_sbm_cy['batchMaster_Id'];
+          
+            $query = "
+            SELECT `batchwise_setup_links_access`.`function_Id` AS function_id, setup_links.access_type FROM `setup_batchmaster` LEFT JOIN `batchwise_setup_links_access` ON `setup_batchmaster`.`Id` = `batchwise_setup_links_access`.`batchmaster_Id` LEFT JOIN setup_links ON setup_links.Id = batchwise_setup_links_access.function_Id WHERE setup_batchmaster.Id = '$BM_Id' AND batchwise_setup_links_access.user_type_Id = '1' AND  (  setup_links.access_type IN (3,4) OR setup_links.depth = 0)
+            ";
+            $result1 = mysqli_query( $mysqli, $query );
+
+            if ( $result1 != null )
+            {
+              while ( $res = mysqli_fetch_assoc( $result1 ) )
+              {
+                $function_array[] = $res['function_id'];
+              }
+            }
+        }
+
+
+
+    ?>
+
+
+
+
 
         <?php
 
@@ -221,7 +280,7 @@ function hasAccess($permission = [])
 ini_set( 'memory_limit', '-1' );
 // get unique PARENT nodes directly under ROOT node
 
-$search .= 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 1 AND  access_type = 0 ORDER BY parent_sequence,`setup_links`.`Id`';
+$search .= 'SELECT DISTINCT `parent`, `setup_links`.* FROM `setup_links` WHERE `depth` = 0 AND link_user_type = 1 AND  access_type IN (3,4) ORDER BY parent_sequence Asc';
 
 
 $tree_views = QUERY::run( $search )->fetchAll();
@@ -241,7 +300,7 @@ function printView($tree_views , $mysqli)
 
     $searchChild = 'SELECT setup_links.* FROM `setup_links` 
     JOIN batchwise_setup_links_access ON batchwise_setup_links_access.function_Id = setup_links.Id 
-  WHERE setup_links.`parent` = ? AND setup_links.link_user_type = 1';
+  WHERE setup_links.`parent` = ? AND setup_links.link_user_type = 1 AND access_type IN (3,4) ORDER BY parent_sequence Asc';
     $views       = QUERY::run( $searchChild, [ $tree_view['Id'] ] )->fetchAll();
     
 //-- if permission -------------------------------------------------------------
@@ -262,7 +321,7 @@ function printView($tree_views , $mysqli)
 
 
         //checking Parent Count
-      $parent_count_q = mysqli_query($mysqli, "SELECT * FROM `setup_links` WHERE `url` IS NULL AND Id = '$tree_view[Id]' ");
+      $parent_count_q = mysqli_query($mysqli, "SELECT * FROM `setup_links` WHERE `url` IS NULL AND Id = '$tree_view[Id]' ORDER BY parent_sequence Asc");
       $row_parent_count = mysqli_fetch_array($parent_count_q);
     
 
@@ -299,7 +358,7 @@ function printView($tree_views , $mysqli)
 
       if ( $view['header'] && !$view['url'] && (1) ) // if ? array of array then -> recurse
       {
-        $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? AND link_user_type = 1 ';
+        $searchSubChild = 'SELECT * FROM setup_links WHERE Id = ? AND link_user_type = 1 ORDER BY parent_sequence Asc';
         $subChilds      = QUERY::run( $searchSubChild, [ $view['Id'] ] )->fetchAll(); // GET UNIQUE SUB-CHILDS
 
         $html .= '
