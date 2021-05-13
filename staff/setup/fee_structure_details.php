@@ -3,9 +3,9 @@
 include_once '../SessionInfo.php';
 //Database File
 include_once '../../config/database.php';
+ $FS_Id = $_GET['FS_Id'];
 
-
-$q = "SELECT fee_headermaster.* FROM fee_headermaster  WHERE fee_headermaster.sectionmaster_Id = '$SectionMaster_Id' ";
+  $q = "SELECT fee_structure_details.*, fee_structure_master.Fee_Structure_Name,setup_academicyear.abbreviation FROM `fee_structure_details` JOIN fee_structure_master ON fee_structure_master.Id = fee_structure_details.Fee_Structure_Id JOIN setup_academicyear ON setup_academicyear.Id = fee_structure_details.academicYearId WHERE fee_structure_master.sectionmaster_Id = '$SectionMaster_Id' AND  fee_structure_details.academicYearId = '$Acadmic_Year_ID' AND fee_structure_details.Fee_Structure_Id  = '$FS_Id' ";
 
 ?>
 
@@ -13,14 +13,14 @@ $q = "SELECT fee_headermaster.* FROM fee_headermaster  WHERE fee_headermaster.se
 
 <div class="container">
 
-    <div class="row">
-        <div class="col-md-6"><h3 style="font-weight:bold;font-style:italic;" class="font_all"><i class="fa fa-clock-o text-primary" aria-hidden="true"></i> Fee Header Master</h3>
-        </div>   
-    </div>
+        
+<div class="col-md-12"><h4><span class="badge btn btn-primary return_btn"><i class="fa fa-arrow-left"></i></span><i><b> Fee Structure Details Master </b></i></h4></div>
+
+
 
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="headingFive">
                 <h4 class="panel-title">
@@ -35,10 +35,10 @@ $q = "SELECT fee_headermaster.* FROM fee_headermaster  WHERE fee_headermaster.se
                             <thead>
                                 <tr>
                                     <th>Sr No</th>
-                                    <th>Header Name</th>
+                                    <th>Name</th>
                                     <th>Abbreviation</th>
-                                    <th>Type Of Receipt</th>
-                                    
+                                    <th>Payable Date  <br>(DD/MM/YYYY)</th>
+                                    <th>Last Date  <br>(DD/MM/YYYY)</th>       
                                 </tr>
                             </thead>
                             <tbody>
@@ -47,9 +47,10 @@ $q = "SELECT fee_headermaster.* FROM fee_headermaster  WHERE fee_headermaster.se
                                     <td></td>
                                     <td></td>
                                     <td></td>
-                                  
+                                    <td></td>
+                            
+                                        
                                 </tr>
-
 
                             </tbody>
                         </table>
@@ -76,6 +77,7 @@ $q = "SELECT fee_headermaster.* FROM fee_headermaster  WHERE fee_headermaster.se
                     </div>
                     <div class="modal-body" style="padding-bottom:10%">
                         <form id="import_file_form" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="FS_Id" id="FS_Id" value="<?php echo $FS_Id; ?>">
                             <div class="form-group">
                                 <div class="form-group">
                                     <label class="col-md-4 input-md control-label" for="name">Select an excel file </label>
@@ -108,9 +110,11 @@ $q = "SELECT fee_headermaster.* FROM fee_headermaster  WHERE fee_headermaster.se
                     
                     <tr>
                         <th style="width:8%">Sr No.</th>
-                        <th>Header Name</th>
+                        <th>Fee Structure Name</th>
+                        <th>Fee Structure Details Name</th>
                         <th>Abbreviation</th>
-                        <th>Type Of Receipt</th>
+                        <th>Payable Date</th>
+                        <th>Last Date </th>
                         <th>Operations</th>
                     </tr>
                 </thead>
@@ -120,30 +124,35 @@ $q = "SELECT fee_headermaster.* FROM fee_headermaster  WHERE fee_headermaster.se
 
                         <tr>
                             <td><?php echo $i; ?></td>
-                            <td><?php echo $r_instance_fetch['header_name']; ?></td>
-                            <td><?php echo $r_instance_fetch['abbreviation']; ?></td>
-                            <td><?php echo $r_instance_fetch['type_of_receipt']; ?></td>
-                        
+                            <td><?php echo $r_instance_fetch['Fee_Structure_Name']; ?></td>
+                            <td><?php echo $r_instance_fetch['Name']; ?></td>
+                            <td><?php echo $r_instance_fetch['Abbreviation']; ?></td>
+                            <td><?php echo date('d/m/Y',strtotime(str_replace('/','-',$r_instance_fetch['Payable_date']))); ?></td>
+                            <td><?php echo date('d/m/Y',strtotime(str_replace('/','-',$r_instance_fetch['Last_Date']))); ?></td>
+                           
                             <td>
              
                             <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:flex">
                                
-                               
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-default delete_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Delete Header Account" data-toggle="tooltip"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:#ff3547;"></span></button>
-                            </div>
+                                
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-default delete_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Delete Fee Structure Details" data-toggle="tooltip"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:#ff3547;"></span></button>
+                                </div>
 
 
                                 <div class="btn-group" role="group">
-                                    <a><button type="button" class="btn btn-default edit_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Edit Header Account" data-toggle="tooltip"><span class="glyphicon glyphicon-edit" aria-hidden="true" style="color:#33b5e5;"></span></button></a>
+                                    <a><button type="button" class="btn btn-default edit_instance_btn" id="<?php echo $r_instance_fetch['Id']; ?>" data-placement="top" title="Edit Fee Structure Details" data-toggle="tooltip"><span class="glyphicon glyphicon-edit" aria-hidden="true" style="color:#33b5e5;"></span></button></a>
                                 </div>
 
 
                                 
                                 <input type="hidden" value="<?php echo $r_instance_fetch['Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Id">
-                                <input type="hidden"  value="<?php echo $r_instance_fetch['header_name']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_header_name">
-                                <input type="hidden" value="<?php echo $r_instance_fetch['abbreviation']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_abbreviation">
-                                <input type="hidden" value="<?php echo $r_instance_fetch['type_of_receipt']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_type_of_receipt">
+                                <input type="hidden"  value="<?php echo $r_instance_fetch['Fee_Structure_Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Fee_Structure_Id">
+                                <input type="hidden" value="<?php echo $r_instance_fetch['Name']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Name">
+                                <input type="hidden" value="<?php echo $r_instance_fetch['Abbreviation']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Abbreviation">
+                                <input type="hidden" value="<?php echo $r_instance_fetch['Payable_date']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Payable_date">
+                                <input type="hidden" value="<?php echo $r_instance_fetch['Last_Date']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Last_Date">
+                                <input type="hidden" value="<?php echo $r_instance_fetch['academicYearId']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_academicYearId">
                         
                             </div>
 
@@ -170,21 +179,46 @@ $q = "SELECT fee_headermaster.* FROM fee_headermaster  WHERE fee_headermaster.se
                 <div class="panel-heading" role="tab" id="headingOne">
                 <h4 class="panel-title">
                     <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    Add New Fee Header
+                    Add New Fee Structure Details
                     </a>
                 </h4>
                 </div>
                 <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">
                     <div class="form-group">
-                        <label for="email">Select Header Name*  </label>
-                        <input type="text" class="form-control" id="add_header_name" name="add_header_name" placeholder="Enter Header Name">
+                        <label for="email">Select Fee Structure Name*  </label>
+                        <select class="form-control drop_sel" id="add_Fee_Structure_Id" name="add_Fee_Structure_Id"  readonly>
+                        <?php
+                                 $query_de = "SELECT fee_structure_master.* FROM `fee_structure_master` WHERE fee_structure_master.sectionmaster_Id = '$SectionMaster_Id' AND fee_structure_master.Id  = '$FS_Id' ";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['Fee_Structure_Name']."</option>";
+                                 }
+                        ?>
+                         </select>
+                        <br>
+                        <label for="email">Select Fee Structure Details Name*  </label>
+                        <input type="text" class="form-control" id="add_Name" name="add_Name" placeholder="Enter Name">
                         <br>
                         <label for="email">Abbreviation*  </label>
-                        <input type="text" class="form-control" id="add_abbreviation" name="add_abbreviation" placeholder="Enter Account No">
+                        <input type="text" class="form-control" id="add_Abbreviation" name="add_Abbreviation" placeholder="Enter Abbreviation">
                         <br>
-                        <label for="email">Type Of Receipt*  </label>
-                        <input type="text" class="form-control" id="add_type_of_receipt" name="add_type_of_receipt" placeholder="Enter Type Of Receipt">
+                        <label for="email">Payable Date*  </label>
+                        <input type="text" class="form-control" id="add_Payable_date" name="add_Payable_date" placeholder="Enter Payable Date">
+                        <br>
+                        <label for="email">Last Date*  </label>
+                        <input type="text" class="form-control" id="add_Last_Date" name="add_Last_Date" placeholder="Enter Last Date">
+                        <br>
+                        <label for="email">Academic Year*  </label>
+                        <select class="form-control drop_sel" id="add_academicYearId" name="add_academicYearId" readonly>
+                        <?php
+                                 $query_de = "SELECT  setup_academicyear.* FROM `setup_academicyear` WHERE  setup_academicyear.sectionmaster_Id = '$SectionMaster_Id'  AND setup_academicyear.Id ='$Acadmic_Year_ID' ";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['abbreviation']."</option>";
+                                 }
+                        ?>
+                         </select>
                         
                        
                     </div>
@@ -202,7 +236,7 @@ $q = "SELECT fee_headermaster.* FROM fee_headermaster  WHERE fee_headermaster.se
                 <h4 class="panel-title">
                 <button type="button" class="close add_instance"><span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#3c8dbc;"></span></button>
                     <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    Edit Fee Header
+                    Edit Fee Structure Details
                     </a>
                 </h4>
                 </div>
@@ -212,15 +246,40 @@ $q = "SELECT fee_headermaster.* FROM fee_headermaster  WHERE fee_headermaster.se
                     <div class="form-group">
                         <input type="hidden" class="form-control" id="edit_InstanceId" name="edit_InstanceId">
                      
-                        <label for="email">Select Header Name*  </label>
-                        <input type="text" class="form-control" id="edit_header_name" name="edit_header_name" placeholder="Enter Header Name">
+                        <label for="email">Select Fee Structure Name*  </label>
+                        <select class="form-control drop_sel" id="edit_Fee_Structure_Id" name="edit_Fee_Structure_Id" readonly>
+                        <?php
+                                 $query_de = "SELECT fee_structure_master.* FROM `fee_structure_master` WHERE fee_structure_master.sectionmaster_Id = '$SectionMaster_Id' AND fee_structure_master.Id  = '$FS_Id'";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['Fee_Structure_Name']."</option>";
+                                 }
+                        ?>
+                         </select>
+                        <br>
+                        <label for="email">Select Fee Structure Details Name*  </label>
+                        <input type="text" class="form-control" id="edit_Name" name="edit_Name" placeholder="Enter Name">
                         <br>
                         <label for="email">Abbreviation*  </label>
-                        <input type="text" class="form-control" id="edit_abbreviation" name="edit_abbreviation" placeholder="Enter Abbreviation" required>
+                        <input type="text" class="form-control" id="edit_Abbreviation" name="edit_Abbreviation" placeholder="Enter Abbreviation">
                         <br>
-                        <label for="email">Type Of Receipt*  </label>
-                        <input type="text" class="form-control" id="edit_type_of_receipt" name="edit_type_of_receipt" placeholder="Enter Type Of Receipt" required>
-                       
+                        <label for="email">Payable Date*  </label>
+                        <input type="text" class="form-control" id="edit_Payable_date" name="edit_Payable_date" placeholder="Enter Payable Date">
+                        <br>
+                        <label for="email">Last Date*  </label>
+                        <input type="text" class="form-control" id="edit_Last_Date" name="edit_Last_Date" placeholder="Enter Last Date">
+                        <br>
+                        <label for="email">Academic Year*  </label>
+                        <select class="form-control drop_sel" id="edit_academicYearId" name="edit_academicYearId" readonly  >
+                        <?php
+                                 $query_de = "SELECT  setup_academicyear.* FROM `setup_academicyear` WHERE  setup_academicyear.sectionmaster_Id = '$SectionMaster_Id'  AND setup_academicyear.Id ='$Acadmic_Year_ID'";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['abbreviation']."</option>";
+                                 }
+                        ?>
+                         </select>
+                        
                     </div>
                 </div>
                 </form>
@@ -246,6 +305,26 @@ $q = "SELECT fee_headermaster.* FROM fee_headermaster  WHERE fee_headermaster.se
 
 
 
+$('#add_Payable_date').datepicker({
+    format: 'dd/mm/yyyy',
+    autoclose: true
+});
+
+$('#add_Last_Date').datepicker({
+    format: 'dd/mm/yyyy',
+    autoclose: true
+});
+
+
+$('#edit_Payable_date').datepicker({
+    format: 'dd/mm/yyyy',
+    autoclose: true
+});
+
+$('#edit_Last_Date').datepicker({
+    format: 'dd/mm/yyyy',
+    autoclose: true
+});
 $('div').removeClass("modal-backdrop");
 $('.InstanceCreate_Model').collapse('show');
 $('.EventSelect_Model').hide();
@@ -257,6 +336,26 @@ $('.add_instance').click(function(event){
     $('.InstanceCreate_Model').collapse('show');
 
 });
+
+
+
+
+$('.return_btn').click(function (event) {
+    event.preventDefault();
+    $("#loader").css("display", "block");
+    $("#DisplayDiv").css("display", "none");
+    $.ajax({
+      url: './setup/fee_structure_master.php',
+      type: 'GET',
+      success: function (response) {
+        $('#DisplayDiv').html(response);
+        $("#loader").css("display", "none");
+        $("#DisplayDiv").css("display", "block");
+      },
+    });
+  });
+
+
 
 
 
@@ -280,16 +379,21 @@ $('.edit_instance_btn').click(function(event){
 
 
     var fetch_Edited_Id = createURL.searchParams.get('fetch_edit_Id');
-    var fetch_Edited_header_name = createURL.searchParams.get('fetch_edit_header_name');
-    var fetch_Edited_abbreviation = createURL.searchParams.get('fetch_edit_abbreviation');
-    var fetch_Edited_type_of_receipt = createURL.searchParams.get('fetch_edit_type_of_receipt');
+    var fetch_Edited_Fee_Structure_Id = createURL.searchParams.get('fetch_edit_Fee_Structure_Id');
+    var fetch_Edited_Name = createURL.searchParams.get('fetch_edit_Name');
+    var fetch_Edited_Abbreviation = createURL.searchParams.get('fetch_edit_Abbreviation');
+    var fetch_Edited_Payable_date = createURL.searchParams.get('fetch_edit_Payable_date');
+    var fetch_Edited_Last_Date = createURL.searchParams.get('fetch_edit_Last_Date');
+    var fetch_Edited_academicYearId = createURL.searchParams.get('fetch_edit_academicYearId');
 
     //Assign Value To Editable Compoents
     $('#edit_InstanceId').val(fetch_Edited_Id);
-    $('#edit_header_name').val(fetch_Edited_header_name);
-    $('#edit_abbreviation').val(fetch_Edited_abbreviation);
-    $('#edit_type_of_receipt').val(fetch_Edited_type_of_receipt);
-
+    $('#edit_Fee_Structure_Id').val(fetch_Edited_Fee_Structure_Id);
+    $('#edit_Name').val(fetch_Edited_Name);
+    $('#edit_Abbreviation').val(fetch_Edited_Abbreviation);
+    $('#edit_Payable_date').val(fetch_Edited_Payable_date);
+    $('#edit_Last_Date').val(fetch_Edited_Last_Date);
+    $('#edit_academicYearId').val(fetch_Edited_academicYearId);
 });
 //Instance Edit Close----------------------------------------------------------------------------------------------------
 
@@ -304,24 +408,26 @@ var EditData = $('#Edit_FormData').serializeArray();
 
 $("#loader").css("display", "block");
 $("#DisplayDiv").css("display", "none");
+var FS_Id = $('#FS_Id').val();
 
 $.ajax({
-    url:'./superadmin/superadmin_api.php?Edit_FeeHeaderInstance='+'u',
+    url:'./setup/setup_api.php?Edit_FeeDetailsStructureInstance='+'u',
     type:'POST',
     data: EditData,
     dataType: "json",
     success:function(edit_instance_res){  
         if(edit_instance_res == '200'){
             $.ajax({
-                url:'./superadmin/fee_headermaster.php',
+                url:'./setup/fee_structure_details.php',
                 type:'GET',
+                data: {FS_Id:FS_Id},
                 success:function(sd_logs){
                     $('#DisplayDiv').html(sd_logs);
                     $("#loader").css("display", "none");
                     $("#DisplayDiv").css("display", "block");
                     iziToast.success({
                         title: 'Success',
-                        message: 'Fee Header Edited',
+                        message: 'Fee Structure Details Edited',
                     });
                 },
             });   
@@ -329,8 +435,9 @@ $.ajax({
         }else{
 
             $.ajax({
-                url:'./superadmin/fee_headermaster.php',
+                url:'./setup/fee_structure_details.php',
                 type:'GET',
+                data: {FS_Id:FS_Id},
                 success:function(sd_logs){
                     $('#DisplayDiv').html(sd_logs);
                     $("#loader").css("display", "none");
@@ -354,24 +461,26 @@ $.ajax({
 //Instance Delete----------------------------------------------------------------------------------------------------
 $('.delete_instance_btn').click(function(event){
     var delete_instance_Id = $(this).attr('id');
+    var FS_Id = $('#FS_Id').val();
     if (confirm('Are you sure you want to Delete Existing bank?')) {
         $.ajax({
-            url:'./superadmin/superadmin_api.php?Delete_FeeHeaderInstance='+'u',
+            url:'./setup/setup_api.php?Delete_FeeDetailsStructureInstance='+'u',
             type: 'POST',
             data: {delete_instance_Id:delete_instance_Id},
             success:function(del_msg){
                 if(del_msg == '200'){
                     
                     $.ajax({
-                        url:'./superadmin/fee_headermaster.php',
+                        url:'./setup/fee_structure_details.php',
                         type:'GET',
+                        data: {FS_Id:FS_Id},
                         success:function(st_logs){
                             $('#DisplayDiv').html(st_logs);
                             $("#loader").css("display", "none");
                             $("#DisplayDiv").css("display", "block");
                             iziToast.success({
                                 title: 'Success',
-                                message: 'Fee Header Deleted',
+                                message: 'Fee Structure Details Deleted',
                             });
                         },
                     });   
@@ -388,12 +497,16 @@ $('.delete_instance_btn').click(function(event){
 //INSTANCE ADD-----------------------------------------------------------------------------------------------------------
 
 $('#submit_addinstance').click(function(event){
-   var add_header_name = $('#add_header_name').val();
-   var add_abbreviation = $('#add_abbreviation').val();
-   var add_type_of_receipt = $('#add_type_of_receipt').val();
+   var add_Fee_Structure_Id = $('#add_Fee_Structure_Id').val();
+   var add_Name = $('#add_Name').val();
+   var add_Abbreviation = $('#add_Abbreviation').val();
+   var add_Payable_date = $('#add_Payable_date').val();
+   var add_Last_Date = $('#add_Last_Date').val();
+   var add_academicYearId = $('#add_academicYearId').val();
 
+   var FS_Id = $('#FS_Id').val();
 
-    if(add_header_name == '' || add_abbreviation == '' || add_type_of_receipt == ''){
+    if(add_Fee_Structure_Id == '' || add_Name == '' || add_Abbreviation == '' || add_Payable_date == '' || add_Last_Date == '' || add_academicYearId == ''){
         iziToast.warning({
             title: 'Empty Fields',
             message: 'All fields is mandatory',
@@ -405,23 +518,24 @@ $('#submit_addinstance').click(function(event){
     $("#DisplayDiv").css("display", "none");
 
     $.ajax({
-        url:'./superadmin/superadmin_api.php?Add_FeeHeaderInstance='+'u',
+        url:'./setup/setup_api.php?Add_FeeDetailsStructureInstance='+'u',
         type:'POST',
-        data: {add_header_name:add_header_name, add_abbreviation:add_abbreviation, add_type_of_receipt:add_type_of_receipt},
+        data: {add_Fee_Structure_Id:add_Fee_Structure_Id, add_Name:add_Name, add_Abbreviation:add_Abbreviation, add_Payable_date:add_Payable_date, add_Last_Date:add_Last_Date, add_academicYearId:add_academicYearId},
         dataType: "json",
         success:function(add_instance_res){  
             console.log(add_instance_res['success']);
             if(add_instance_res['status'] == 'success'){
                 $.ajax({
-                    url:'./superadmin/fee_headermaster.php',
+                    url:'./setup/fee_structure_details.php',
                     type:'GET',
+                    data: {FS_Id:FS_Id},
                     success:function(st_logs){
                         $('#DisplayDiv').html(st_logs);
                         $("#loader").css("display", "none");
                         $("#DisplayDiv").css("display", "block");
                         iziToast.success({
                             title: 'Success',
-                            message: 'Fee Header Added',
+                            message: 'Fee Structure Details Added',
                         });
                     },
                 });   
@@ -432,7 +546,7 @@ $('#submit_addinstance').click(function(event){
                         $("#DisplayDiv").css("display", "block");
                         iziToast.error({
                             title: 'Duplicate',
-                            message: 'Fee Header Already Exist',
+                            message: 'Fee Structure Details Already Exist',
                         });
             }
 
@@ -478,12 +592,12 @@ $('#import_file_submit').on('click', function(event){
     $('#contact_dialog').modal('hide');
     let form = $('#import_file_form')[0];
     let data = new FormData(form);
-
+    var FS_Id = $('#FS_Id').val();
     setTimeout(function(){
         $("#loader").css("display", "block");
         $("#DisplayDiv").css("display", "none");
         jQuery.ajax({
-            url: './superadmin/superadmin_api.php?Add_FeeHeaderInstance_InBulk=u',
+            url: './setup/setup_api.php?Add_FeeDetailsStructureInstance_InBulk=u',
             type: 'POST',
             enctype: 'multipart/form-data',
             processData: false,  // Important!
@@ -508,8 +622,9 @@ $('#import_file_submit').on('click', function(event){
 
 
 					jQuery.ajax({
-						url: './superadmin/fee_headermaster.php',
+						url: './setup/fee_structure_details.php',
 						type: "GET",
+                        data: {FS_Id:FS_Id},
 						success:function(data){
 							$('#DisplayDiv').html(data);
 							$("#loader").css("display", "none");
