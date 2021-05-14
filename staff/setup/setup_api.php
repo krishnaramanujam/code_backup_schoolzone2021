@@ -2741,9 +2741,9 @@ if(isset($_GET['Add_FeeDetailsStructureInstance'])){
     $LD = date('Y-m-d',strtotime(str_replace('/','-',$add_Last_Date)));
   
     $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into fee_structure_details
-    (Fee_Structure_Id, Name, Abbreviation, Payable_date, Last_Date, academicYearId) 
+    (Fee_Structure_Id, Name, Abbreviation, Payable_date, Last_Date, academicYearId, proportion) 
     Values
-    ('$add_Fee_Structure_Id', '".htmlspecialchars($add_Name, ENT_QUOTES)."', '".htmlspecialchars($add_Abbreviation, ENT_QUOTES)."', '".htmlspecialchars($PAD, ENT_QUOTES)."', '".htmlspecialchars($LD, ENT_QUOTES)."', '$add_academicYearId')");
+    ('$add_Fee_Structure_Id', '".htmlspecialchars($add_Name, ENT_QUOTES)."', '".htmlspecialchars($add_Abbreviation, ENT_QUOTES)."', '".htmlspecialchars($PAD, ENT_QUOTES)."', '".htmlspecialchars($LD, ENT_QUOTES)."', '$add_academicYearId', '$add_proportion')");
 
     
     $res['status'] = 'success';
@@ -2768,7 +2768,8 @@ if(isset($_GET['Edit_FeeDetailsStructureInstance'])){
     Abbreviation='".htmlspecialchars($edit_Abbreviation, ENT_QUOTES)."',
     Payable_date='".htmlspecialchars($PAD, ENT_QUOTES)."',
     Last_Date='".htmlspecialchars($LD, ENT_QUOTES)."',
-    academicYearId='".htmlspecialchars($edit_academicYearId, ENT_QUOTES)."'
+    academicYearId='".htmlspecialchars($edit_academicYearId, ENT_QUOTES)."',
+    proportion='".htmlspecialchars($edit_proportion, ENT_QUOTES)."'
     where Id  = '$edit_InstanceId'");
 
     echo "200";
@@ -2812,7 +2813,7 @@ if(isset($_GET['Add_FeeDetailsStructureInstance_InBulk'])){
     $writer->openToFile($fileName); // write data to a file or to a PHP stream
     // $writer->openToBrowser($fileName); // stream data directly to the browser
 
-    $singleRow =['Sr No','Name','Abbreviation','Payable Date','Last Date','Upload Status'];
+    $singleRow =['Sr No','Name','Abbreviation','Payable Date','Last Date','Proportion','Upload Status'];
     $writer->addRow($singleRow); // add a row at a time
 
 
@@ -2849,7 +2850,7 @@ if(isset($_GET['Add_FeeDetailsStructureInstance_InBulk'])){
             $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into fee_structure_details
             (Fee_Structure_Id, Name, Abbreviation, Payable_date, Last_Date, academicYearId) 
             Values
-            ('$FS_Id', '".htmlspecialchars($row[1], ENT_QUOTES)."', '".htmlspecialchars($row[2], ENT_QUOTES)."', '".$row[3]->format('Y-m-d')."' , '".$row[4]->format('Y-m-d')."' , '$Acadmic_Year_ID')");
+            ('$FS_Id', '".htmlspecialchars($row[1], ENT_QUOTES)."', '".htmlspecialchars($row[2], ENT_QUOTES)."', '".$row[3]->format('Y-m-d')."' , '".$row[4]->format('Y-m-d')."' , '$Acadmic_Year_ID', '$row[5]')");
 
 
 
@@ -2864,7 +2865,7 @@ if(isset($_GET['Add_FeeDetailsStructureInstance_InBulk'])){
  
 
         $multipleRows=[
-            [$row[0],$row[1],$row[2],$row[3]->format('Y-m-d'),$row[4]->format('Y-m-d'),$uploadMessage],
+            [$row[0],$row[1],$row[2],$row[3]->format('Y-m-d'),$row[4]->format('Y-m-d'),$row[5],$uploadMessage],
         ];
         $writer->addRows($multipleRows); // add multiple rows at a time
 

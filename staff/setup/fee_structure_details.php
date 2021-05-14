@@ -38,11 +38,13 @@ include_once '../../config/database.php';
                                     <th>Name</th>
                                     <th>Abbreviation</th>
                                     <th>Payable Date  <br>(DD/MM/YYYY)</th>
-                                    <th>Last Date  <br>(DD/MM/YYYY)</th>       
+                                    <th>Last Date  <br>(DD/MM/YYYY)</th> 
+                                    <th>Proportion</th>      
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -115,6 +117,7 @@ include_once '../../config/database.php';
                         <th>Abbreviation</th>
                         <th>Payable Date</th>
                         <th>Last Date </th>
+                        <th>Proportion</th>
                         <th>Operations</th>
                     </tr>
                 </thead>
@@ -129,7 +132,7 @@ include_once '../../config/database.php';
                             <td><?php echo $r_instance_fetch['Abbreviation']; ?></td>
                             <td><?php echo date('d/m/Y',strtotime(str_replace('/','-',$r_instance_fetch['Payable_date']))); ?></td>
                             <td><?php echo date('d/m/Y',strtotime(str_replace('/','-',$r_instance_fetch['Last_Date']))); ?></td>
-                           
+                            <td><?php echo $r_instance_fetch['proportion']; ?></td>
                             <td>
              
                             <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:flex">
@@ -153,6 +156,7 @@ include_once '../../config/database.php';
                                 <input type="hidden" value="<?php echo $r_instance_fetch['Payable_date']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Payable_date">
                                 <input type="hidden" value="<?php echo $r_instance_fetch['Last_Date']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Last_Date">
                                 <input type="hidden" value="<?php echo $r_instance_fetch['academicYearId']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_academicYearId">
+                                <input type="hidden" value="<?php echo $r_instance_fetch['proportion']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_proportion">
                         
                             </div>
 
@@ -208,6 +212,9 @@ include_once '../../config/database.php';
                         <br>
                         <label for="email">Last Date*  </label>
                         <input type="text" class="form-control" id="add_Last_Date" name="add_Last_Date" placeholder="Enter Last Date">
+                        <br>
+                        <label for="email">Proportion*  </label>
+                        <input type="text" class="form-control" id="add_proportion" name="add_proportion" placeholder="Enter Proportion" onkeypress="return isNumber(event)">
                         <br>
                         <label for="email">Academic Year*  </label>
                         <select class="form-control drop_sel" id="add_academicYearId" name="add_academicYearId" readonly>
@@ -268,6 +275,9 @@ include_once '../../config/database.php';
                         <br>
                         <label for="email">Last Date*  </label>
                         <input type="text" class="form-control" id="edit_Last_Date" name="edit_Last_Date" placeholder="Enter Last Date">
+                        <br>
+                        <label for="email">Proportion*  </label>
+                        <input type="text" class="form-control" id="edit_proportion" name="edit_proportion" placeholder="Enter Proportion" onkeypress="return isNumber(event)">
                         <br>
                         <label for="email">Academic Year*  </label>
                         <select class="form-control drop_sel" id="edit_academicYearId" name="edit_academicYearId" readonly  >
@@ -385,6 +395,7 @@ $('.edit_instance_btn').click(function(event){
     var fetch_Edited_Payable_date = createURL.searchParams.get('fetch_edit_Payable_date');
     var fetch_Edited_Last_Date = createURL.searchParams.get('fetch_edit_Last_Date');
     var fetch_Edited_academicYearId = createURL.searchParams.get('fetch_edit_academicYearId');
+    var fetch_Edited_proportion = createURL.searchParams.get('fetch_edit_proportion');
 
     //Assign Value To Editable Compoents
     $('#edit_InstanceId').val(fetch_Edited_Id);
@@ -394,6 +405,7 @@ $('.edit_instance_btn').click(function(event){
     $('#edit_Payable_date').val(fetch_Edited_Payable_date);
     $('#edit_Last_Date').val(fetch_Edited_Last_Date);
     $('#edit_academicYearId').val(fetch_Edited_academicYearId);
+    $('#edit_proportion').val(fetch_Edited_proportion);
 });
 //Instance Edit Close----------------------------------------------------------------------------------------------------
 
@@ -503,10 +515,10 @@ $('#submit_addinstance').click(function(event){
    var add_Payable_date = $('#add_Payable_date').val();
    var add_Last_Date = $('#add_Last_Date').val();
    var add_academicYearId = $('#add_academicYearId').val();
-
+   var add_proportion = $('#add_proportion').val();
    var FS_Id = $('#FS_Id').val();
 
-    if(add_Fee_Structure_Id == '' || add_Name == '' || add_Abbreviation == '' || add_Payable_date == '' || add_Last_Date == '' || add_academicYearId == ''){
+    if(add_Fee_Structure_Id == '' || add_Name == '' || add_Abbreviation == '' || add_Payable_date == '' || add_Last_Date == '' || add_academicYearId == '' || add_proportion == ''){
         iziToast.warning({
             title: 'Empty Fields',
             message: 'All fields is mandatory',
@@ -520,7 +532,7 @@ $('#submit_addinstance').click(function(event){
     $.ajax({
         url:'./setup/setup_api.php?Add_FeeDetailsStructureInstance='+'u',
         type:'POST',
-        data: {add_Fee_Structure_Id:add_Fee_Structure_Id, add_Name:add_Name, add_Abbreviation:add_Abbreviation, add_Payable_date:add_Payable_date, add_Last_Date:add_Last_Date, add_academicYearId:add_academicYearId},
+        data: {add_Fee_Structure_Id:add_Fee_Structure_Id, add_Name:add_Name, add_Abbreviation:add_Abbreviation, add_Payable_date:add_Payable_date, add_Last_Date:add_Last_Date, add_academicYearId:add_academicYearId, add_proportion:add_proportion},
         dataType: "json",
         success:function(add_instance_res){  
             console.log(add_instance_res['success']);
@@ -556,6 +568,14 @@ $('#submit_addinstance').click(function(event){
 });
 
 //Instance Add Close----------------------------------------------------------------------------------------------------
+function isNumber(evt) {
+    evt = (evt) ? evt : window.event;
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false;
+    }
+    return true;
+}
 
 $('#InstanceMaster_Table').DataTable( {
     dom: 'Bifrtp',
