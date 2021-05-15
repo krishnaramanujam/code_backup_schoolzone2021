@@ -10,6 +10,9 @@ include_once '../../config/database.php';
 
 <div class="container">
 
+    <div class="row">
+        <div class="col-md-11"><h3 style="font-weight:bold;font-style:italic;" class="font_all"><i class="fa fa-clock-o text-primary" aria-hidden="true"></i>Batchwise Fee Allocation Status</h3></div>   
+    </div>
 
     <div class="col-md-12"><h4><i><b>Fee Allocation for Existing Student</b></i></h4></div>
 
@@ -64,6 +67,21 @@ include_once '../../config/database.php';
 
         $batch_sel = $_GET['batch_sel'];
 
+        $feeentrys_fetch_q = mysqli_query($mysqli," SELECT fee_feemaster.*, fee_headermaster.header_name FROM `fee_feemaster` JOIN fee_headermaster ON fee_headermaster.Id = fee_feemaster.feeheader_Id WHERE fee_feemaster.sectionmaster_Id = '$SectionMaster_Id' AND fee_feemaster.batchmaster_Id = '$batch_sel' ");
+        $row_fee_master_count = mysqli_num_rows($feeentrys_fetch_q);
+        if($row_fee_master_count > 0){
+            $FM_Arr = [];
+            while($r_feeentry_fetch = mysqli_fetch_array($feeentrys_fetch_q)){ 
+                $new_arrays = array(
+                    'FM_Id' => $r_feeentry_fetch['Id'],
+                    'FM_headername' => $r_feeentry_fetch['header_name']
+                );  
+                array_push($FM_Arr, $new_arrays);
+                
+            }// close while
+        }
+    
+
 ?>
 
 <div class="row">
@@ -75,54 +93,40 @@ include_once '../../config/database.php';
          <form id="StudentListForm">
          <input type="hidden" name="return_batch_sel" id="batch_sel" class="form-control" value="<?php echo $batch_sel; ?>">
 
-         <input type="hidden" name="selected_SBM_Id" id="selected_SBM_Id" class="form-control">
-
          <table class="table table-striped" id="InstanceMaster_Table">
              <thead>
-                 <tr><th>Sr No.</th><th style="text-align:left;">Student Name</th><th>Student Id</th><th>Status</th> <th>Operation  <br> <input type="checkbox" class="subcheck" id="check"></th> <th>Edit Details</th></tr>
+                 <tr><th>Sr No.</th><th style="text-align:left;">Student Name</th>
+                 
+                 <?php
+                    if(isset($FM_Arr)){ 
+                    foreach ( $FM_Arr as $FM_Arr_header ) { ?>
+                        <th><?php echo $FM_Arr_header['FM_headername']; ?></th> 
+                 <?php } }?>
+                 
+                 </tr>
              </thead>
              <tbody>
-                 <?php  $instance_fetch_q = mysqli_query($mysqli,"Select user_studentregister.student_name, user_studentregister.student_Id, CASE WHEN user_studentbatchmaster.fee_allocation_status = 1 THEN 'Fee Allocated' WHEN user_studentbatchmaster.fee_allocation_status = 0 THEN 'Fee Not Allocated' ELSE 'NA' END AS fee_allocation_status_txt, user_studentbatchmaster.fee_allocation_status, user_studentbatchmaster.Id As SBM_Id FROM user_studentbatchmaster JOIN user_studentregister ON user_studentregister.SBM_Id = user_studentbatchmaster.Id WHERE user_studentbatchmaster.batchMaster_Id = '$batch_sel'  ");
+                 <?php  $instance_fetch_q = mysqli_query($mysqli,"Select user_studentregister.student_name, user_studentregister.student_Id,  user_studentbatchmaster.Id As SBM_Id FROM user_studentbatchmaster JOIN user_studentregister ON user_studentregister.SBM_Id = user_studentbatchmaster.Id WHERE user_studentbatchmaster.batchMaster_Id = '$batch_sel'  ");
                  $i = 1; while($r_instance_fetch = mysqli_fetch_array($instance_fetch_q)){  ?>
                      <tr> 
                          <td style="width:10%"><?php echo $i; ?></td>
                          <td style="width:15%;text-align:left;"><?php echo $r_instance_fetch['student_name']; ?></td>
-                         <td><?php echo $r_instance_fetch['student_Id']; ?></td>
-                         <td><?php echo $r_instance_fetch['fee_allocation_status_txt']; ?></td>
-                         <td>
                          
-                          
-                         <div class="pretty p-icon p-smooth 
-                          
-                          <?php if(!empty($r_instance_fetch['fee_allocation_status'])){ echo 'hidden';  } ?>">
-
-                                  <input type="checkbox" class="subcheck sel_box" id="check<?php echo $r_instance_fetch['SBM_Id']; ?>" name="SBM_Id[]" value="<?php echo $r_instance_fetch['SBM_Id']; ?>" >
-                                      <div class="state p-success">
-                                          <i class="icon fa fa-check"></i>
-                                          <label></label>
-                                      </div>
-                          </div> 
-                        
-                          
-
-                         </td>
-
-                         <td>
-                            <?php if($r_instance_fetch['fee_allocation_status'] == '1'){ ?>
-                                <div class="btn-group" role="group">
-                                    <a><button type="button" class="btn btn-default edit_instance_btn" id="<?php echo $r_instance_fetch['SBM_Id']; ?>" data-placement="top" title="Edit Receipts Details" data-toggle="tooltip"><span class="glyphicon glyphicon-edit" aria-hidden="true" style="color:#33b5e5;"></span></button></a>
-                                </div>
-                            <?php } ?>
-                         </td>
-
+                         <?php 
+                         if(isset($FM_Arr)){ 
+                            foreach ( $FM_Arr as $FM_Arr_header ) { ?>
+                            <?php 
+                             $receiptdetails_q = mysqli_query($mysqli," SELECT IF(SUM(fee_receiptsdetails.amount) IS NULL, 0, SUM(fee_receiptsdetails.amount)) As fee_amt FROM `fee_receiptsdetails`  WHERE fee_receiptsdetails.SBM_Id = '$r_instance_fetch[SBM_Id]' AND fee_receiptsdetails.feemaster_Id = '$FM_Arr_header[FM_Id]' ");
+                             $r_receiptdetails = mysqli_fetch_array($receiptdetails_q);
+                            ?>
+                            <td><?php echo $r_receiptdetails['fee_amt']; ?></td>
+                            <?php } } ?>
                      </tr>
                  <?php $i++; } ?>
 
              </tbody>
          </table>
-        <div class="panel-footer" style="text-align: center;"> 
-            <button type="button" class="btn btn-primary" id="save_student_list">Submit</button>
-        </div>
+  
          </form>
      </div> <!--Col Close-->
 
@@ -156,15 +160,13 @@ $('#FilterForm').submit(function(e){
     $("#DisplayDiv").css("display", "none");
     
     $.ajax({
-        url:'./fee_management/fee_allocation_existing.php?Generate_View='+'u',
+        url:'./fee_management/batchwise_fee_allocation_status.php?Generate_View='+'u',
         type:'GET',
         data: {batch_sel:batch_sel},
         success:function(srh_response){
             $('#DisplayDiv').html(srh_response);
             $("#loader").css("display", "none");
             $("#DisplayDiv").css("display", "block");
-
-            $('#add_batchmasterid').val(batch_sel);
             
         },
    });
@@ -174,81 +176,33 @@ $('#FilterForm').submit(function(e){
 });
 
 
-$('#save_student_list').click(function (e) {
-    e.preventDefault();
 
-    var newSelectResult = '';
-    $('.sel_box:checked').each(function () {
-        var status = (this.checked ? $(this).val() : "");
-        var id = $(this).attr("id");
-        newSelectResult = newSelectResult.concat( status , ",");
-    });
-
-
-    if(newSelectResult == ''){
-        alert('Please select Checkbox');
-        return false;
+$('#InstanceMaster_Table').DataTable( {
+    dom: 'Bifrtp',
+    bPaginate:false,
+    
+    buttons: [
+    {
+        extend: 'excel',
+        footer: true,
+		title: "Download Format",
+		text: 'Download Format',
+        exportOptions : {
+            columns : ':visible',
+            format : {
+                header : function (mDataProp, columnIdx) {
+            var htmlText = '<span>' + mDataProp + '</span>';
+            var jHtmlObject = jQuery(htmlText);
+            jHtmlObject.find('div').remove();
+            var newHtml = jHtmlObject.text();
+            console.log('My header > ' + newHtml);
+            return newHtml;
+                }
+            }
+        }
     }
-
-    var selected_SBM_Id = newSelectResult.slice(0, -1);
-
-    $('#selected_SBM_Id').val(selected_SBM_Id);
-
-    var data = $('#StudentListForm').serializeArray();
-
-    $("#loader").css("display", "block");
-        $("#DisplayDiv").css("display", "none");
-        $.ajax({
-            url:'./fee_management/fee_allocation_existing_save_students.php',
-            type:'POST',
-            data: data,
-            success:function(res){ 
-                $('#DisplayDiv').html(res);
-                $("#loader").css("display", "none");
-                $("#DisplayDiv").css("display", "block");
-            }, 
-        });//close ajax
-
-});
-
-//Model Always Show
-$('div').removeClass("modal-backdrop");
-$('.InstanceCreate_Model').collapse('show');
-$('.EventSelect_Model').hide();
-
-
-$('.add_instance').click(function(event){
-
-    $('.EventSelect_Model').hide();
-    $('.InstanceCreate_Model').collapse('show');
-
-});
-
-
-//INSTANCE ADD-----------------------------------------------------------------------------------------------------------
-
-
-//Manage Instance Btn----------------------------------------------------------------------------------------------------------
-$('.edit_instance_btn').click(function(event){
-    var selected_instance_Id = $(this).attr('id');
-    var batch_sel = $('#batch_sel').val();
-
-    $("#loader").css("display", "block");
-    $("#DisplayDiv").css("display", "none");
-
-    $.ajax({
-        url:'./fee_management/fee_allocation_existing_save_students_edit.php',
-        type:'POST',
-        data: {selected_SBM_Id: selected_instance_Id, return_batch_sel:batch_sel},
-        success:function(si_logs){
-            $('#DisplayDiv').html(si_logs);
-            $("#loader").css("display", "none");
-            $("#DisplayDiv").css("display", "block");
-        },
-    });  
-
-});
-//Manage Instance Btn close----------------------------------------------------------------------------------------------------------
+    ]
+} );
 
 </script>
 

@@ -70,7 +70,7 @@ include_once '../../config/database.php';
 
 
 <div class="row">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="headingFive">
                 <h4 class="panel-title">
@@ -92,7 +92,7 @@ include_once '../../config/database.php';
                                     <th>Amount</th>
                                     <th>Fee Structure No</th>
                                     <th>Bank Account No</th>
-                                    <th></th>
+                                    <th>Fee Header Type No</th>
                                     <th>Please remove the below data before importing:</th>
                                     <th>Please remove the below data before importing:</th>
                                 </tr>
@@ -182,6 +182,57 @@ include_once '../../config/database.php';
                                     <th></th>
                                     <td><?php echo $run_d['Id']; ?></td>
                                     <td><?php echo $run_d['abbreviation']; ?></td>
+                                   </tr>
+
+                                 
+                                 <?php
+                                 }
+                            ?>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <th></th>
+                                <th></th>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <th></th>
+                                <th></th>
+                                <td>Fee Header Type No</td>
+                                <td>Fee Header Type Name</td>
+                            </tr>
+
+                            <?php
+                                 $query_de = "SELECT fee_headertype.* FROM `fee_headertype`";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){  ?>
+
+                                   <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <th></th>
+                                    <td><?php echo $run_d['Id']; ?></td>
+                                    <td><?php echo $run_d['headertype_name']; ?></td>
                                    </tr>
 
                                  
@@ -413,6 +464,20 @@ include_once '../../config/database.php';
 
                      </select>
                     
+                     <br>
+                     <label for="email">Select Header Type*  </label>
+                     <select class="form-control drop_sel" id="add_feeheadertype_Id" name="add_feeheadertype_Id">
+                     <option value="">Select</option>
+                         <?php
+                                 $query_de = "SELECT fee_headertype.* FROM `fee_headertype` ";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['headertype_name']."</option>";
+                                 }
+                         ?>
+
+                     </select>
+                    
                  </div>
              </div>
              <div class="panel-footer">
@@ -512,6 +577,20 @@ include_once '../../config/database.php';
                          ?>
 
                      </select>
+
+                     <br>
+                     <label for="email">Select Header Type*  </label>
+                     <select class="form-control drop_sel" id="edit_feeheadertype_Id" name="edit_feeheadertype_Id">
+        
+                         <?php
+                                 $query_de = "SELECT fee_headertype.* FROM `fee_headertype` ";
+                                 $run_de = mysqli_query($mysqli,$query_de);
+                                 while($run_d = mysqli_fetch_array($run_de)){ 
+                                     echo "<option value=".$run_d['Id'].">".$run_d['headertype_name']."</option>";
+                                 }
+                         ?>
+
+                     </select>
                     
                  </div>
              </div>
@@ -593,11 +672,11 @@ $('#submit_addinstance').click(function(event){
    var add_batchmasterid = $('#add_batchmasterid').val();
    
    var add_bankaccountmaster_Id = $('#add_bankaccountmaster_Id').val();
-
+   var add_feeheadertype_Id = $('#add_feeheadertype_Id').val();
    var batch_sel = $('#batch_sel').val();
 
 
-    if(add_feeheader_Id == '' || add_Gender == '' || add_applicable_to == '' || add_freeship == '' || add_Amount == ''|| add_feestructure_Id == '' || add_batchmasterid == '' || add_bankaccountmaster_Id == ''){
+    if(add_feeheader_Id == '' || add_Gender == '' || add_applicable_to == '' || add_freeship == '' || add_Amount == ''|| add_feestructure_Id == '' || add_batchmasterid == '' || add_bankaccountmaster_Id == '' || add_feeheadertype_Id == ''){
         iziToast.warning({
             title: 'Empty Fields',
             message: 'All fields is mandatory',
@@ -611,7 +690,7 @@ $('#submit_addinstance').click(function(event){
     $.ajax({
         url:'./fee_management/fee_management_api.php?Add_FeeMasterInstance='+'u',
         type:'POST',
-        data: {add_feeheader_Id:add_feeheader_Id,add_Gender:add_Gender,add_applicable_to:add_applicable_to, add_freeship:add_freeship, add_Amount:add_Amount, add_feestructure_Id:add_feestructure_Id, add_batchmasterid:add_batchmasterid, add_bankaccountmaster_Id:add_bankaccountmaster_Id},
+        data: {add_feeheader_Id:add_feeheader_Id,add_Gender:add_Gender,add_applicable_to:add_applicable_to, add_freeship:add_freeship, add_Amount:add_Amount, add_feestructure_Id:add_feestructure_Id, add_batchmasterid:add_batchmasterid, add_bankaccountmaster_Id:add_bankaccountmaster_Id, add_feeheadertype_Id:add_feeheadertype_Id},
         dataType: "json",
         success:function(add_instance_res){  
             if(add_instance_res['status'] == 'success'){

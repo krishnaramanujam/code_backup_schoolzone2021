@@ -22,9 +22,9 @@ if(isset($_GET['Add_FeeMasterInstance'])){
     $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
 
     $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into fee_feemaster
-    (sectionmaster_Id, feeheader_Id, Gender, applicable_to, freeship, Amount, feestructure_Id, batchmaster_Id, bankaccountmaster_Id) 
+    (sectionmaster_Id, feeheader_Id, Gender, applicable_to, freeship, Amount, feestructure_Id, batchmaster_Id, bankaccountmaster_Id, feeheadertype_Id) 
     Values
-    ('$SectionMaster_Id', '".htmlspecialchars($add_feeheader_Id, ENT_QUOTES)."', '".htmlspecialchars($add_Gender, ENT_QUOTES)."', '".htmlspecialchars($add_applicable_to, ENT_QUOTES)."', '".htmlspecialchars($add_freeship, ENT_QUOTES)."', '$add_Amount', '$add_feestructure_Id', '$add_batchmasterid', '$add_bankaccountmaster_Id')");
+    ('$SectionMaster_Id', '".htmlspecialchars($add_feeheader_Id, ENT_QUOTES)."', '".htmlspecialchars($add_Gender, ENT_QUOTES)."', '".htmlspecialchars($add_applicable_to, ENT_QUOTES)."', '".htmlspecialchars($add_freeship, ENT_QUOTES)."', '$add_Amount', '$add_feestructure_Id', '$add_batchmasterid', '$add_bankaccountmaster_Id', '$add_feeheadertype_Id')");
 
 
     
@@ -49,7 +49,8 @@ if(isset($_GET['Edit_FeeMasterInstance'])){
     Amount='".htmlspecialchars($edit_Amount, ENT_QUOTES)."',
     feestructure_Id='".htmlspecialchars($edit_feestructure_Id, ENT_QUOTES)."',
     batchmaster_Id='".htmlspecialchars($edit_batchmasterid, ENT_QUOTES)."',
-    bankaccountmaster_Id = '".htmlspecialchars($edit_bankaccountmaster_Id, ENT_QUOTES)."'
+    bankaccountmaster_Id = '".htmlspecialchars($edit_bankaccountmaster_Id, ENT_QUOTES)."',
+    feeheadertype_Id = '".htmlspecialchars($edit_feeheadertype_Id, ENT_QUOTES)."'
     where Id  = '$edit_InstanceId'");
 
     echo "200";
@@ -92,7 +93,7 @@ if(isset($_GET['Add_FeeMasterInstance_InBulk'])){
     $writer->openToFile($fileName); // write data to a file or to a PHP stream
     // $writer->openToBrowser($fileName); // stream data directly to the browser
 
-    $singleRow =['Sr No','Fee Header No','Gender','Applicable to','Freeship','Amount','Fee Structure No','Bank Account No','Upload Status'];
+    $singleRow =['Sr No','Fee Header No','Gender','Applicable to','Freeship','Amount','Fee Structure No','Bank Account No','Fee Header Type No','Upload Status'];
     $writer->addRow($singleRow); // add a row at a time
 
 
@@ -127,9 +128,9 @@ if(isset($_GET['Add_FeeMasterInstance_InBulk'])){
 
     
             $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into fee_feemaster
-            (sectionmaster_Id, feeheader_Id, Gender, applicable_to, freeship, Amount, feestructure_Id, batchmaster_Id, bankaccountmaster_Id) 
+            (sectionmaster_Id, feeheader_Id, Gender, applicable_to, freeship, Amount, feestructure_Id, batchmaster_Id, bankaccountmaster_Id, feeheadertype_Id) 
             Values
-            ('$SectionMaster_Id', '".htmlspecialchars($row[1], ENT_QUOTES)."', '".htmlspecialchars($row[2], ENT_QUOTES)."', '".htmlspecialchars($row[3], ENT_QUOTES)."', '".htmlspecialchars($row[4], ENT_QUOTES)."', '$row[5]', '$row[6]', '$batch_sel_import', '$row[7]')");
+            ('$SectionMaster_Id', '".htmlspecialchars($row[1], ENT_QUOTES)."', '".htmlspecialchars($row[2], ENT_QUOTES)."', '".htmlspecialchars($row[3], ENT_QUOTES)."', '".htmlspecialchars($row[4], ENT_QUOTES)."', '$row[5]', '$row[6]', '$batch_sel_import', '$row[7]', '$row[8]')");
 
             if(mysqli_error($mysqli)){
                 $displayMessage[]  = $row[1].' : Query Failed';
@@ -142,7 +143,7 @@ if(isset($_GET['Add_FeeMasterInstance_InBulk'])){
  
 
         $multipleRows=[
-            [$row[0],$row[1],$row[2],$row[3],$row[4],$row[5],$row[6],$row[7],$uploadMessage],
+            [$row[0],$row[1],$row[2],$row[3],$row[4],$row[5],$row[6],$row[7],$row[8],$uploadMessage],
         ];
         $writer->addRows($multipleRows); // add multiple rows at a time
 
@@ -173,3 +174,51 @@ if(isset($_GET['Add_FeeMasterInstance_InBulk'])){
 }
 //-----------------------------------------------------------------------------------------------------------------------
 
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_FeeForNewExistingStudents'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    $SBM_Id = explode(",",$SBM_Id);
+
+    
+    foreach($SBM_Id as $s => $value) {
+        //Loop For Selected Header
+        foreach($FM_Id as $i => $value) {
+            //Fetching Fee Master Details
+            $fee_masterdetail_q = mysqli_query($mysqli," SELECT fee_feemaster.*, fee_headermaster.header_name FROM `fee_feemaster` JOIN fee_headermaster ON fee_headermaster.Id = fee_feemaster.feeheader_Id WHERE fee_feemaster.Id = '$FM_Id[$i]'");
+            $r_fee_masterdetail = mysqli_fetch_array($fee_masterdetail_q);
+
+            foreach($FSD_Id as $j => $value) {
+            
+                $receiptdetailamt = $_POST['allocate_amount_'.$FM_Id[$i].'_'.$FSD_Id[$j]];
+                $Feemaster_Id = $FM_Id[$i];
+                $Feestructuredetail_Id = $FSD_Id[$j];
+
+                $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into fee_receiptsdetails
+                (feemaster_Id, feereceipts_Id, Fee_name, amount, feestructuredetails_Id, feeheadertype_Id, feeheader_Id, SBM_Id) 
+                Values
+                ('$Feemaster_Id', '0', '$r_fee_masterdetail[header_name]', '$receiptdetailamt[0]', '$Feestructuredetail_Id', '$r_fee_masterdetail[feeheadertype_Id]', '$r_fee_masterdetail[feeheader_Id]', '$SBM_Id[$s]')");
+
+
+                unset($receiptdetailamt); unset($Feemaster_Id); unset($Feestructuredetail_Id);
+            } // close header loop
+        } // close header loop
+
+
+        $updating_feeallocationstatus = mysqli_query($mysqli,"Update user_studentbatchmaster Set 
+            fee_allocation_status = '1'
+            where Id  = '$SBM_Id[$s]'");
+    }//close SBM_Id
+    
+
+    $res['status'] = 'success';
+    echo json_encode($res);
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
