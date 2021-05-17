@@ -111,6 +111,10 @@ $q = "SELECT setup_sectionmaster.* FROM setup_sectionmaster Where 1";
                                     <button type="button" class="btn btn-default moduleMappingTableLink" data-toggle="tooltip" data-placement="top" title="Module Mapping" id="<?php echo $r_instance_fetch['Id']; ?>"><span class="glyphicon glyphicon-tasks" aria-hidden="true" style="color:#fbb536;"></span></button>
                                 </div>
 
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-default receiptheaderTableLink" data-toggle="tooltip" data-placement="top" title="Receipt Header Master" id="<?php echo $r_instance_fetch['Id']; ?>"><span class="glyphicon glyphicon-tasks" aria-hidden="true" style="color:#f9d2a0;"></span></button>
+                                </div>
+
 
                                 
                                 <input type="hidden" value="<?php echo $r_instance_fetch['Id']; ?>" class="<?php echo $r_instance_fetch['Id']; ?> all_fields" name="fetch_edit_Id">
@@ -653,6 +657,26 @@ $('.moduleMappingTableLink').click(function(event){
 });
 //Manage Instance Btn close----------------------------------------------------------------------------------------------------------
 
+
+//Manage Instance Btn----------------------------------------------------------------------------------------------------------
+$('.receiptheaderTableLink').click(function(event){
+    var selected_instance_Id = $(this).attr('id');
+   
+    $("#loader").css("display", "block");
+    $("#DisplayDiv").css("display", "none");
+
+    $.ajax({
+        url:'./superadmin/receipt_header_master.php?selectedSection_Id='+ selected_instance_Id,
+        type:'GET',
+        success:function(si_logs){
+            $('#DisplayDiv').html(si_logs);
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+        },
+    });  
+
+});
+//Manage Instance Btn close----------------------------------------------------------------------------------------------------------
 
 </script>
 

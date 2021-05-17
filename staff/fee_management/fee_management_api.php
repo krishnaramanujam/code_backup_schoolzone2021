@@ -222,3 +222,57 @@ if(isset($_GET['Add_FeeForNewExistingStudents'])){
     
 }
 //-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_FeeForNewExistingStudents'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+        //Updating Old Fee header to 0
+        $updating_feereceipt = mysqli_query($mysqli,"Update fee_receiptsdetails Set 
+        feeheadertype_Id = null
+            where fee_receiptsdetails.SBM_Id  = '$SBM_Id'");
+
+
+        foreach($FM_Id as $i => $value) {
+            //Fetching Fee Master Details
+
+            //Fetching Fee Master Id
+            $fee_master_q = mysqli_query($mysqli,"Select fee_receiptsdetails.feemaster_Id from fee_receiptsdetails Where fee_receiptsdetails.Id = '$FM_Id[$i]'");
+            $r_fee_master = mysqli_fetch_array($fee_master_q);
+
+            $fee_masterdetail_q = mysqli_query($mysqli," SELECT fee_feemaster.*, fee_headermaster.header_name FROM `fee_feemaster` JOIN fee_headermaster ON fee_headermaster.Id = fee_feemaster.feeheader_Id WHERE fee_feemaster.Id = '$r_fee_master[feemaster_Id]'");
+            $r_fee_masterdetail = mysqli_fetch_array($fee_masterdetail_q);
+
+            foreach($FSD_Id as $j => $value) {
+            
+                $receiptdetailamt = $_POST['allocate_amount_'.$FM_Id[$i].'_'.$FSD_Id[$j]];
+                $Feemaster_Id = $FM_Id[$i];
+                $Feestructuredetail_Id = $FSD_Id[$j];
+
+                $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into fee_receiptsdetails
+                (feemaster_Id, feereceipts_Id, Fee_name, amount, feestructuredetails_Id, feeheadertype_Id, feeheader_Id, SBM_Id) 
+                Values
+                ('$Feemaster_Id', '0', '$r_fee_masterdetail[header_name]', '$receiptdetailamt[0]', '$Feestructuredetail_Id', '$r_fee_masterdetail[feeheadertype_Id]', '$r_fee_masterdetail[feeheader_Id]', '$SBM_Id')");
+
+
+                unset($receiptdetailamt); unset($Feemaster_Id); unset($Feestructuredetail_Id);
+            } // close header loop
+        } // close header loop
+
+
+        // $updating_feeallocationstatus = mysqli_query($mysqli,"Update user_studentbatchmaster Set 
+        //     fee_allocation_status = '1'
+        //     where Id  = '$SBM_Id'");
+    
+
+    $res['status'] = 'success';
+    echo json_encode($res);
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------

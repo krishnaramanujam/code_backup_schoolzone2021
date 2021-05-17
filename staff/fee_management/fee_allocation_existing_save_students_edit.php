@@ -106,13 +106,266 @@ $r_batch_fetch = mysqli_fetch_array($batch_fetch);
     if(isset($_GET['Generate_View'])){
         $FS_sel = $_POST['FS_sel'];
         $FS_txt = $_POST['FS_txt'];
+
+
+        $fee_structure_details_q = mysqli_query($mysqli, "SELECT fee_structure_details.*, fee_structure_master.Fee_Structure_Name,setup_academicyear.abbreviation FROM `fee_structure_details` JOIN fee_structure_master ON fee_structure_master.Id = fee_structure_details.Fee_Structure_Id JOIN setup_academicyear ON setup_academicyear.Id = fee_structure_details.academicYearId WHERE fee_structure_master.sectionmaster_Id = '$SectionMaster_Id' AND  fee_structure_details.academicYearId = '$Acadmic_Year_ID' AND fee_structure_details.Fee_Structure_Id  = '$FS_sel' ");
+
+        $row_fee_str_count = mysqli_num_rows($fee_structure_details_q);
+        if($row_fee_str_count > 0){
+            $FSD_Arr = [];
+            $tot_prop = 0;
+            $entry_count = 0;
+            while($r_FSD_data = mysqli_fetch_array($fee_structure_details_q)){
+                $new_arrays = array(
+                    'FSD_Name' => $r_FSD_data['Name'],
+                    'FSD_Abbreviation' => $r_FSD_data['Abbreviation'],
+                    'FSD_proportion' => $r_FSD_data['proportion'],
+                    'FSD_Id' => $r_FSD_data['Id']
+                );  
+                array_push($FSD_Arr, $new_arrays);
+                $tot_prop = $tot_prop + $r_FSD_data['proportion'];
+
+                $entry_count++;
+            }
+        }// close if
+        // print_r($FSD_Arr);
+
 ?>
+
+
+<div class="row">
+        <div class="col-md-9">
+        <form id="StudentListForm">
+        <input type="hidden" name="SBM_Id" class="form-control" value="<?php echo $selected_SBM_Id; ?>">
+          <table class="table table-striped" id="InstanceMaster_Table">
+             <thead>
+                 <tr><th colspan="100%" class="text-center">Fee Structure: <span class="text-primary"><?php echo $FS_txt; ?></span></th></tr>
+                 <tr>
+                    <th></th>
+                    <th></th><th></th>
+                    <?php foreach ( $FSD_Arr as $FSD_Arr_header ) { ?>
+                        <th><?php echo $FSD_Arr_header['FSD_Name']; ?></th> 
+                    <?php } ?>
+                    <th></th>
+                    <th></th>
+                 </tr>
+                 <tr>
+                    <th>Sr No</th>
+                    <th>Fee Header</th><th>Amount / Weightage</th>
+                    <?php foreach ( $FSD_Arr as $FSD_Arr_header ) { ?>
+                        <th><?php echo $FSD_Arr_header['FSD_proportion']; ?>
+                            <input type="hidden" value="<?php echo $FSD_Arr_header['FSD_Id']; ?>" name="FSD_Id[]">
+                        </th> 
+                    <?php } ?>
+                    <th>Total</th>
+                    <th><input type="checkbox" class="subcheck" id="check"></th>
+                 </tr>
+             </thead>
+             <tbody>
+                  <?php  $instance_fetch_q = mysqli_query($mysqli,"SELECT fee_receiptsdetails.*, fee_headermaster.header_name, SUM(fee_receiptsdetails.amount) As Amount FROM fee_receiptsdetails JOIN fee_headermaster ON fee_headermaster.Id = fee_receiptsdetails.feeheader_Id WHERE fee_receiptsdetails.SBM_Id = '$selected_SBM_Id' AND fee_receiptsdetails.feepaymentstatus = '0' AND fee_receiptsdetails.feeheadertype_Id IS NOT NULL Group By fee_receiptsdetails.feemaster_Id   ");
+                 $i = 1; while($r_instance_fetch = mysqli_fetch_array($instance_fetch_q)){  ?>
+                     <tr> 
+                         <td style="width:10%"><?php echo $i; ?></td>
+                         <td style="width:15%;text-align:left;"><?php echo $r_instance_fetch['header_name']; ?></td>
+                         <td class="weight_amount_<?php echo $r_instance_fetch['Id']; ?>"><?php echo $r_instance_fetch['Amount']; ?></td>
+                         
+
+            
+                        <?php foreach ( $FSD_Arr as $FSD_Arr_header ) { ?>
+                            <?php 
+                                $details_fetch_q = mysqli_query($mysqli,"SELECT fee_receiptsdetails.*, fee_headermaster.header_name, IF(SUM(fee_receiptsdetails.amount) IS NULL, 0, SUM(fee_receiptsdetails.amount)) AS Amount FROM fee_receiptsdetails JOIN fee_headermaster ON fee_headermaster.Id = fee_receiptsdetails.feeheader_Id WHERE fee_receiptsdetails.SBM_Id = '$selected_SBM_Id' AND fee_receiptsdetails.feepaymentstatus = '0' AND fee_receiptsdetails.feestructuredetails_Id = '$FSD_Arr_header[FSD_Id]' AND fee_receiptsdetails.feemaster_Id = '$r_instance_fetch[feemaster_Id]'  ");
+                                $i = 1; $r_details_fetch = mysqli_fetch_array($details_fetch_q);  
+
+                            ?>
+                            <td><input type="text" 
+                            id="allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>" class="row_allocate_amount_<?php echo $r_instance_fetch['Id']; ?> row_allocate_amount_all
+                            col_allocate_amount_<?php echo $FSD_Arr_header['FSD_Id']; ?>"
+                            
+                            name="allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>[]" style="border-bottom: 2px solid #19aa6e;" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" value="<?php echo $r_details_fetch['Amount']; ?>"></td>
+
+                            
+                            <script>
+                            $('#check<?php echo $r_instance_fetch['Id']; ?>').click(function(){
+                                var overall_row = $('.overall_row_<?php echo $FSD_Arr_header['FSD_Id']; ?>').text();
+                                
+                                if($(this).prop("checked") == false){
+                                    //Column Total
+                                    $('#allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>').val();
+                                    var newrowtot = +overall_row - parseInt($('#allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>').val());
+
+                                }else{
+                                    //Column Total
+
+                                    var newrowtot = +overall_row + parseInt($('#allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>').val());
+
+                                }   
+                                $('.overall_row_<?php echo $FSD_Arr_header['FSD_Id']; ?>').text(newrowtot);
+                            });
+
+                            //ALL Check Row
+                            $('#check').click(function(){
+                                var overall_row_tot = $('.overall_row_<?php echo $FSD_Arr_header['FSD_Id']; ?>').text();
+                               
+                                if($(this).prop("checked") == false){
+                                  
+                                    var new_tot = 0;
+                                }else{
+                                  
+                                    var texts= $(".col_allocate_amount_<?php echo $FSD_Arr_header['FSD_Id']; ?>").map(function() {
+                                            return $(this).val();
+                                        }).get();
+                                        // console.log(texts);
+                                    sum = 0;
+                                    texts.forEach(function (element, index) {
+                                    
+                                    if(element == '' || element == undefined){
+                                        element = 0;
+                                    }
+                                    sum = sum + parseInt(element);
+                                    });
+                                    
+                                    var new_tot = sum;
+                            
+                                }   
+                                $('.overall_row_<?php echo $FSD_Arr_header['FSD_Id']; ?>').text(new_tot)
+                            });
+                            </script>
+                        <?php } ?>
+
+
+                        <script>
+                                //Disabled Entries
+                                $('.row_allocate_amount_<?php echo $r_instance_fetch['Id']; ?>').prop("disabled", true);
+                                $('#row_totalamount<?php echo $r_instance_fetch['Id']; ?>').prop("disabled", true);
+
+                                 //GP KEY PRESS
+                                $('.row_allocate_amount_<?php echo $r_instance_fetch['Id']; ?>').keyup(function() {
+                                    var texts= $(".row_allocate_amount_<?php echo $r_instance_fetch['Id']; ?>").map(function() {
+                                       return $(this).val();
+                                    }).get();
+
+                                 
+                                    sum = 0;
+                                    texts.forEach(function (element, index) {
+                                    
+                                    if(element == '' || element == undefined){
+                                        element = 0;
+                                    }
+                                    sum = sum + parseInt(element);
+                                    });
+                                    
+                                    
+                                    $('#row_totalamount<?php echo $r_instance_fetch['Id']; ?>').val(sum);
+
+                                });
+                            
+
+
+                                $('#check<?php echo $r_instance_fetch['Id']; ?>').click(function(){
+                                    var overall_tot = $('.overall_tot').text();
+
+                                    var overall_row = $('.overall_row_<?php echo $FSD_Arr_header['FSD_Id']; ?>').text();
+                                    
+                                    if($(this).prop("checked") == false){
+                                        //Overall Total
+                                        $('.row_allocate_amount_<?php echo $r_instance_fetch['Id']; ?>').prop("disabled", true);
+                                        $('#row_totalamount<?php echo $r_instance_fetch['Id']; ?>').prop("disabled", true);
+                                        
+                                        var newtot = +overall_tot - parseInt($('#row_totalamount<?php echo $r_instance_fetch['Id']; ?>').val());
+
+                                        //Row Total
+
+                                    }else{
+                                        //Overall Total
+                                        $('.row_allocate_amount_<?php echo $r_instance_fetch['Id']; ?>').prop("disabled", false);
+                                        $('#row_totalamount<?php echo $r_instance_fetch['Id']; ?>').prop("disabled", false);
+                                        
+                                        var newtot = +overall_tot + parseInt($('#row_totalamount<?php echo $r_instance_fetch['Id']; ?>').val());
+
+                                        //Row Total
+
+                                    }   
+                                    $('.overall_tot').text(newtot);
+                                });
+
+                            </script>
+               
+  
+                        <td><input type="text" id="row_totalamount<?php echo $r_instance_fetch['Id']; ?>" name="row_totalamount[]" readonly value="<?php echo $r_instance_fetch['Amount']; ?>" class="row_totalamount_all"></td> 
+
+                         <td>    
+                            <div class="pretty p-icon p-smooth">
+                                    <input type="checkbox" class="subcheck sel_box" id="check<?php echo $r_instance_fetch['Id']; ?>" name="FM_Id[]" value="<?php echo $r_instance_fetch['Id']; ?>" >
+                                        <div class="state p-success">
+                                            <i class="icon fa fa-check"></i>
+                                            <label></label>
+                                        </div>
+                            </div> 
+                         </td>
+                     </tr>
+                 <?php $i++; } ?>
+
+
+             </tbody>
+             <tfoot>
+                 <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Total :</th>
+                    <?php $l = 1; foreach ( $FSD_Arr as $FSD_Arr_header ) { ?>
+                        <th class="overall_row_<?php echo $FSD_Arr_header['FSD_Id']; ?>">0</th>
+                    <?php $l++; } ?>
+                    <th class="overall_tot">0</th>
+                    <th></th>
+                 </tr>
+             </tfoot>
+         </table>
+         <div class="panel-footer" style="text-align: center;"> 
+            <button type="button" class="btn btn-primary" id="save_Fee_list">Submit</button>
+        </div>
+        </form>
+
+        </div>
+    </div>
 
 <?php } // close isset ?> 
 <!-- -------------------------------------------------------------------------------------------------- -->
 
 
 <script>
+$('#check').click(function(){
+    var overall_tot = $('.overall_tot').text();
+    if($(this).prop("checked") == false){
+        $(".sel_box").removeAttr('checked');
+    
+        $('.row_totalamount_all').prop("disabled", true);
+        $('.row_allocate_amount_all').prop("disabled", true);
+        
+        var new_tot = 0;
+        
+    }else{
+        $('.row_totalamount_all').prop("disabled", false);
+        $('.row_allocate_amount_all').prop("disabled", false);
+
+        $(".sel_box").prop('checked', true);
+
+        var texts= $(".row_totalamount_all").map(function() {
+                return $(this).val();
+            }).get();
+        sum = 0;
+        texts.forEach(function (element, index) {
+        
+        if(element == '' || element == undefined){
+            element = 0;
+        }
+        sum = sum + parseInt(element);
+        });
+        
+        var new_tot = sum;
+    }   
+    $('.overall_tot').text(new_tot);
+});
+
 
 $('.return_btn').click(function(event){
     event.preventDefault();
@@ -188,6 +441,80 @@ $('#online_table').DataTable( {
     }
     ]
 } );
+
+
+//Instance Edit----------------------------------------------------------------------------------------------------
+$('#save_Fee_list').click(function(event){
+    event.preventDefault();
+    var batch_sel = $('#batch_sel').val();
+
+    var newSelectResult = '';
+    var AmountMatchStatus = '';
+    $('.sel_box:checked').each(function () {
+        var status = (this.checked ? $(this).val() : "");
+        var id = $(this).attr("id");
+        newSelectResult = newSelectResult.concat( status , ",");
+
+        var current_val = $(this).val();
+
+        var weight_amt = $('.weight_amount_'+current_val).text();
+        var generated_amt = $('#row_totalamount'+current_val).val();
+
+
+
+        if(parseInt(weight_amt) != parseInt(generated_amt)){
+            AmountMatchStatus = 'AmountNotMatch';
+        }
+    });
+
+
+    if(newSelectResult == ''){
+        alert('Please select Checkbox');
+        return false;
+    }
+
+    
+    if(AmountMatchStatus != ''){
+        alert('Amount not matching');
+        return false;
+    }
+
+
+
+    var FORMDATA = $('#StudentListForm').serializeArray();
+  
+    $("#loader").css("display", "block");
+    $("#DisplayDiv").css("display", "none");
+
+    $.ajax({
+        url: './fee_management/fee_management_api.php?Edit_FeeForNewExistingStudents=u',
+        type:'POST',
+        data: FORMDATA,
+        dataType: "json",
+        success:function(response){
+            //Checking Status 
+            if(response['status'] == 'success') {
+                $.ajax({
+                    url:'./fee_management/fee_allocation_existing.php?Generate_View='+'u',
+                    type:'GET',
+                    data: {batch_sel:batch_sel},
+                    success:function(response){
+                        $('#DisplayDiv').html(response);
+                        $("#loader").css("display", "none");
+                        $("#DisplayDiv").css("display", "block");
+                    },
+                });
+
+                iziToast.success({
+                    title: 'Success',
+                    message: 'Fee Allocated Successfully',
+                });
+            }
+
+        },
+   });
+
+});
 
 
 </script>

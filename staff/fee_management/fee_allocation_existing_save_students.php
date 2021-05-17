@@ -170,8 +170,12 @@ $r_batch_fetch = mysqli_fetch_array($batch_fetch);
                          
 
             
-                        <?php foreach ( $FSD_Arr as $FSD_Arr_header ) { ?>
-                            <td><input type="text" id="allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>" class="row_allocate_amount_<?php echo $r_instance_fetch['Id']; ?> row_allocate_amount_all" name="allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>[]" style="border-bottom: 2px solid #19aa6e;" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57"></td>
+                        <?php $l = 1; foreach ( $FSD_Arr as $FSD_Arr_header ) { ?>
+                            <td><input type="text" 
+                            id="allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>" class="row_allocate_amount_<?php echo $r_instance_fetch['Id']; ?> row_allocate_amount_all
+                            col_allocate_amount_<?php echo $FSD_Arr_header['FSD_Id']; ?>"
+                            
+                            name="allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>[]" style="border-bottom: 2px solid #19aa6e;" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57"></td>
 
                             <script>
                                 
@@ -215,6 +219,54 @@ $r_batch_fetch = mysqli_fetch_array($batch_fetch);
 
 
                                 });
+
+                            </script>
+
+                            <script>
+                            $('#check<?php echo $r_instance_fetch['Id']; ?>').click(function(){
+                                var overall_row = $('.overall_row_<?php echo $FSD_Arr_header['FSD_Id']; ?>').text();
+                                
+                                if($(this).prop("checked") == false){
+                                    //Column Total
+                                    $('#allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>').val();
+                                    var newrowtot = +overall_row - parseInt($('#allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>').val());
+
+                                }else{
+                                    //Column Total
+
+                                    var newrowtot = +overall_row + parseInt($('#allocate_amount_<?php echo $r_instance_fetch['Id']; ?>_<?php echo $FSD_Arr_header['FSD_Id']; ?>').val());
+
+                                }   
+                                $('.overall_row_<?php echo $FSD_Arr_header['FSD_Id']; ?>').text(newrowtot);
+                            });
+
+                            //ALL Check Row
+                            $('#check').click(function(){
+                                var overall_row_tot = $('.overall_row_<?php echo $FSD_Arr_header['FSD_Id']; ?>').text();
+                               
+                                if($(this).prop("checked") == false){
+                                  
+                                    var new_tot = 0;
+                                }else{
+                                  
+                                    var texts= $(".col_allocate_amount_<?php echo $FSD_Arr_header['FSD_Id']; ?>").map(function() {
+                                            return $(this).val();
+                                        }).get();
+                                        // console.log(texts);
+                                    sum = 0;
+                                    texts.forEach(function (element, index) {
+                                    
+                                    if(element == '' || element == undefined){
+                                        element = 0;
+                                    }
+                                    sum = sum + parseInt(element);
+                                    });
+                                    
+                                    var new_tot = sum;
+                            
+                                }   
+                                $('.overall_row_<?php echo $FSD_Arr_header['FSD_Id']; ?>').text(new_tot)
+                            });
                             </script>
                         <?php } ?>
 
@@ -249,19 +301,30 @@ $r_batch_fetch = mysqli_fetch_array($batch_fetch);
 
                                 $('#check<?php echo $r_instance_fetch['Id']; ?>').click(function(){
                                     var overall_tot = $('.overall_tot').text();
+
+                                
                                     if($(this).prop("checked") == false){
+                                        //Overall Total
                                         $('.row_allocate_amount_<?php echo $r_instance_fetch['Id']; ?>').prop("disabled", true);
                                         $('#row_totalamount<?php echo $r_instance_fetch['Id']; ?>').prop("disabled", true);
                                         
                                         var newtot = +overall_tot - parseInt($('#row_totalamount<?php echo $r_instance_fetch['Id']; ?>').val());
+
+                                        //Row Total
+
                                     }else{
+                                        //Overall Total
                                         $('.row_allocate_amount_<?php echo $r_instance_fetch['Id']; ?>').prop("disabled", false);
                                         $('#row_totalamount<?php echo $r_instance_fetch['Id']; ?>').prop("disabled", false);
                                         
                                         var newtot = +overall_tot + parseInt($('#row_totalamount<?php echo $r_instance_fetch['Id']; ?>').val());
+
+                                        //Row Total
+
                                     }   
                                     $('.overall_tot').text(newtot);
                                 });
+
                             </script>
                
                         <td><input type="text" id="row_totalamount<?php echo $r_instance_fetch['Id']; ?>" name="row_totalamount[]" readonly value="" class="row_totalamount_all"></td> 
@@ -282,8 +345,12 @@ $r_batch_fetch = mysqli_fetch_array($batch_fetch);
              </tbody>
              <tfoot>
                  <tr>
-                    <th colspan="3"></th>
-                    <th colspan="<?php echo $entry_count; ?>" class="text-right">Total : </th>
+                    <th></th>
+                    <th></th>
+                    <th>Total :</th>
+                    <?php $l = 1; foreach ( $FSD_Arr as $FSD_Arr_header ) { ?>
+                        <th class="overall_row_<?php echo $FSD_Arr_header['FSD_Id']; ?>">0</th>
+                    <?php $l++; } ?>
                     <th class="overall_tot">0</th>
                     <th></th>
                  </tr>
@@ -310,21 +377,7 @@ $('#check').click(function(){
         $('.row_totalamount_all').prop("disabled", true);
         $('.row_allocate_amount_all').prop("disabled", true);
 
-        var texts= $(".row_totalamount_all").map(function() {
-                return $(this).val();
-            }).get();
-
-        sum = 0;
-        texts.forEach(function (element, index) {
-        
-        if(element == '' || element == undefined){
-            element = 0;
-        }
-        sum = sum + parseInt(element);
-        });
-        var new_tot = overall_tot - sum;
-        
-        console.log(new_tot);
+        var new_tot = 0;
         
     }else{
         $('.row_totalamount_all').prop("disabled", false);

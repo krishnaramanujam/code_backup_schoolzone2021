@@ -638,4 +638,149 @@ if(isset($_GET['Add_FeeHeaderInstance_InBulk'])){
 }
 //-----------------------------------------------------------------------------------------------------------------------
 
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Add_ReceiptHeaderInstance'])){
+   
+    extract($_POST);
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into receipt_header_master
+    (sectionmaster_Id, name, priority) 
+    Values
+    ('$SectionMaster_Id', '".htmlspecialchars($add_name, ENT_QUOTES)."', '".htmlspecialchars($add_priority, ENT_QUOTES)."')");
+
+
+    $last_id = mysqli_insert_id($mysqli);
+
+    if(isset($_FILES['headerimage'])){
+
+
+        $photo_Error = $_FILES['headerimage']['error'];
+        if($photo_Error == 0) {
+                
+            $photo_Array = $_FILES['headerimage'];
+            $photo_Name = $_FILES['headerimage']['name'];
+            $photo_TmpName = $_FILES['headerimage']['tmp_name'];
+            $photo_Size = $_FILES['headerimage']['size'];
+            $photo_Type = $_FILES['headerimage']['type'];
+    
+            $ext = strtolower(pathinfo($photo_Name, PATHINFO_EXTENSION));
+           
+            $current_file_name = $last_id.".".$ext;
+            
+            $targetfolder = "../../assets/receipt_header_img/".$current_file_name;
+            
+            $targetfolder_new = "assets/receipt_header_img/".$current_file_name;
+
+
+            if (file_exists($targetfolder)) {
+                unlink($targetfolder);
+            }
+            //Path CHecking===========================================================
+
+            if(move_uploaded_file($_FILES['headerimage']['tmp_name'], $targetfolder))
+            {
+                $Updating_pdf = mysqli_query($mysqli,"UPDATE  receipt_header_master SET image_path = '$targetfolder_new' WHERE  receipt_header_master.Id = '$last_id'"); 
+
+    
+            }
+            else {
+                $message = "Problem uploading file";
+            }
+
+
+        }//checking if image Uplaod
+
+
+    }// close image isset
+
+
+
+    $res['message'] = $message;
+
+  
+    $res['status'] = 'success';
+    echo json_encode($res);
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Edit_ReceiptHeaderInstance'])){
+
+    extract($_POST);
+
+     
+    $updating_CalenderInstance = mysqli_query($mysqli,"Update receipt_header_master Set name = '".htmlspecialchars($edit_name, ENT_QUOTES)."',priority='".htmlspecialchars($edit_priority, ENT_QUOTES)."' where Id  = '$edit_InstanceId'");
+
+
+    if(isset($_FILES['headerimage'])){
+
+
+        $photo_Error = $_FILES['headerimage']['error'];
+        if($photo_Error == 0) {
+                
+            $photo_Array = $_FILES['headerimage'];
+            $photo_Name = $_FILES['headerimage']['name'];
+            $photo_TmpName = $_FILES['headerimage']['tmp_name'];
+            $photo_Size = $_FILES['headerimage']['size'];
+            $photo_Type = $_FILES['headerimage']['type'];
+    
+            $ext = strtolower(pathinfo($photo_Name, PATHINFO_EXTENSION));
+           
+            $current_file_name = $edit_InstanceId.".".$ext;
+            
+            $targetfolder = "../../assets/receipt_header_img/".$current_file_name;
+            
+            $targetfolder_new = "assets/receipt_header_img/".$current_file_name;
+
+
+            if (file_exists($targetfolder)) {
+                unlink($targetfolder);
+            }
+            //Path CHecking===========================================================
+
+            if(move_uploaded_file($_FILES['headerimage']['tmp_name'], $targetfolder))
+            {
+                $Updating_pdf = mysqli_query($mysqli,"UPDATE  receipt_header_master SET image_path = '$targetfolder_new' WHERE  receipt_header_master.Id = '$edit_InstanceId'"); 
+
+    
+            }
+            else {
+                $message = "Problem uploading file";
+            }
+
+
+        }//checking if image Uplaod
+
+
+    }// close image isset
+
+
+
+    $res['message'] = $message;
+    $res['status'] = 'success';
+    echo json_encode($res);
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['Delete_ReceiptHeaderInstance'])){
+
+    extract($_POST);
+
+    $deleting_formheader = mysqli_query($mysqli,"DELETE FROM receipt_header_master where Id = '$delete_instance_Id'");
+
+    echo "200";
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
+
 ?>
