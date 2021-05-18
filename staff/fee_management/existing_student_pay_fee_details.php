@@ -24,7 +24,7 @@ $r_studentdetails = mysqli_fetch_array($studentdetails_fetch_q);
 
 
    <!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////// --> 
-   <div class="col-md-8">
+   <div class="col-md-11">
     
     <div class="box">
 
@@ -60,6 +60,19 @@ $r_studentdetails = mysqli_fetch_array($studentdetails_fetch_q);
 
         </div><!--DD Row2 Close-->
 
+        <div class="row">
+
+            <div class="col-md-3" style="text-align:center;"><label>Date of Receipt :</label></div>
+            <div class="col-md-4">
+                <span class="text-primary"> <input type="text" class="form-control" id="receipt_date" name="receipt_date" value="" placeholder="Enter Date" style="border-bottom: 2px solid #19aa6e;"> </span>
+            </div>
+
+            <div class="col-md-2" style="text-align:center;"><label></label></div>
+            <div class="col-md-3">
+                <span class="text-primary"></span>
+            </div>
+
+        </div><!--DD Row2 Close-->
      
      
          </div>
@@ -72,7 +85,7 @@ $r_studentdetails = mysqli_fetch_array($studentdetails_fetch_q);
 
 
 <!-------------------------------------------------------------------------------------------------------------- --------->
-<div class="container col-md-8">
+<div class="container col-md-11">
 <hr>
 <?php
 
@@ -159,7 +172,7 @@ if($row_receipt_q > 0){
 ?>
 <?php } }  ?>
 
-<div class="container col-md-8">
+<div class="container col-md-11">
     <form id="SelectionForm form-horizontal">
 
         <div class="form-group">
@@ -194,18 +207,24 @@ if($row_receipt_q > 0){
     
     $fee_details_group_query = mysqli_query($mysqli,"SELECT fee_receiptsdetails.Id AS FRD_Id, fee_receiptsdetails.Fee_name, SUM(fee_receiptsdetails.amount) as amount, fee_structure_details.Id AS SSD_Id, fee_structure_details.Name, fee_structure_details.Payable_date, fee_structure_details.Last_Date FROM fee_receiptsdetails LEFT JOIN fee_structure_details ON fee_structure_details.Id = fee_receiptsdetails.feestructuredetails_Id WHERE fee_receiptsdetails.SBM_Id = '$SBM_Id' AND fee_receiptsdetails.amount != '0' AND fee_receiptsdetails.feepaymentstatus = '0' AND fee_receiptsdetails.feeheadertype_Id = '1' AND fee_receiptsdetails.feestructuredetails_Id IN ($sel_feestype) Group BY fee_receiptsdetails.feeheader_Id Order By fee_receiptsdetails.feeheader_Id ");
     $row_fees_details_group = mysqli_num_rows($fee_details_group_query);
+
+    //All Receipt Entries
+    $fee_details__query = mysqli_query($mysqli,"SELECT fee_receiptsdetails.Id AS FRD_Id, fee_receiptsdetails.Fee_name, fee_receiptsdetails.amount AS amount, fee_structure_details.Id AS SSD_Id, fee_structure_details.Name, fee_structure_details.Payable_date, fee_structure_details.Last_Date FROM fee_receiptsdetails LEFT JOIN fee_structure_details ON fee_structure_details.Id = fee_receiptsdetails.feestructuredetails_Id WHERE fee_receiptsdetails.SBM_Id = '$SBM_Id' AND fee_receiptsdetails.amount != '0' AND fee_receiptsdetails.feepaymentstatus = '0' AND fee_receiptsdetails.feeheadertype_Id = '1' AND fee_receiptsdetails.feestructuredetails_Id IN($sel_feestype) ORDER BY fee_receiptsdetails.feeheader_Id  ");
+    $row_fees_details = mysqli_num_rows($fee_details__query);
+
 ?>
 
-<div class="container col-md-8">
+<div class="container col-md-11">
     <form id="formInfo">
-        <!-- <?php 
+
+        <?php 
             if($row_fees_details > 0){
-             while($r_fees_details = mysqli_fetch_array($fee_details_query)){   
+             while($r_fees_details = mysqli_fetch_array($fee_details__query)){   
         ?>
 
             <input type="hidden" id="fees_details_Id<?php echo $r_fees_details['FRD_Id']; ?>" name="fees_details_Id[]" value="<?php echo $r_fees_details['FRD_Id']; ?>"  readonly>
 
-        <?php } }?> -->
+        <?php } }?>
 
         <table class="table table-striped table-hover">
             <thead>
@@ -252,13 +271,73 @@ if($row_receipt_q > 0){
                 </tbody>
 
                 <tfoot>
-                    <th></th>
-                    <th style="text-align:left;">Total:</th>
-                    <th colspan="2" style="text-align:left;"><input type="text" class="form-control" id="total_amount" name="total_amount" value="<?php echo $total_all_feess; ?>" Placeholder="" style="text-align: left;" readonly>  </th>
-                </tfoot>
-        
+                    <tr>
+                        <th></th>
+                        <th style="text-align:left;">Total:</th>
+                        <th colspan="2" style="text-align:left;"><input type="text" class="form-control" id="total_amount" name="total_amount" value="<?php echo $total_all_feess; ?>" Placeholder="" style="text-align: left;" readonly>  </th>
+                    </tr>
 
+                    <tr>
+                        <td></td>
+                        <td style="text-align:left;">Previous fees adjustment</td>
+                        <td style="text-align:left;"><input type="text" value="0" name="previous_fee" id="previous_fee" style="border-bottom: 2px solid #19aa6e;background-color: #eee; " onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" readonly></td>
+                        <td></td>
+                    </tr> 
+                    <tr>
+                        <td></td>
+                        <td style="text-align:left;">Current fees adjustment</td>
+                        <td style="text-align:left;"><input type="text" value="0" name="current_fee" id="current_fee" style="border-bottom: 2px solid #19aa6e;"  disabled></td>
+                        
+                        <td class="text-left">
+                            <div class="pretty p-icon p-smooth">
+                                    <input type="checkbox" id="current_fee_ajust_box">
+                                        <div class="state p-success">
+                                            <i class="icon fa fa-check"></i>
+                                            <label>Check to Enable</label>
+                                        </div>
+                            </div>
+                        </td>
+                
+                    </tr>
+
+                    <tr>
+                        <th></th>
+                        <th style="text-align:left;">Overall Total:</th>
+                        <th colspan="2" style="text-align:left;"><input type="text" class="form-control" id="overall_total_amount" name="overall_total_amount" value="<?php echo $total_all_feess; ?>" Placeholder="" style="text-align: left;" readonly>  </th>
+                    </tr>
+ 
+                </tfoot>
+
+               
         </table>
+
+        <hr>
+
+        <!-- PAYMENT OPTIONS -->
+
+        <table class="table"> 
+            <thead>
+                <tr>
+                    <th colspan="100%" class="text-warning">Payment Options</th>
+                </tr>
+                <tr>
+                    <th>Select Payment Mode</th><th>Amount</th><th>Bank Name</th><th>Instrument no</th><th>Instrument date</th><th>RRN 
+                    </th><th>APPR</th><th>Remove</th>
+                </tr>
+            </thead>
+
+            <tbody class="payment_table_body">
+                    
+            </tbody>
+            
+        </table>
+        <div class="panel-footer" style="text-align: left;"> 
+            <input type="button" name="add_payment" value="Add Payment Method" id="add_payment" class="btn" style="background-color:#018488; color: white;" data-toggle="modal" data-target="#freeshipmodal">  
+        </div>
+
+
+
+        <!-- PAYMENT OPTION CLOSE -->
 
         <div class="panel-footer" style="text-align: center;"> 
             <button type="button" class="btn btn-success"  name="pay_fees_online" id="pay_fees_online">Pay Fees</button>  
@@ -268,12 +347,37 @@ if($row_receipt_q > 0){
 </div>
 
 
-
+    <?php include('./add_payment_options.php'); ?>
+    <script>
+    
+    $("#formInfo").on('click', ".delete_instance_btn", function() {
+        var $tr_r = $(this).closest('.tr_clone');
+        var rem = $tr_r.remove().fadeOut(300);
+        iziToast.success({
+            title: 'Success',
+            message: 'Payment Option Successfully Removed',
+        });
+    });
+    
+    
+    
+    </script>
 <?php } // close Fee Summary Isset?>
 <!-- ---------------------------------------------------------------------------------------------------- -->
-
-
+<link rel="stylesheet" href="../extra/plugins/datepicker/datepicker3.css">
+<link rel="stylesheet" href="../extra/plugins/daterangepicker/daterangepicker.css">
+<script src="../extra/plugins/datepicker/bootstrap-datepicker.js"></script>
+<link rel="stylesheet" href="../extra/plugins/datepicker/datepicker3.css">
+    
 <script>
+
+$('#receipt_date').datepicker({
+        format: "dd/mm/yyyy",
+        autoclose: true,
+        orientation: "top",
+        endDate: "today"
+});
+
 
 $('.return_btn').click(function(event){
     event.preventDefault();
@@ -327,6 +431,140 @@ $('#fee_type_submit').click(function(e){
     
 //-----------------------------------------------------------------
 
+
+$('#previous_fee').keyup(function() {
+    var current_fee = $('#current_fee').val();
+    var previous_fee = $('#previous_fee').val();
+    var total_amount = $('#total_amount').val();
+
+
+    if(previous_fee == ''){
+        previous_fee = 0;
+        $('#previous_fee').val(previous_fee);
+    }
+
+    var new_tot = +(total_amount) + +(previous_fee) - +(current_fee);
+
+    $('#overall_total_amount').val(new_tot);
+});
+
+$("#current_fee").keypress(function(e){
+  if (e.which != 46 && e.which != 45 && e.which != 46 &&
+      !(e.which >= 48 && e.which <= 57)) {
+    return false;
+  }
+});
+
+$('#current_fee').keyup(function(e) {
+    var current_fee = $('#current_fee').val();
+    var previous_fee = $('#previous_fee').val();
+    var total_amount = $('#total_amount').val();
+
+
+    if(current_fee == ''){
+        current_fee = 0;
+        $('#current_fee').val(current_fee);
+    }
+
+    var new_tot = +(total_amount) + +(previous_fee) + +(current_fee);
+
+    if(Number.isNaN(new_tot)){
+        $('#current_fee').val(0);
+        new_tot = $('#total_amount').val();
+    }
+
+    $('#overall_total_amount').val(new_tot);
+});
+
+$('#current_fee_ajust_box').click(function(){
+    
+    if($(this).prop("checked") == false){
+        //Overall Total
+        $('#current_fee').prop("disabled", true);
+    }else{
+        //Overall Total
+        $('#current_fee').prop("disabled", false);
+    }   
+   
+});
+
+
+
+
+$('#pay_fees_online').click(function(event){
+    event.preventDefault();
+    var overall_total_amount = $('#overall_total_amount').val();
+    var AmountMatchStatus = '';
+
+    //Checking Total Payment Amount
+    var texts= $(".paymentamt_all").map(function() {
+                return $(this).val();
+            }).get();
+    sum = 0;
+    texts.forEach(function (element, index) {
+    
+    if(element == '' || element == undefined){
+        element = 0;
+    }
+    sum = sum + parseInt(element);
+    });
+
+    if(parseInt(sum) != parseInt(overall_total_amount)){
+        AmountMatchStatus = 'AmountNotMatch';
+    }
+
+    if(AmountMatchStatus != ''){
+        iziToast.warning({
+            title: 'Warning',
+            message: 'Amount Not Matching',
+        });
+        return false;
+    }
+
+
+    var FORMDATA = $('#formInfo').serializeArray();
+    var SBM_Id = $('#SBM_Id').val();
+    var receipt_date = $('#receipt_date').val();
+  
+  $("#loader").css("display", "block");
+  $("#DisplayDiv").css("display", "none");
+
+  $.ajax({
+      url: './fee_management/fee_management_api.php?GenerateReceipt_FeeForNewExistingStudents=u&SBM_Id='+SBM_Id+'&Receipt_date='+receipt_date,
+      type:'POST',
+      data: FORMDATA,
+      dataType: "json",
+      success:function(response){
+          //Checking Status 
+          if(response['status'] == 'success') {
+              $.ajax({
+                  url:'./fee_management/srh_existing_student_fees.php',
+                  type:'GET',
+                  success:function(response1){
+                      $('#DisplayDiv').html(response1);
+                      $("#loader").css("display", "none");
+                      $("#DisplayDiv").css("display", "block");
+                  },
+              });
+
+              iziToast.success({
+                  title: 'Success',
+                  message: 'Receipt Generated Successfully',
+              });
+          }else{
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+            iziToast.error({
+                  title: 'Error',
+                  message: 'Try After Some Time',
+            });
+          }
+
+      },
+ });
+});
+
+
 </script>
 
 <style>
@@ -363,4 +601,3 @@ input:disabled {
     background-color: #eee;          
 }
 </style>
-

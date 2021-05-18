@@ -276,3 +276,97 @@ if(isset($_GET['Edit_FeeForNewExistingStudents'])){
     
 }
 //-----------------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+if(isset($_GET['GenerateReceipt_FeeForNewExistingStudents'])){
+   
+    extract($_POST);
+
+    $SBM_Id = $_GET['SBM_Id'];
+    $Receipt_date = $_GET['Receipt_date'];
+
+    $RD_date = date( 'Y-m-d', strtotime( str_replace( '/', '-', $Receipt_date ) ) );
+
+    $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
+    $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
+
+    $fee_header_type_Id = '1';
+    $time = date("Y-m-d h:m:s");
+
+    try {
+
+        //Fetching Student Details For Receipt Generation
+        $student_details_q = mysqli_query($mysqli, "SELECT user_studentregister.student_name, user_studentregister.student_Id, user_studentbatchmaster.Id AS SBM_Id, setup_batchmaster.Id As BM_Id,user_studentregister.CR_Id, user_studentbatchmaster.applicationDetails_Id As AD_Id, user_studentregister.Id As SR_Id  FROM user_studentbatchmaster JOIN user_studentregister ON user_studentregister.SBM_Id = user_studentbatchmaster.Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id  JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE  user_studentbatchmaster.Id  = '$SBM_Id'");
+        $r_student_details = mysqli_fetch_array($student_details_q);
+
+
+        mysqli_query( $mysqli, 'SET AUTOCOMMIT = 0' );
+        mysqli_query( $mysqli,'SET foreign_key_checks = 0');
+
+        $receipt_number_next = mysqli_query($mysqli, "SELECT MAX( CAST( `fee_receipts`.`receipt_no` AS UNSIGNED INTEGER ) ) AS `receipt_no` FROM `fee_receipts` JOIN setup_batchmaster ON setup_batchmaster.Id = fee_receipts.batchmaster_Id join setup_programmaster on setup_batchmaster.programMaster_Id = setup_programmaster.Id join setup_streammaster on setup_programmaster.streammaster_Id = setup_streammaster.Id  Where setup_streammaster.sectionmaster_Id = '$SectionMaster_Id' AND setup_batchmaster.academicyear_Id = '$Acadmic_Year_ID' AND fee_receipts.feeheadertype = '$fee_header_type_Id' ORDER BY fee_receipts.id DESC LIMIT 1 ");
+        $r_next_receipt = mysqli_fetch_array($receipt_number_next);
+
+        //type casting the (string)receipt_no to (integer)receipt_no
+        $last_receipt_no = (int)$r_next_receipt['receipt_no'];
+
+        // pading the receipt_no with zero to get receipt number: 0001
+        $receipt_no = str_pad( ++$last_receipt_no, 4, '0', STR_PAD_LEFT );
+
+
+        //Inserting Fees Reciept
+        $inserting_receipts = mysqli_query($mysqli, "Insert into fee_receipts (batchmaster_Id, candidateregister_Id, studentregister_Id, SBM_Id, applicationdetails_Id, Student_name, receipt_no, amount, date_of_payment, feeheadertype, stafflogin_id, timestamp) 
+        values 
+        ('$r_student_details[BM_Id]', '$r_student_details[CR_Id]', '$r_student_details[SR_Id]', '$SBM_Id', '$r_student_details[AD_Id]', '$r_student_details[student_name]', '$receipt_no', '$overall_total_amount', '$RD_date', '$fee_header_type_Id', '$ActiveStaffLogin_Id', '$time')"); 
+
+        $receipt_Id = mysqli_insert_id($mysqli);
+
+
+        if(isset($fees_details_Id)) {
+
+            //Now Update Fee Details Status
+            foreach($fees_details_Id as $index => $value) {
+
+                $Update_fees_status = mysqli_query($mysqli,"Update fee_receiptsdetails set feepaymentstatus = '1' , feeReceipts_Id = '$receipt_Id' Where fee_receiptsdetails.Id = '$fees_details_Id[$index]'");
+
+            }// close Foreach
+
+        }// close FSD_Id
+
+
+        if(isset($fees_details_Id)) {
+
+            //Now Update Fee Details Status
+            foreach($fees_details_Id as $index => $value) {
+
+                $Update_fees_status = mysqli_query($mysqli,"Update fee_receiptsdetails set feepaymentstatus = '1' , feeReceipts_Id = '$receipt_Id' Where fee_receiptsdetails.Id = '$fees_details_Id[$index]'");
+
+            }// close Foreach
+
+        }// close FSD_Id
+
+        
+
+       
+        mysqli_commit( $mysqli);
+        mysqli_query( $mysqli, 'SET foreign_key_checks = 1');
+        mysqli_query( $mysqli, 'SET AUTOCOMMIT = 1' );
+
+        $res['status'] = 'success';
+        echo json_encode($res);
+    }// close try
+    catch(Exception $e){
+
+        echo $e->getMessage();
+
+        mysqli_rollback($mysqli);
+
+    } // close catch
+    
+
+    $res['status'] = 'success';
+    echo json_encode($res);
+
+    
+}
+//-----------------------------------------------------------------------------------------------------------------------
