@@ -89,7 +89,7 @@ $r_studentdetails = mysqli_fetch_array($studentdetails_fetch_q);
 <hr>
 <?php
 
-$receipt_q = mysqli_query($mysqli,"SELECT fee_receipts.*, fee_receipts.id as frid, setup_batchmaster.Batch_Name FROM fee_receipts JOIN setup_batchmaster ON setup_batchmaster.Id = fee_receipts.batchMaster_Id WHERE fee_receipts.SBM_Id = '$SBM_Id' ");
+$receipt_q = mysqli_query($mysqli,"SELECT fee_receipts.*, fee_receipts.Id as frid, setup_batchmaster.Batch_Name FROM fee_receipts JOIN setup_batchmaster ON setup_batchmaster.Id = fee_receipts.batchMaster_Id WHERE fee_receipts.SBM_Id = '$SBM_Id' ");
 
 $row_receipt_q = mysqli_num_rows($receipt_q);
 
@@ -290,7 +290,7 @@ if($row_receipt_q > 0){
                         
                         <td class="text-left">
                             <div class="pretty p-icon p-smooth">
-                                    <input type="checkbox" id="current_fee_ajust_box">
+                                    <input type="checkbox" id="current_fee_ajust_box" name="current_fee_ajust_box" value="on">
                                         <div class="state p-success">
                                             <i class="icon fa fa-check"></i>
                                             <label>Check to Enable</label>
@@ -360,23 +360,15 @@ if($row_receipt_q > 0){
     });
     
     
-    
+
+
     </script>
 <?php } // close Fee Summary Isset?>
 <!-- ---------------------------------------------------------------------------------------------------- -->
-<link rel="stylesheet" href="../extra/plugins/datepicker/datepicker3.css">
-<link rel="stylesheet" href="../extra/plugins/daterangepicker/daterangepicker.css">
-<script src="../extra/plugins/datepicker/bootstrap-datepicker.js"></script>
-<link rel="stylesheet" href="../extra/plugins/datepicker/datepicker3.css">
+
     
 <script>
 
-$('#receipt_date').datepicker({
-        format: "dd/mm/yyyy",
-        autoclose: true,
-        orientation: "top",
-        endDate: "today"
-});
 
 
 $('.return_btn').click(function(event){
@@ -477,10 +469,13 @@ $('#current_fee').keyup(function(e) {
 });
 
 $('#current_fee_ajust_box').click(function(){
-    
+    var total_amount = $('#total_amount').val();
     if($(this).prop("checked") == false){
         //Overall Total
         $('#current_fee').prop("disabled", true);
+
+        $('#current_fee').val(0);
+        $('#overall_total_amount').val(total_amount);
     }else{
         //Overall Total
         $('#current_fee').prop("disabled", false);
@@ -521,10 +516,21 @@ $('#pay_fees_online').click(function(event){
         return false;
     }
 
+    var receipt_date = $('#receipt_date').val();
+    if(receipt_date == ''){
+        iziToast.warning({
+            title: 'Warning',
+            message: 'Please Select Date Of Payment',
+        });
+        return false;
+    }
 
     var FORMDATA = $('#formInfo').serializeArray();
     var SBM_Id = $('#SBM_Id').val();
-    var receipt_date = $('#receipt_date').val();
+
+    var student_Id = $('#student_Id').val();
+
+    
   
   $("#loader").css("display", "block");
   $("#DisplayDiv").css("display", "none");
@@ -537,20 +543,27 @@ $('#pay_fees_online').click(function(event){
       success:function(response){
           //Checking Status 
           if(response['status'] == 'success') {
+              
               $.ajax({
-                  url:'./fee_management/srh_existing_student_fees.php',
-                  type:'GET',
-                  success:function(response1){
-                      $('#DisplayDiv').html(response1);
-                      $("#loader").css("display", "none");
-                      $("#DisplayDiv").css("display", "block");
-                  },
-              });
+                url:'./fee_management/existing_student_pay_fee_details.php',
+                type:'GET',
+                data: {SBM_Id: SBM_Id, student_Id:student_Id},
+                success:function(si_logs){
+                    $('#DisplayDiv').html(si_logs);
+                    $("#loader").css("display", "none");
+                    $("#DisplayDiv").css("display", "block");
+                    
+                    
+                },
+            });  
 
-              iziToast.success({
-                  title: 'Success',
-                  message: 'Receipt Generated Successfully',
-              });
+            iziToast.success({
+                        title: 'Success',
+                        message: 'Receipt Generated Successfully',
+                    });
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+            
           }else{
             $("#loader").css("display", "none");
             $("#DisplayDiv").css("display", "block");
@@ -564,6 +577,14 @@ $('#pay_fees_online').click(function(event){
  });
 });
 
+
+
+$('.receipt_Sel').click(function(e){
+    var R_Id = $(this).attr('id');
+    var SBM_Id = $('#SBM_Id').val();
+
+    window.open("./fee_management/receipts.php?R_Id="+ R_Id +"&SBM_Id="+SBM_Id, "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=800,left=800,width=400,height=400"); 
+});
 
 </script>
 
@@ -601,3 +622,13 @@ input:disabled {
     background-color: #eee;          
 }
 </style>
+<script>
+
+$('#receipt_date').datepicker({
+        format: "dd/mm/yyyy",
+        autoclose: true,
+        endDate: "today",
+        startDate: "-52w"
+    });
+</script>
+

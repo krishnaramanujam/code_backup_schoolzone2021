@@ -125,6 +125,35 @@ $('#InstanceMaster_Table').DataTable( {
 $('#InstanceMaster_Table').dataTable().yadcf([
     {column_number: 1, filter_match_mode: "exact"},
 ]);
+
+
+
+
+//Manage Instance Btn----------------------------------------------------------------------------------------------------------
+$('.receive_fee_btn').click(function(event){
+    event.preventDefault();
+    var selected_instance_Id = $(this).attr('id');
+    var student_Id = $('#student_Id').val();
+    $("#loader").css("display", "block");
+    $("#DisplayDiv").css("display", "none");
+
+    $.ajax({
+        url:'./fee_management/existing_student_pay_fee_details.php',
+        type:'GET',
+        data: {SBM_Id: selected_instance_Id, student_Id:student_Id},
+        success:function(si_logs){
+            $('#DisplayDiv').html(si_logs);
+            $("#loader").css("display", "none");
+            $("#DisplayDiv").css("display", "block");
+        },
+    });  
+   
+
+});
+//Manage Instance Btn close----------------------------------------------------------------------------------------------------------
+
+
+
 </script>
 <?php } // close isset ?> 
 <!-- -------------------------------------------------------------------------------------------------- -->
@@ -149,40 +178,15 @@ $('#FilterForm').submit(function(e){
         data: {student_Id:student_Id},
         success:function(srh_response){
             $('#DisplayDiv').html(srh_response);
+       
             $("#loader").css("display", "none");
             $("#DisplayDiv").css("display", "block");
-
         },
    });
 
 
 
 });
-
-
-
-//Manage Instance Btn----------------------------------------------------------------------------------------------------------
-$('.receive_fee_btn').click(function(event){
-    var selected_instance_Id = $(this).attr('id');
-    var student_Id = $('#student_Id').val();
-    $("#loader").css("display", "block");
-    $("#DisplayDiv").css("display", "none");
-
-    $.ajax({
-        url:'./fee_management/existing_student_pay_fee_details.php',
-        type:'GET',
-        data: {SBM_Id: selected_instance_Id, student_Id:student_Id},
-        success:function(si_logs){
-            $('#DisplayDiv').html(si_logs);
-            $("#loader").css("display", "none");
-            $("#DisplayDiv").css("display", "block");
-        },
-    });  
-
-});
-//Manage Instance Btn close----------------------------------------------------------------------------------------------------------
-
-
 
 </script>
 

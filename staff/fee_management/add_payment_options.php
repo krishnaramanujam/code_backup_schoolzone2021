@@ -193,10 +193,7 @@
             </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
 </form>
-<link rel="stylesheet" href="../extra/plugins/datepicker/datepicker3.css">
-<link rel="stylesheet" href="../extra/plugins/daterangepicker/daterangepicker.css">
-<script src="../extra/plugins/datepicker/bootstrap-datepicker.js"></script>
-<link rel="stylesheet" href="../extra/plugins/datepicker/datepicker3.css">
+
 
 <script>
 
@@ -448,23 +445,19 @@ $('#model_save_btn').click(function(e){
 $('#dd_date').datepicker({
             format: "dd/mm/yyyy",
             autoclose: true,
-            orientation: "top",
-            endDate: "today"
+            endDate: "today",
+            startDate: "-52w"
 
 });
 
 $('#cheque_date').datepicker({
         format: "dd/mm/yyyy",
         autoclose: true,
-        orientation: "top",
-        endDate: "today"
+        endDate: "today",
+        startDate: "-52w"
 });
 
 
 </script>
 
-<script
-    src="https://code.jquery.com/jquery-2.2.4.min.js"
-    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-    crossorigin="anonymous"></script>
 

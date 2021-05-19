@@ -200,9 +200,9 @@ if(isset($_GET['Add_FeeForNewExistingStudents'])){
                 $Feestructuredetail_Id = $FSD_Id[$j];
 
                 $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into fee_receiptsdetails
-                (feemaster_Id, feereceipts_Id, Fee_name, amount, feestructuredetails_Id, feeheadertype_Id, feeheader_Id, SBM_Id) 
+                (feemaster_Id, feereceipts_Id, Fee_name, amount, feestructuredetails_Id, feeheadertype_Id, feeheader_Id, SBM_Id, receiptheader_Id) 
                 Values
-                ('$Feemaster_Id', '0', '$r_fee_masterdetail[header_name]', '$receiptdetailamt[0]', '$Feestructuredetail_Id', '$r_fee_masterdetail[feeheadertype_Id]', '$r_fee_masterdetail[feeheader_Id]', '$SBM_Id[$s]')");
+                ('$Feemaster_Id', '0', '$r_fee_masterdetail[header_name]', '$receiptdetailamt[0]', '$Feestructuredetail_Id', '$r_fee_masterdetail[feeheadertype_Id]', '$r_fee_masterdetail[feeheader_Id]', '$SBM_Id[$s]' , '$r_fee_masterdetail[receiptheader_Id]')");
 
 
                 unset($receiptdetailamt); unset($Feemaster_Id); unset($Feestructuredetail_Id);
@@ -255,9 +255,9 @@ if(isset($_GET['Edit_FeeForNewExistingStudents'])){
                 $Feestructuredetail_Id = $FSD_Id[$j];
 
                 $Inserting_StaffQualification = mysqli_query($mysqli,"Insert into fee_receiptsdetails
-                (feemaster_Id, feereceipts_Id, Fee_name, amount, feestructuredetails_Id, feeheadertype_Id, feeheader_Id, SBM_Id) 
+                (feemaster_Id, feereceipts_Id, Fee_name, amount, feestructuredetails_Id, feeheadertype_Id, feeheader_Id, SBM_Id, receiptheader_Id) 
                 Values
-                ('$Feemaster_Id', '0', '$r_fee_masterdetail[header_name]', '$receiptdetailamt[0]', '$Feestructuredetail_Id', '$r_fee_masterdetail[feeheadertype_Id]', '$r_fee_masterdetail[feeheader_Id]', '$SBM_Id')");
+                ('$Feemaster_Id', '0', '$r_fee_masterdetail[header_name]', '$receiptdetailamt[0]', '$Feestructuredetail_Id', '$r_fee_masterdetail[feeheadertype_Id]', '$r_fee_masterdetail[feeheader_Id]', '$SBM_Id', '$r_fee_masterdetail[receiptheader_Id]')");
 
 
                 unset($receiptdetailamt); unset($Feemaster_Id); unset($Feestructuredetail_Id);
@@ -286,7 +286,12 @@ if(isset($_GET['GenerateReceipt_FeeForNewExistingStudents'])){
     $SBM_Id = $_GET['SBM_Id'];
     $Receipt_date = $_GET['Receipt_date'];
 
-    $RD_date = date( 'Y-m-d', strtotime( str_replace( '/', '-', $Receipt_date ) ) );
+
+    if(!empty($Receipt_date)){
+        $RD_date = date( 'Y-m-d', strtotime( str_replace( '/', '-', $Receipt_date ) ) );
+    }else{
+        $RD_date = '';
+    }
 
     $ActiveStaffLogin_Id = $_SESSION['schoolzone']['ActiveStaffLogin_Id'];
     $SectionMaster_Id = $_SESSION['schoolzone']['SectionMaster_Id'];
@@ -295,6 +300,8 @@ if(isset($_GET['GenerateReceipt_FeeForNewExistingStudents'])){
     $time = date("Y-m-d h:m:s");
 
     try {
+
+        $message = '';
 
         //Fetching Student Details For Receipt Generation
         $student_details_q = mysqli_query($mysqli, "SELECT user_studentregister.student_name, user_studentregister.student_Id, user_studentbatchmaster.Id AS SBM_Id, setup_batchmaster.Id As BM_Id,user_studentregister.CR_Id, user_studentbatchmaster.applicationDetails_Id As AD_Id, user_studentregister.Id As SR_Id  FROM user_studentbatchmaster JOIN user_studentregister ON user_studentregister.SBM_Id = user_studentbatchmaster.Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id  JOIN setup_programmaster ON setup_programmaster.Id = setup_batchmaster.programmaster_Id JOIN setup_streammaster ON setup_streammaster.Id = setup_programmaster.streammaster_Id WHERE  user_studentbatchmaster.Id  = '$SBM_Id'");
@@ -311,7 +318,7 @@ if(isset($_GET['GenerateReceipt_FeeForNewExistingStudents'])){
         $last_receipt_no = (int)$r_next_receipt['receipt_no'];
 
         // pading the receipt_no with zero to get receipt number: 0001
-        $receipt_no = str_pad( ++$last_receipt_no, 4, '0', STR_PAD_LEFT );
+        $receipt_no = ++$last_receipt_no;
 
 
         //Inserting Fees Reciept
@@ -319,41 +326,93 @@ if(isset($_GET['GenerateReceipt_FeeForNewExistingStudents'])){
         values 
         ('$r_student_details[BM_Id]', '$r_student_details[CR_Id]', '$r_student_details[SR_Id]', '$SBM_Id', '$r_student_details[AD_Id]', '$r_student_details[student_name]', '$receipt_no', '$overall_total_amount', '$RD_date', '$fee_header_type_Id', '$ActiveStaffLogin_Id', '$time')"); 
 
+        
+        if(mysqli_error($mysqli)){
+            $message = 'Error(R)'; 
+        }
+
         $receipt_Id = mysqli_insert_id($mysqli);
 
 
-        if(isset($fees_details_Id)) {
+        // if(isset($fees_details_Id)) {
+
+        //     //Now Update Fee Details Status
+        //     foreach($fees_details_Id as $index => $value) {
+        //         //Getting Receipt Header Id
+        //         if($index == 0){
+        //             //Receipt 
+        //             $headerId_q = mysqli_query($mysqli, "Select fee_receiptsdetails.receiptheader_Id from fee_receiptsdetails where fee_receiptsdetails.Id = '$fees_details_Id[$index]'");
+        //             $r_headerId = mysqli_fetch_array($headerId_q);
+        //         }
+
+        //         $Update_fees_status = mysqli_query($mysqli,"Update fee_receiptsdetails set feepaymentstatus = '1' , feeReceipts_Id = '$receipt_Id' Where fee_receiptsdetails.Id = '$fees_details_Id[$index]'");
+
+        //         if(mysqli_error($mysqli)){
+        //             $message = 'Error(RD)'; 
+        //         }
+        //     }// close Foreach
+
+        // }// close FSD_Id
+
+
+        if(isset($paymentmode_sr)) {
 
             //Now Update Fee Details Status
-            foreach($fees_details_Id as $index => $value) {
+            foreach($paymentmode_sr as $index => $value) {
 
-                $Update_fees_status = mysqli_query($mysqli,"Update fee_receiptsdetails set feepaymentstatus = '1' , feeReceipts_Id = '$receipt_Id' Where fee_receiptsdetails.Id = '$fees_details_Id[$index]'");
+                //INstrument Date
+                if(!empty($instrument_date[$index])){
+                    $ID_date = date( 'Y-m-d', strtotime( str_replace( '/', '-', $instrument_date[$index] ) ) );
+                }else{
+                    $ID_date = '';
+                }
+
+                $Update_fees_status = mysqli_query($mysqli,"Insert into paymentdetails_master
+                (feereceipt_Id, mode_of_payment, date_of_payment, instrument_no, instrument_date, amount, bankmaster_Id, RRN, APPR) values 
+                ('$receipt_Id', '$paymentmodeId[$index]', '$RD_date', '$instrument_no[$index]','$ID_date' ,'$paymentamt[$index]','$bankmaster_Id[$index]', '$rrn[$index]', '$appr[$index]')");
+
+                if(mysqli_error($mysqli)){
+                    $message = 'Error(PD)'; 
+                }else{
+                    $PD_Ids[] = mysqli_insert_id($mysqli);
+                }    
 
             }// close Foreach
 
         }// close FSD_Id
 
 
-        if(isset($fees_details_Id)) {
-
-            //Now Update Fee Details Status
-            foreach($fees_details_Id as $index => $value) {
-
-                $Update_fees_status = mysqli_query($mysqli,"Update fee_receiptsdetails set feepaymentstatus = '1' , feeReceipts_Id = '$receipt_Id' Where fee_receiptsdetails.Id = '$fees_details_Id[$index]'");
-
-            }// close Foreach
-
-        }// close FSD_Id
-
+        if(isset($PD_Ids)){
+            $format_PD_Id = implode(",",$PD_Ids);
+        }else{
+            $format_PD_Id = 'NA';
+        }
+    
+        //Ajustment Fees
+        if(isset($current_fee_ajust_box) AND $current_fee != '0'){
+            $Inserting_ajustment = mysqli_query($mysqli,"Insert into adjustment_fees_master(SR_Id, receipt_Id, paymentdetails_Id, amount) values ('$r_student_details[SR_Id]', '$receipt_Id', '$format_PD_Id', '$current_fee')");
+        }
         
 
-       
-        mysqli_commit( $mysqli);
-        mysqli_query( $mysqli, 'SET foreign_key_checks = 1');
-        mysqli_query( $mysqli, 'SET AUTOCOMMIT = 1' );
+        if(empty($message)){
 
-        $res['status'] = 'success';
-        echo json_encode($res);
+            $updating_Receipt = mysqli_query($mysqli, "Update fee_receipts set receiptheader_Id = '$r_headerId[receiptheader_Id]' Where fee_receipts.Id = '$receipt_Id'");
+
+
+            mysqli_commit( $mysqli);
+            mysqli_query( $mysqli, 'SET foreign_key_checks = 1');
+            mysqli_query( $mysqli, 'SET AUTOCOMMIT = 1' );
+
+            $res['status'] = 'success';
+            echo json_encode($res);
+        }else{
+
+            mysqli_rollback($mysqli);        
+            $res['message'] = $message;    
+            $res['status'] = 'failed';
+            echo json_encode($res);
+        }
+       
     }// close try
     catch(Exception $e){
 
@@ -361,11 +420,12 @@ if(isset($_GET['GenerateReceipt_FeeForNewExistingStudents'])){
 
         mysqli_rollback($mysqli);
 
+        
+        $res['status'] = 'failed';
+        echo json_encode($res);
+
     } // close catch
     
-
-    $res['status'] = 'success';
-    echo json_encode($res);
 
     
 }

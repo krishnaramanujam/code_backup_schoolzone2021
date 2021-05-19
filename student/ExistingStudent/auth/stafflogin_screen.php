@@ -6,7 +6,7 @@ ini_set('memory_limit','-1');
 ini_set('display_errors',1);
 error_reporting(E_ALL);
 
-include('../../../config/database.php');
+include('../../../config/database_student.php');
 
 $SM_Id = $_GET['SM_Id'];
 

@@ -104,7 +104,7 @@ function hasAccess($permission = [])
 
 
   <link rel="stylesheet" href="../extra/dist/css/index1_style.css">
-  <link rel="stylesheet" href="../extra/plugins/datepicker/datepicker3.css">
+  
 </head>
 <body class="hold-transition skin-grey sidebar-mini skin-blue fixed-padding" onload=display_c();>
 
@@ -599,9 +599,7 @@ function hasAccess($permission = [])
   
   <!-- daterangepicker -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
-  <script src="../extra/plugins/daterangepicker/daterangepicker.js"></script>
-  <!-- datepicker -->
-  <script src="../extra/plugins/datepicker/bootstrap-datepicker.js"></script>
+
 
 
   <script> var AdminLTEOptions = {navbarMenuHeight: "10px",}; </script>
@@ -654,6 +652,10 @@ function hasAccess($permission = [])
 <script src="../assets/plugins/datatables/dataTables.fnGetFilteredNodes.js"></script>
 <script src="https://cdn.datatables.net/plug-ins/1.10.15/api/sum().js"></script>
 
+
+<!-- Date Picker -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 
 
@@ -926,10 +928,6 @@ $('.directloginback_btn').click(function(event){
 
 
 <script>
-      $('#staff_dateofbirth').datepicker({
-          format: 'dd/mm/yyyy',
-          autoclose: true
-      });
       
       $('.NewPasswordContainer').hide();
       $('.NewEmailContainer').hide();
@@ -956,6 +954,10 @@ $('.directloginback_btn').click(function(event){
           $('.NewMobileContainer').hide();
         }
 
+      });
+
+      $('#staff_dateofbirth').datepicker({
+          format: 'dd/mm/yyyy'
       });
 </script>
 

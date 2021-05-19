@@ -16,11 +16,12 @@ if ( isset( $_SESSION['schoolzone_student']['SectionMaster_Id'] ) AND  isset( $_
 $Admin_Registeration_Id = $Activestudentregister_Id;
 
 //Fetching User Details
-$data_query = "SELECT user_studentregister.student_name AS username, setup_sectionmaster.abbreviation AS section_abbreviation , setup_batchmaster.batch_name, user_studentbatchmaster.batchMaster_Id FROM user_studentregister JOIN user_studentbatchmaster ON user_studentbatchmaster.Id = user_studentregister.SBM_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = user_studentregister.sectionmaster_Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id WHERE user_studentregister.Id = '$Activestudentregister_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id'  ";
+$data_query = "SELECT user_studentregister.student_name AS username, setup_sectionmaster.abbreviation AS section_abbreviation , setup_batchmaster.batch_name, user_studentbatchmaster.batchMaster_Id,user_studentbatchmaster.Id As SBM_Id FROM user_studentregister JOIN user_studentbatchmaster ON user_studentbatchmaster.Id = user_studentregister.SBM_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = user_studentregister.sectionmaster_Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id WHERE user_studentregister.Id = '$Activestudentregister_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id'  ";
 $fetch_data_q = mysqli_query($mysqli,$data_query);
 
 $r_Staffdata_fetch = mysqli_fetch_array($fetch_data_q);
 
+$_SESSION['schoolzone_student']['SBM_Id'] = $r_Staffdata_fetch['SBM_Id'];
 
 $BM_Id = $r_Staffdata_fetch['batchMaster_Id'];
 
