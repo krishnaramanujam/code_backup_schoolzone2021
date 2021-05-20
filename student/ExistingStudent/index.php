@@ -16,12 +16,13 @@ if ( isset( $_SESSION['schoolzone_student']['SectionMaster_Id'] ) AND  isset( $_
 $Admin_Registeration_Id = $Activestudentregister_Id;
 
 //Fetching User Details
-$data_query = "SELECT user_studentregister.student_name AS username, setup_sectionmaster.abbreviation AS section_abbreviation , setup_batchmaster.batch_name, user_studentbatchmaster.batchMaster_Id,user_studentbatchmaster.Id As SBM_Id FROM user_studentregister JOIN user_studentbatchmaster ON user_studentbatchmaster.Id = user_studentregister.SBM_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = user_studentregister.sectionmaster_Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id WHERE user_studentregister.Id = '$Activestudentregister_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id'  ";
+$data_query = "SELECT user_studentregister.student_name AS username, setup_sectionmaster.abbreviation AS section_abbreviation , setup_batchmaster.batch_name, user_studentbatchmaster.batchMaster_Id,user_studentbatchmaster.Id As SBM_Id,user_studentregister.CR_Id  FROM user_studentregister JOIN user_studentbatchmaster ON user_studentbatchmaster.Id = user_studentregister.SBM_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = user_studentregister.sectionmaster_Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id WHERE user_studentregister.Id = '$Activestudentregister_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id'  ";
 $fetch_data_q = mysqli_query($mysqli,$data_query);
 
 $r_Staffdata_fetch = mysqli_fetch_array($fetch_data_q);
 
-$_SESSION['schoolzone_student']['SBM_Id'] = $r_Staffdata_fetch['SBM_Id'];
+//Student Session Info
+$_SESSION['schoolzone_student']['CR_Id'] = $r_Staffdata_fetch['CR_Id'];
 
 $BM_Id = $r_Staffdata_fetch['batchMaster_Id'];
 
@@ -101,8 +102,8 @@ function hasAccess($permission = [])
     <a href="" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"><b> <?php echo $r_Staffdata_fetch['section_name']; ?> </b></span>
+      <span class="logo-lg" style="text-transform: uppercase;"><b> SCHOOLZONE </b></span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg" style="text-transform: uppercase;"><b> <?php echo $r_Staffdata_fetch['section_abbreviation']; ?> </b></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -152,11 +153,12 @@ function hasAccess($permission = [])
         </li>
 
 
-          <li class="dropdown user user-menu timeView" style="margin-right: 10px">
-            <div align="right" style="min-width: 310px; margin: 0 auto; padding-bottom: 15px; padding-top: 15px">
+        <li class="dropdown user user-menu timeView" style="margin-right: 10px">
+            <div align="right" style="min-width: 310px; margin: 0 auto; padding-bottom: 15px; padding-top: 15px" class="nav-time-view">
               <span id="UTCtime" style="color: #fff"></span>
             </div>
           </li>
+
 
 
         </ul>
@@ -529,6 +531,18 @@ echo $page;
 
 <!-- ======================================================================================= -->
 
+<!-- ======================================================================================= -->
+<?php 
+
+//Fetching User Details
+$data_query = "SELECT setup_sectionmaster.section_name,setup_sectionmaster.section_logo,setup_sectionmaster.address,setup_sectionmaster.abbreviation FROM setup_sectionmaster  WHERE  setup_sectionmaster.Id = '$SectionMaster_Id' ";
+$fetch_data_q = mysqli_query($mysqli,$data_query);
+
+$r_Staffdata_fetch    = mysqli_fetch_array($fetch_data_q);
+?>
+<div  style="padding-top: 0px;padding-bottom: 0px;background-color: transparent;text-align:center;background-color: white;" class="global-header-div">
+  <h3 class="text-warning global-header-title"><img src="../../<?php echo $r_Staffdata_fetch['section_logo']; ?>" style="border-radius: 50%;max-width: 120px;max-height: 100px;" class="global-header-img"/><?php echo  $r_Staffdata_fetch['section_name']; ?></h3>
+</div>
 
     <div id="loader" style="display:none;"></div>
     <!-- Main content -->
@@ -888,11 +902,44 @@ echo $page;
     
 @media screen and (max-width: 750px) {
 
-  .navbar {
-    display: flex;
-  }
+.navbar {
+  display: flex;
+}
+
+.global-header-div{
+  margin-top: 70px !important;
+}
+
+.global-header-title{
+  font-size: 15px;
+}
+
+  
+.global-header-img{
+  margin-right: 0px !important;
+}
+
+
+.mobile-logo{
+  display:block ;
+}
+
+.nav-time-view{
+  text-align:center !important;
+}
 
 }
 
+.global-header-div{
+  margin-top: -25px;
+}
+
+.global-header-img{
+margin-right: 10px;
+}
+
+.mobile-logo{
+display:none;
+}
 
 </style>

@@ -115,9 +115,11 @@ function hasAccess($permission = [])
     <!-- Logo -->
     <a href="" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
+    
+      
       <span class="logo-mini"><b> <?php echo $r_Staffdata_fetch['section_name']; ?> </b></span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg" style="text-transform: uppercase;"><b> <?php echo $r_Staffdata_fetch['section_abbreviation']; ?> </b></span>
+      <span class="logo-lg" style="text-transform: uppercase;"><b> SCHOOLZONE </b></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -192,7 +194,7 @@ function hasAccess($permission = [])
 
 
           <li class="dropdown user user-menu timeView" style="margin-right: 10px">
-            <div align="right" style="min-width: 310px; margin: 0 auto; padding-bottom: 15px; padding-top: 15px">
+            <div align="right" style="min-width: 310px; margin: 0 auto; padding-bottom: 15px; padding-top: 15px" class="nav-time-view">
               <span id="UTCtime" style="color: #fff"></span>
             </div>
           </li>
@@ -551,7 +553,17 @@ function hasAccess($permission = [])
 
 
 <!-- ======================================================================================= -->
+<?php 
 
+//Fetching User Details
+$data_query = "SELECT setup_sectionmaster.section_name,setup_sectionmaster.section_logo,setup_sectionmaster.address,setup_sectionmaster.abbreviation FROM setup_sectionmaster  WHERE  setup_sectionmaster.Id = '$SectionMaster_Id' ";
+$fetch_data_q = mysqli_query($mysqli,$data_query);
+
+$r_Staffdata_fetch    = mysqli_fetch_array($fetch_data_q);
+?>
+<div  style="padding-top: 0px;padding-bottom: 0px;background-color: transparent;text-align:center;background-color: white;" class="global-header-div">
+  <h3 class="text-warning global-header-title"><img src="../<?php echo $r_Staffdata_fetch['section_logo']; ?>" style="border-radius: 50%;max-width: 120px;max-height: 100px;" class="global-header-img"/><?php echo  $r_Staffdata_fetch['section_name']; ?></h3>
+</div>
 
     <div id="loader" style="display:none;"></div>
     <!-- Main content -->
@@ -687,7 +699,7 @@ function hasAccess($permission = [])
     function display_ct() {
       var strcount;
       var x = new Date();
-      var NewFormatDate = x.toString().slice(0, 24);
+      var NewFormatDate = x.toString().slice(0, 21);
       document.getElementById('UTCtime').innerHTML = NewFormatDate;
       tt = display_c();
     }
@@ -970,7 +982,40 @@ $('.directloginback_btn').click(function(event){
     display: flex;
   }
 
+  .global-header-div{
+    margin-top: 70px !important;
+  }
+
+  .global-header-title{
+    font-size: 15px;
+  }
+  
+    
+  .global-header-img{
+    margin-right: 0px !important;
+  }
+
+  
+  .mobile-logo{
+    display:block ;
+  }
+
+  .nav-time-view{
+    text-align:center !important;
+  }
+
 }
 
+.global-header-div{
+    margin-top: -25px;
+}
+
+.global-header-img{
+  margin-right: 10px;
+}
+
+.mobile-logo{
+  display:none;
+}
 
 </style>

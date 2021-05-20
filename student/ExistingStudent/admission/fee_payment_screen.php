@@ -11,14 +11,29 @@ include('../../../config/database_student.php');
 
 $SectionMaster_Id = $_SESSION['schoolzone_student']['SectionMaster_Id'];
 $Activestudentregister_Id = $_SESSION['schoolzone_student']['Activestudentregister_Id'];
-$CurrentSBM_Id = $_SESSION['schoolzone_student']['SBM_Id'];
-//Fetching StudentName
-$fetch_data_q = mysqli_query($mysqli,"SELECT user_studentregister.* FROM user_studentbatchmaster join `user_studentregister` on user_studentbatchmaster.studentRegister_Id = user_studentregister.Id WHERE user_studentbatchmaster.Id = '$CurrentSBM_Id'");
+$CR_Id = $_SESSION['schoolzone_student']['CR_Id'];
 
-$r_fetch_data = mysqli_fetch_array($fetch_data_q);
+//Student Details
+$student_data_query = "SELECT user_studentregister.student_name AS username, setup_sectionmaster.abbreviation AS section_abbreviation , setup_batchmaster.batch_name, user_studentbatchmaster.batchMaster_Id,user_studentbatchmaster.Id As SBM_Id,user_studentregister.CR_Id, user_studentregister.student_Id  FROM user_studentregister JOIN user_studentbatchmaster ON user_studentbatchmaster.Id = user_studentregister.SBM_Id JOIN setup_sectionmaster ON setup_sectionmaster.Id = user_studentregister.sectionmaster_Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id WHERE user_studentregister.Id = '$Activestudentregister_Id' AND setup_sectionmaster.Id = '$SectionMaster_Id'  ";
+$student_fetch_data_q = mysqli_query($mysqli,$student_data_query);
+$r_student_fetch = mysqli_fetch_array($student_fetch_data_q);
+
+
+//Fetching SBM
+$fetch_data_q = mysqli_query($mysqli,"SELECT user_studentregister.* FROM user_studentbatchmaster JOIN `user_studentregister` ON user_studentbatchmaster.studentRegister_Id = user_studentregister.Id JOIN setup_batchmaster ON setup_batchmaster.Id = user_studentbatchmaster.batchMaster_Id WHERE user_studentregister.Id = '$Activestudentregister_Id' AND setup_batchmaster.academicyear_Id = '$Acadmic_Year_ID' AND user_studentregister.sectionmaster_Id = '$SectionMaster_Id' ");
+$row_fetch_data = mysqli_num_rows($fetch_data_q);
+
+if($row_fetch_data > 0){
+    $r_fetch_data = mysqli_fetch_array($fetch_data_q);
+    $SBM_Id = $r_fetch_data['SBM_Id'];
+}else{
+    $SBM_Id = '';
+}
+
+
 
 //Finding AD_Id
-$app_data_q = mysqli_query($mysqli,"SELECT  user_applicationdetails.Id as AD_Id FROM user_applicationdetails JOIN setup_batchmaster ON setup_batchmaster.Id = user_applicationdetails.batchMaster_Id WHERE user_applicationdetails.candidateRegister_Id = '$r_fetch_data[CR_Id]' AND setup_batchmaster.academicYear_Id = '$Acadmic_Year_ID'");
+$app_data_q = mysqli_query($mysqli,"SELECT  user_applicationdetails.Id as AD_Id FROM user_applicationdetails JOIN setup_batchmaster ON setup_batchmaster.Id = user_applicationdetails.batchMaster_Id WHERE user_applicationdetails.candidateRegister_Id = '$r_student_fetch[CR_Id]' AND setup_batchmaster.academicYear_Id = '$Acadmic_Year_ID'");
 $row_app_data = mysqli_num_rows($app_data_q);
 
 if($row_app_data > 0){
@@ -44,12 +59,12 @@ if($row_app_data > 0){
 
             <div class="col-md-3" style="text-align:center;"><label>Student Name :</label></div>
             <div class="col-md-4">
-                <span class="text-primary"><?php echo $r_fetch_data['student_name']; ?></span>
+                <span class="text-primary"><?php echo $r_student_fetch['username']; ?></span>
             </div>
 
             <div class="col-md-2" style="text-align:center;"><label>Student Id :</label></div>
             <div class="col-md-3">
-                <span class="text-primary"><?php echo $r_fetch_data['student_Id']; ?></span>
+                <span class="text-primary"><?php echo $r_student_fetch['student_Id']; ?></span>
             </div>
 
         </div><!--DD Row1 Close-->
@@ -66,7 +81,7 @@ if($row_app_data > 0){
         <div class="box">
             <?php
             //Fetching Unique Header type 
-            $header_type_q = mysqli_query($mysqli, "SELECT fee_receiptsdetails.feeheadertype_Id, fee_headertype.headertype_name FROM fee_receiptsdetails JOIN fee_headertype ON fee_headertype.Id = fee_receiptsdetails.feeheadertype_Id WHERE (fee_receiptsdetails.SBM_Id = '$CurrentSBM_Id' OR fee_receiptsdetails.applicationdetails_Id = '$AD_Id') AND( fee_receiptsdetails.feeheadertype_Id IS NOT NULL OR fee_receiptsdetails.feeheadertype_Id != '' ) GROUP BY fee_receiptsdetails.feeheadertype_Id ORDER BY fee_headertype.sequence ASC ");
+            $header_type_q = mysqli_query($mysqli, "SELECT fee_receiptsdetails.feeheadertype_Id, fee_headertype.headertype_name FROM fee_receiptsdetails JOIN fee_headertype ON fee_headertype.Id = fee_receiptsdetails.feeheadertype_Id WHERE (fee_receiptsdetails.SBM_Id = '$SBM_Id' OR fee_receiptsdetails.applicationdetails_Id = '$AD_Id') AND( fee_receiptsdetails.feeheadertype_Id IS NOT NULL OR fee_receiptsdetails.feeheadertype_Id != '' ) GROUP BY fee_receiptsdetails.feeheadertype_Id ORDER BY fee_headertype.sequence ASC ");
             $row_header_type = mysqli_num_rows($header_type_q);
 
                 if($row_header_type > 0){
@@ -122,7 +137,7 @@ if($row_app_data > 0){
                                 fee_receiptsdetails 
                               WHERE
                                 fee_receiptsdetails.feepaymentstatus = 0 AND fee_receiptsdetails.feereceipts_Id = 0 AND (
-                                  fee_receiptsdetails.SBM_Id = '$CurrentSBM_Id' OR fee_receiptsdetails.applicationdetails_Id = '$AD_Id'
+                                  fee_receiptsdetails.SBM_Id = '$SBM_Id' OR fee_receiptsdetails.applicationdetails_Id = '$AD_Id'
                                 ) AND fee_receiptsdetails.feeheadertype_Id = '$feedetails_val[headerType]' AND fee_receiptsdetails.amount != '0'");
 
                                 $row_fees_details = mysqli_num_rows($fee_details_query);
@@ -139,7 +154,7 @@ if($row_app_data > 0){
                                             <button class="btn btn-warning pending_btn" id="<?php echo $r_order_status['order_id']; ?>" type="button">Pending</button>
                                         <?php } ?>
                                     <?php $pending_count++; }elseif($row_fees_details > '0') { ?>
-                                        <button class="btn btn-primary fee_details_btn"  type="button" id="<?php echo $AD_Id; ?>" fee-header-type="<?php echo $feedetails_val['headerType']; ?>">link</button>
+                                        <button class="btn btn-primary fee_details_btn"  type="button" id="<?php echo $AD_Id; ?>" fee-header-type="<?php echo $feedetails_val['headerType']; ?>"  SBM-Id="<?php echo $SBM_Id; ?>">link</button>
                                     <?php } ?>
 
 
@@ -177,7 +192,7 @@ if($row_app_data > 0){
 <hr>
 <?php
 
-$receipt_q = mysqli_query($mysqli,"SELECT fee_receipts.*, fee_receipts.Id as frid, setup_batchmaster.Batch_Name FROM fee_receipts JOIN setup_batchmaster ON setup_batchmaster.Id = fee_receipts.batchMaster_Id WHERE fee_receipts.SBM_Id = '$CurrentSBM_Id'  ");
+$receipt_q = mysqli_query($mysqli,"SELECT fee_receipts.*, fee_receipts.Id as frid, setup_batchmaster.Batch_Name FROM fee_receipts JOIN setup_batchmaster ON setup_batchmaster.Id = fee_receipts.batchMaster_Id WHERE fee_receipts.SBM_Id = '$SBM_Id'  ");
 
 $row_receipt_q = mysqli_num_rows($receipt_q);
 
@@ -299,6 +314,7 @@ $('.pending_btn').click(function(e){
 $('.fee_details_btn').click(function(e){
     var application_Id = $(this).attr('id');
     var headertypeId = $(this).attr('fee-header-type');
+    var SBM_Id = $(this).attr('SBM-Id');
 
     $("#loader").css("display", "block");
     $("#DisplayDiv").css("display", "none");
@@ -306,7 +322,7 @@ $('.fee_details_btn').click(function(e){
     $.ajax({
         type:'GET',
         url:'./admission/fee_details_screen.php',
-        data : {application_Id:application_Id, headertypeId:headertypeId},
+        data : {AD_Id:application_Id, headertypeId:headertypeId, SBM_Id:SBM_Id},
         success:function(response){
             $('#DisplayDiv').html(response);
             $("#loader").css("display", "none");

@@ -17,7 +17,7 @@ $r_Staffdata_fetch = mysqli_fetch_array($fetch_data_q);
 
 
 
-<h3 style="text-align:center;font-weight: 700;" class="text-warning">EXISTING STUDENT PORTAL <?php echo $Acadmic_Year_ID; ?> <br><br> <?php echo $r_Staffdata_fetch['section_name']; ?>
+<h3 style="text-align:center;font-weight: 700;" class="text-warning">EXISTING STUDENT PORTAL 
     <br><br> 
 
     <?php
@@ -36,4 +36,3 @@ $r_Staffdata_fetch = mysqli_fetch_array($fetch_data_q);
 
 
     ?>
-
